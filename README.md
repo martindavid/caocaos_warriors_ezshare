@@ -22,11 +22,19 @@ Make sure you have this librarys/software installed in your machine:
 ### Steps
 **0. Import the project to eclipse**
 
+1. File -> Import -> Maven -> Existing maven project
+2. Select your code folder
+3. Finish
+
 ![Import project](https://media.giphy.com/media/l0Iy6gQxboYSaCw3m/giphy.gif)
 
 **1. Install any dependencies**
 
+1. Right click on the root project
+2. Select maven -> Update Project
+
 ![Install dependencies](https://media.giphy.com/media/3og0IvfO0V3XmQmaEo/giphy.gif)
+
 
 ### Running The App
 **0. Compile/Build the application**
