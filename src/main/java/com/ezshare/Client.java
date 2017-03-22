@@ -1,22 +1,15 @@
 package com.ezshare;
 
-import java.io.IOException;
-
+import org.apache.commons.cli.CommandLine;
 import org.pmw.tinylog.Logger;
-
-import com.ezshare.client.TCPClient;
 
 public class Client {
 	
-	public static void main(String[] main) {
+	public static void main(String[] args) {
 		Logger.info("Client is running");
-		TCPClient client = new TCPClient();
-		try {
-			client.Execute();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		CommandLine cmd = new Cli(args).parseClient();
+		
+		// TODO: put a logic to parse the argument
 	}
 
 }
