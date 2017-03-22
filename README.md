@@ -21,9 +21,11 @@ Make sure you have this librarys/software installed in your machine:
 
 ### Steps
 **0. Import the project to eclipse**
+
 ![Import project](https://media.giphy.com/media/l0Iy6gQxboYSaCw3m/giphy.gif)
 
 **1. Install any dependencies**
+
 ![Install dependencies](https://media.giphy.com/media/3og0IvfO0V3XmQmaEo/giphy.gif)
 
 ### Running The App
