@@ -11,6 +11,9 @@ public class Server {
 		Logger.info("Server is running");
 		CommandLine cmd = new Cli(args).parseServer();
 		
+		TCPServer server = new TCPServer();
+		server.Execute();
+		
 		// TODO: put a logic to parse the argument
 		if (cmd.hasOption(Constant.ADVERTISED_HOSTNAME)) {
 			Logger.info("Advertised Hostname passed with value: " + cmd.getOptionValue(Constant.ADVERTISED_HOSTNAME));

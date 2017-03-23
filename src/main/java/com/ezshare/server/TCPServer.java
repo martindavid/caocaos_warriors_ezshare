@@ -16,9 +16,10 @@ import java.net.Socket;
  * Created by mvalentino on 20/3/17.
  */
 public class TCPServer {
-
+	public Resources[] resources;
+	
     public void Execute() {
-
+    	
         int portNumber = 44457;
         try (
                 ServerSocket serverSocket =
@@ -31,8 +32,10 @@ public class TCPServer {
         ) {
             String inputLine;
             while ((inputLine = in.readLine()) != null) {
+            	Resources resource = new Resources();
+            	resource.description = inputLine;
                 Logger.info("Message from client: " + inputLine);
-                out.println(inputLine);
+                out.println(resource.toJson());
             }
         } catch (IOException e) {
             System.out.println("Exception caught when trying to listen on port "
