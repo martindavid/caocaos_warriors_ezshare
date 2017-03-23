@@ -1,4 +1,4 @@
-package com.ezshare.server;
+package com.ezshare;
 
 import java.io.IOException;
 
@@ -7,7 +7,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class Resources {
+public class Resource {
 	public String name;
 	public String description;
 	public String[] tags;
@@ -23,12 +23,12 @@ public class Resources {
 		return mapper.writeValueAsString(this);
 	}
 	
-	public static Resources fromJson(String jsonString) {
+	public static Resource fromJson(String jsonString) {
 		ObjectMapper mapper = new ObjectMapper();
 		
-		Resources parsedValue = null;
+		Resource parsedValue = null;
 		try {
-			parsedValue = mapper.readValue(jsonString, Resources.class);
+			parsedValue = mapper.readValue(jsonString, Resource.class);
 		} catch (JsonParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

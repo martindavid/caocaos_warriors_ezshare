@@ -2,45 +2,72 @@ package com.ezshare.server;
 
 import org.pmw.tinylog.Logger;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import java.io.BufferedReader;
+import com.ezshare.Resource;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-
 
 /**
  * Created by mvalentino on 20/3/17.
  */
-public class TCPServer {
-	public Resources[] resources;
+public class TCPServer implements Runnable {
+	public Resource[] resources;
 	
-    public void Execute() {
-    	
-        int portNumber = 44457;
-        try (
-                ServerSocket serverSocket =
-                        new ServerSocket(portNumber);
-                Socket clientSocket = serverSocket.accept();
-                PrintWriter out =
-                        new PrintWriter(clientSocket.getOutputStream(), true);
-                BufferedReader in = new BufferedReader(
-                        new InputStreamReader(clientSocket.getInputStream()));
-        ) {
-            String inputLine;
-            while ((inputLine = in.readLine()) != null) {
-            	Resources resource = new Resources();
-            	resource.description = inputLine;
-                Logger.info("Message from client: " + inputLine);
-                out.println(resource.toJson());
-            }
-        } catch (IOException e) {
-            System.out.println("Exception caught when trying to listen on port "
-                    + portNumber + " or listening for a connection");
-            System.out.println(e.getMessage());
-        }
-    }
+	private int portNumber;
+	private String hostName;
+	private ServerThread client;
+	private Thread thread;
+	private ServerSocket server = null;
+	
+	public TCPServer(String hostName, int portNumber) {
+		this.portNumber = portNumber;
+		this.hostName = hostName;
+		try{
+			this.server = new ServerSocket(this.portNumber);
+		}
+		catch(IOException ioe) {
+			Logger.error(ioe);
+		}
+	}
+	
+	public void run() {
+		Logger.info("Starting the EZShare Server");
+		Logger.info("Using secret: "); // TODO: put a secret
+		Logger.info("using advertised hostname: " + hostName);
+		Logger.info("bound to port: " + portNumber);
+		Logger.info("Waiting for a client.....");
+		
+		
+		while (thread != null) {
+			try {
+				addThread(server.accept());
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				Logger.error(e);
+			}
+		}
+	}
+	
+	public void start() {
+		if (thread == null) {
+			thread = new Thread(this);
+			thread.start();
+		}
+	}
+	
+	public void stop() {
+		if (thread != null) {
+			thread = null;
+		}
+	}
+	
+	/**
+	 * Create a new thread every time the client connected
+	 * @param socket
+	 */
+	public void addThread(Socket socket) {
+		Logger.info("Client connected: " + socket);
+		client = new ServerThread(socket);
+		client.start();
+	}
 }

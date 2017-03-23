@@ -11,8 +11,11 @@ public class Server {
 		Logger.info("Server is running");
 		CommandLine cmd = new Cli(args).parseServer();
 		
-		TCPServer server = new TCPServer();
-		server.Execute();
+		int port = 3030;
+		String hostName = "localhost";
+		
+		TCPServer server = new TCPServer(hostName, port);
+		server.start();
 		
 		// TODO: put a logic to parse the argument
 		if (cmd.hasOption(Constant.ADVERTISED_HOSTNAME)) {
