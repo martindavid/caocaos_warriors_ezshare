@@ -9,6 +9,11 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
+/**
+ * A class that handle parsing command line arguments
+ * @author mvalentino
+ *
+ */
 public class Cli {
 	private String[] args = null;
 	
@@ -16,6 +21,10 @@ public class Cli {
 		this.args = args;
 	}
 	
+	/**
+	 * Construct a command line arguments for server program
+	 * @return CommandLine object
+	 */
 	public CommandLine parseServer() {
 		CommandLineParser parser = new BasicParser();
 		CommandLine cmd = null;
@@ -37,6 +46,10 @@ public class Cli {
 		return cmd;
 	}
 	
+	/**
+	 * Construct a command line arguments for client program
+	 * @return CommandLine object
+	 */
 	public CommandLine parseClient() {
 		CommandLineParser parser = new BasicParser();
 		CommandLine cmd = null;
@@ -57,6 +70,10 @@ public class Cli {
 		return cmd;
 	}
 	
+	/**
+	 * A command line arguments options for server program
+	 * @return
+	 */
 	private Options constructServerOptions() {
 		Options options = new Options();
 		
@@ -70,6 +87,11 @@ public class Cli {
 		return options;
 	}
 	
+	
+	/**
+	 * A command line arguments options for client program
+	 * @return
+	 */
 	private Options constructClientOptions() {
 		Options options = new Options();
 		
@@ -94,6 +116,7 @@ public class Cli {
 		return options;
 	}
 	
+	//TODO: what should we construct here?
 	private void help(Options options){
 		HelpFormatter formatter = new HelpFormatter();
 		formatter.printHelp("Main", options);
