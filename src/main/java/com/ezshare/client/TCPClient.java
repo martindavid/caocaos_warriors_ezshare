@@ -33,6 +33,8 @@ public class TCPClient {
         	// Log it first and send to the server
         	Logger.info("My message: " + message.toJson());
             streamOut.writeUTF(message.toJson());
+		DataInputStream streamIn = new DataInputStream(echoSocket.getInputStream());
+		String data = streamIn.readUTF();
             
         } catch (UnknownHostException e) {
             System.err.println("Don't know about host " + hostName);
