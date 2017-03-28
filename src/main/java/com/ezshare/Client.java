@@ -41,7 +41,7 @@ public class Client {
 		}
 		
 		if (cmd.hasOption(Constant.TAGS)) {
-			message.resource.description = cmd.getOptionValue(Constant.TAGS);
+			message.resource.tags = cmd.getOptionValues(Constant.TAGS);
 		}
 		
 		if (cmd.hasOption(Constant.URI)) {
@@ -62,6 +62,13 @@ public class Client {
 		
 		if (cmd.hasOption(Constant.HOST)) {
 			hostName = cmd.getOptionValue(Constant.HOST);
+		}
+		if (cmd.hasOption(Constant.SECRET)) {
+			message.resource.secret = cmd.getOptionValue(Constant.SECRET);
+		}
+		
+		if (cmd.hasOption(Constant.SERVERS)) {
+			message.resource.ezserver = cmd.getOptionValue(Constant.SERVERS);
 		}
 		
 		TCPClient client = new TCPClient(portNumber, hostName, message);
