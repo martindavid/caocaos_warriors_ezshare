@@ -34,7 +34,9 @@ public class ServerThread extends Thread {
 					System.out.println(message);
 				}	
 			}
-		}
+			streamOut = new DataOutputStream(socket.getOutputStream());
+			out.writeUTF(data)
+                }
 		catch (IOException ioe) {
 			// TODO: handle exception
 			Logger.error(ioe);
