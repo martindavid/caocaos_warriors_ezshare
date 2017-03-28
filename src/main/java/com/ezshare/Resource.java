@@ -15,6 +15,7 @@ public class Resource {
 	public String channel;
 	public String owner;
 	public String ezserver;
+	public String secret;
 	
 	
 	public String toJson() throws JsonProcessingException {
