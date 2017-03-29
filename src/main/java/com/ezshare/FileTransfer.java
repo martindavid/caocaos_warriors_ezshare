@@ -18,24 +18,24 @@ public class FileTransfer {
 	Socket socket;
 	
 	long size = 0;
-	FileTransfer(Socket s, String FilePath) throws IOException{
+	public FileTransfer(Socket s, String FilePath) throws IOException{
 		streamin = s.getInputStream();
 		streamout = s.getOutputStream();
 		filePath = FilePath;
 		file = new File(filePath);
 		socket = s;
 	}
-	void close() throws IOException{
+	public void close() throws IOException{
 		streamin.close();
 		streamout.close();
 		socket.close();
 	}
-	void send() throws IOException{
+	public void send() throws IOException{
 		try{
 			filein = new FileInputStream(file);
 			byte[] buffer = new byte[1024];
 			int subsize;
-			while((subsize = filein.read(buffer)) != 1){
+			while((subsize = filein.read(buffer)) != -1){
 				streamout.write(buffer);
 				streamout.flush();
 				size += subsize;
@@ -46,7 +46,7 @@ public class FileTransfer {
 			socket.close();
 		}
 	}
-	void receive() throws IOException{
+	public void receive() throws IOException{
 		try{
 			fileout = new FileOutputStream(file);
 			int subsize;
@@ -65,17 +65,17 @@ public class FileTransfer {
 			socket.close();
 		}
 	}
-	boolean isClosed(){
+	public boolean isClosed(){
 		if (socket.isClosed() && socket.isConnected()){
 			return true;
 		}else{
 			return false;
 		}
 	}
-	long getFileSize(){
+	public long getFileSize(){
 		return file.length();
 	}
-	long getDealSize(){
+	public long getDealSize(){
 		return size;
 	}
 
