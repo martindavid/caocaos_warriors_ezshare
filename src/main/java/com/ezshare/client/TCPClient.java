@@ -18,6 +18,7 @@ public class TCPClient {
 	private Message message;
 	private int portNumber;
 	private String hostName;
+	private FileTransfer fileTransfer;
 	
 	public TCPClient(int portNumber, String hostName, Message message) {
 		this.portNumber = portNumber;
@@ -33,6 +34,18 @@ public class TCPClient {
         	// Log it first and send to the server
         	Logger.info("My message: " + message.toJson());
             streamOut.writeUTF(message.toJson());
+		DataInputStream streamIn = new DataInputStream(echoSocket.getInputStream());
+		String data = streamIn.readUTF();
+		if (message.command == Constant.PUBLISH || message.command == Constant.SHARE){
+            		fileTransfer = new FileTransfer(echoSocket, message.resource.uri);
+            		fileTransfer.send();
+            		fileTransfer.close();
+            	}else if(message.command == Constant.FETCH){
+            		fileTransfer = new FileTransfer(echoSocket, message.resource.uri);
+            		message.resource.resourceSize = fileTransfer.getFileSize();
+            		fileTransfer.receive();
+            		fileTransfer.close();
+            }
             
         } catch (UnknownHostException e) {
             System.err.println("Don't know about host " + hostName);

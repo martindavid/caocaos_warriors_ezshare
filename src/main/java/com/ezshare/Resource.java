@@ -15,7 +15,8 @@ public class Resource {
 	public String channel;
 	public String owner;
 	public String ezserver;
-	
+	public String secret;
+	public long resourceSize;	
 	
 	public String toJson() throws JsonProcessingException {
 		ObjectMapper mapper = new ObjectMapper();
