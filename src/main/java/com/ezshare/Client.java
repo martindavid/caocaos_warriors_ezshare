@@ -29,6 +29,8 @@ public class Client {
 			message.command = Constant.FETCH;
 		} else if (cmd.hasOption(Constant.EXCHANGE)) {
 			message.command = Constant.EXCHANGE;
+		} else if (cmd.hasOption(Constant.DEBUG)) {
+			message.command = Constant.DEBUG;
 		}
 		
 		
@@ -64,7 +66,7 @@ public class Client {
 			hostName = cmd.getOptionValue(Constant.HOST);
 		}
 		if (cmd.hasOption(Constant.SECRET)) {
-			message.resource.secret = cmd.getOptionValue(Constant.SECRET);
+			message.secret = cmd.getOptionValue(Constant.SECRET);
 		}
 		
 		if (cmd.hasOption(Constant.SERVERS)) {

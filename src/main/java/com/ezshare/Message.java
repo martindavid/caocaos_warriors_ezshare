@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class Message {
 	public String command;
 	public Resource resource;
+	public String secret;
 	
 	public Message() {
 		resource = new Resource();

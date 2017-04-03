@@ -2,6 +2,7 @@ package com.ezshare.server;
 
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 
@@ -17,6 +18,7 @@ public class ServerThread extends Thread {
 	private Socket socket = null;
 	private int ID = -1;
 	private DataInputStream streamIn = null;
+	private DataOutputStream streamOut;
 	
 	public ServerThread(Socket socket) {
 		this.socket = socket;
@@ -34,8 +36,9 @@ public class ServerThread extends Thread {
 					System.out.println(message);
 				}	
 			}
-			streamOut = new DataOutputStream(socket.getOutputStream());
-			out.writeUTF(data)
+			
+//			streamOut = new DataOutputStream(socket.getOutputStream());
+//			streamOut.writeUTF(message);
                 }
 		catch (IOException ioe) {
 			// TODO: handle exception
