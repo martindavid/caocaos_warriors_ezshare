@@ -6,10 +6,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class Message {
 	public String command;
 	public Resource resource;
-	public String secret;
+
 	
 	public Message() {
 		resource = new Resource();
+		// Define the default value for resources
+		resource.uri = "";
+		resource.name="";
+		resource.description="";
+		resource.owner="";
+		resource.channel="";
+		
+		
 	}
 	
 	public String toJson() {

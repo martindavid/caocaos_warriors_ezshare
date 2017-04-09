@@ -18,19 +18,17 @@ public class Client {
 		CommandLine cmd = new Cli(args).parseClient();
 		
 		if (cmd.hasOption(Constant.PUBLISH)) {
-			message.command = Constant.PUBLISH;
+			message.command = Constant.PUBLISH.toUpperCase();
 		} else if (cmd.hasOption(Constant.REMOVE)) {
-			message.command = Constant.REMOVE;
+			message.command = Constant.REMOVE.toUpperCase();
 		} else if (cmd.hasOption(Constant.SHARE)) {
-			message.command = Constant.SHARE;
+			message.command = Constant.SHARE.toUpperCase();
 		} else if (cmd.hasOption(Constant.QUERY)) {
-			message.command = Constant.QUERY;
+			message.command = Constant.QUERY.toUpperCase();
 		} else if (cmd.hasOption(Constant.FETCH)) {
-			message.command = Constant.FETCH;
+			message.command = Constant.FETCH.toUpperCase();
 		} else if (cmd.hasOption(Constant.EXCHANGE)) {
-			message.command = Constant.EXCHANGE;
-		} else if (cmd.hasOption(Constant.DEBUG)) {
-			message.command = Constant.DEBUG;
+			message.command = Constant.EXCHANGE.toUpperCase();
 		}
 		
 		
@@ -43,7 +41,7 @@ public class Client {
 		}
 		
 		if (cmd.hasOption(Constant.TAGS)) {
-			message.resource.tags = cmd.getOptionValues(Constant.TAGS);
+			message.resource.tags.add(cmd.getOptionValue(Constant.TAGS));
 		}
 		
 		if (cmd.hasOption(Constant.URI)) {
@@ -66,14 +64,20 @@ public class Client {
 			hostName = cmd.getOptionValue(Constant.HOST);
 		}
 		if (cmd.hasOption(Constant.SECRET)) {
-			message.secret = cmd.getOptionValue(Constant.SECRET);
+//			message.secret = cmd.getOptionValue(Constant.SECRET);
 		}
 		
 		if (cmd.hasOption(Constant.SERVERS)) {
 			message.resource.ezserver = cmd.getOptionValue(Constant.SERVERS);
 		}
 		
-		TCPClient client = new TCPClient(portNumber, hostName, message);
+		
+		boolean isDebug = false;
+		if (cmd.hasOption(Constant.DEBUG)) {
+			isDebug = true;
+		}
+		
+		TCPClient client = new TCPClient(portNumber, hostName, message, isDebug);
 		client.Execute();
 	}
 }

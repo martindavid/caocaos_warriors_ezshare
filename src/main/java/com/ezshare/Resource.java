@@ -1,5 +1,5 @@
 package com.ezshare;
-
+import java.util.*;
 import java.io.IOException;
 
 import com.fasterxml.jackson.core.JsonParseException;
@@ -10,12 +10,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class Resource {
 	public String name;
 	public String description;
-	public String[] tags;
+	public ArrayList<String> tags;
 	public String uri;
 	public String channel;
 	public String owner;
 	public String ezserver;
-	public long resourceSize;	
+	
+	public Resource() {
+		this.tags = new ArrayList<String>();
+	}
 	
 	public String toJson() throws JsonProcessingException {
 		ObjectMapper mapper = new ObjectMapper();

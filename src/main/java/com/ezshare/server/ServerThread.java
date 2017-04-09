@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.net.Socket;
 
 import org.pmw.tinylog.Logger;
+
+import com.ezshare.FileTransfer;
 /**
  * @author mvalentino
  * 
@@ -19,6 +21,7 @@ public class ServerThread extends Thread {
 	private int ID = -1;
 	private DataInputStream streamIn = null;
 	private DataOutputStream streamOut;
+	private FileTransfer filerecive;
 	
 	public ServerThread(Socket socket) {
 		this.socket = socket;
@@ -33,9 +36,9 @@ public class ServerThread extends Thread {
 			while(true) {
 				if (streamIn.available() > 0) {
 					message = streamIn.readUTF();
-					System.out.println(message);
-				}	
-			}
+					System.out.println(message);}}
+			
+			
 			
 //			streamOut = new DataOutputStream(socket.getOutputStream());
 //			streamOut.writeUTF(message);
