@@ -22,13 +22,11 @@ public class TCPClient {
 	private String hostName;
 	private boolean isDebug;
 	private FileTransfer fileTransfer;
-	private DataInputStream streamIn = null;
 	
-	public TCPClient(int portNumber, String hostName, Message message, boolean isDebug) {
+	public TCPClient(int portNumber, String hostName, Message message) {
 		this.portNumber = portNumber;
 		this.hostName = hostName;
 		this.message = message;
-		this.isDebug = isDebug;
 	}
 	
     public void Execute() throws IOException {
@@ -36,18 +34,18 @@ public class TCPClient {
                 Socket echoSocket = new Socket(hostName, portNumber);
         		DataOutputStream streamOut = new DataOutputStream(echoSocket.getOutputStream());
         ) {
-        	if (isDebug) {
-        		// Print all of the information
-        		Logger.info("Connect on port: " + portNumber);
-        		Logger.info("Connect to hostname: " + hostName);
-        	}
-        	// Log it first and send to the server
-        	
-        	
-        	
-        	
-        	Logger.info("Message :" + message.toJson());
+        	// Print all of the information
+        	Logger.info("Starting the EZShare Server");
+        	Logger.info("using secret: "); // TODO: create functionality to generate secret
+    		Logger.info("using advertised hostname: " + hostName);
+    		Logger.info("bound to port " + portNumber);
+    		Logger.info("started");
+    		
+    		// Log it first and send to the server
+    		Logger.debug("Setting Debug On");
+        	Logger.debug("[SENT]:" + message.toJson());
             streamOut.writeUTF(message.toJson());
+            
             if (message.resource.uri.length()>0)
             {
             	Socket fileSocket = new Socket(hostName, portNumber);
@@ -63,28 +61,24 @@ public class TCPClient {
         	          fileTransfer.close();}
             }
             
-            
-            
     		String message = "";
-    		try{
-    			streamIn = new DataInputStream(new BufferedInputStream(echoSocket.getInputStream()));
+    		try (
+    				DataInputStream streamIn = 
+    					new DataInputStream(new BufferedInputStream(echoSocket.getInputStream())))
+    		{
     			while(true) {
     				if (streamIn.available() > 0) {
     					message = streamIn.readUTF();
-    					System.out.println(message);}}
-    			
-    			
-    			
-//    			streamOut = new DataOutputStream(socket.getOutputStream());
-//    			streamOut.writeUTF(message);
-                    }
+    					System.out.println(message);
+    					break;
+    				}
+    			}
+            }
+    		
     		catch (IOException ioe) {
     			// TODO: handle exception
     			Logger.error(ioe);
     		}
-		
-		
-            
         } catch (UnknownHostException e) {
             System.err.println("Don't know about host " + hostName);
             System.exit(1);
