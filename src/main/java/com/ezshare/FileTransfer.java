@@ -23,12 +23,12 @@ public class FileTransfer {
 		streamout = s.getOutputStream();
 		filePath = FilePath;
 		file = new File(filePath);
-		socket = s;
+		this.socket = s;
 	}
 	public void close() throws IOException{
 		streamin.close();
 		streamout.close();
-		socket.close();
+		
 	}
 	public void send() throws IOException{
 		try{
@@ -42,8 +42,8 @@ public class FileTransfer {
 			}
 		}catch(IOException e) {
 			streamout.close();
-			filein.close();
-			socket.close();
+			
+			
 		}
 	}
 	public void receive() throws IOException{

@@ -2,6 +2,8 @@ package com.ezshare.server;
 
 import java.io.IOException;
 
+import javax.annotation.Resources;
+
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -103,6 +105,10 @@ public class Utilities {
     		resp.response="error";
     		resp.errorMessage="cannot remove resource";
     		return resp.toJson();
+    	}
+    	else 
+    	{
+    		return "";
     	}
     }
 	
