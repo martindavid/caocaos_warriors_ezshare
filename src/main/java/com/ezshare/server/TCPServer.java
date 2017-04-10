@@ -3,6 +3,8 @@ package com.ezshare.server;
 import org.pmw.tinylog.Logger;
 
 import com.ezshare.Resource;
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -69,5 +71,11 @@ public class TCPServer implements Runnable {
 		Logger.info("Client connected: " + socket);
 		client = new ServerThread(socket);
 		client.start();
+	}
+	
+	public void publishResource() throws JsonProcessingException{
+		
+		Resource res=new Resource();
+		res.toJson();
 	}
 }

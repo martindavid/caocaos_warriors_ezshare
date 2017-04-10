@@ -36,12 +36,11 @@ public class ServerThread extends Thread {
 			while(true) {
 				if (streamIn.available() > 0) {
 					message = streamIn.readUTF();
-					System.out.println(message);}}
-			
-			
-			
-//			streamOut = new DataOutputStream(socket.getOutputStream());
-//			streamOut.writeUTF(message);
+					System.out.println(message);
+				}	
+			}
+			streamOut = new DataOutputStream(socket.getOutputStream());
+			out.writeUTF(data);
                 }
 		catch (IOException ioe) {
 			// TODO: handle exception

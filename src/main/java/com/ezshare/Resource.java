@@ -1,6 +1,9 @@
 package com.ezshare;
 import java.util.*;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -15,7 +18,16 @@ public class Resource {
 	public String channel;
 	public String owner;
 	public String ezserver;
+	public String secret;
+	public long resourceSize;
+	public static ArrayList<Resource> resourceList=new ArrayList<Resource>(); 
 	
+	public static void addResource(Resource res){
+		resourceList.add(res);
+	}
+	public static void deleteResource(Resource res){
+		resourceList.remove(res);
+	}
 	public Resource() {
 		this.tags = new ArrayList<String>();
 	}
@@ -45,4 +57,5 @@ public class Resource {
 		
 		return parsedValue;
 	}
+	
 }
