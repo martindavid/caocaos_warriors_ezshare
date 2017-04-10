@@ -1,6 +1,8 @@
 package com.ezshare.server;
 
 import java.io.IOException;
+
+import com.ezshare.PrivateKey;
 import com.ezshare.Resource;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -43,6 +45,27 @@ public class Utilities {
 		try 
 		{
 			obj = mapper.readValue(resourceJson, Resource.class);
+		} catch (JsonParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	return obj;	
+		
+	}
+	
+	/*** Returns an Object of the class Private Key***/
+	public PrivateKey toPrivateKeyObject (String keyJson){
+    	ObjectMapper mapper = new ObjectMapper();
+    	PrivateKey obj=null;
+		try 
+		{
+			obj = mapper.readValue(keyJson, PrivateKey.class);
 		} catch (JsonParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -125,11 +148,29 @@ public class Utilities {
         }
         return false;
     }
+    
+    public static boolean isEmpty(final String testCode){
+    	if(testCode == null || testCode.isEmpty()){
+    		return true;
+    	}
+    	else
+    		return false;
+    }
+    /***
+     * Validates if String has *
+     * @param testString
+     * @return
+     */
     public static boolean ownerValidation(String testString){
     	if(testString.equals("*")){return true;}
     	else return false;
     }
-    
+    /***
+     * Creates a new resource when the conditions are correct
+     * @param resJson
+     * @return
+     * @throws JsonProcessingException
+     */
     public String publishCommand(String resJson) throws JsonProcessingException{
 
     	//How do I create a new resource to append it
@@ -141,7 +182,7 @@ public class Utilities {
 	    		return messageReturn(2);
 	    	}
     	//Check for present URI
-    	if(res.uri == null || res.uri.isEmpty()) { return messageReturn(2); }
+    	if(isEmpty(res.uri)) { return messageReturn(2); }
     	//Check for Owner
     	if(res.owner.equals("*")){return messageReturn(2);}
     	
@@ -168,7 +209,12 @@ public class Utilities {
             }
     	return messageReturn(3);
     }
-    
+    /***
+     * Deletes a Resource Object when the conditions meet
+     * @param resJson
+     * @return
+     * @throws JsonProcessingException
+     */
     public String removeCommand(String resJson) throws JsonProcessingException{
     	Resource res=toResourceObject(resJson);
     	
@@ -186,6 +232,33 @@ public class Utilities {
     		}
     	}
     	return messageReturn(6);
+    	
+    }
+    
+    /***
+     * Query for a resource
+     * @param resJson
+     * @return
+     * @throws JsonProcessingException
+     */
+    public String queryCommand(String resJson) throws JsonProcessingException{
+    	Resource res=toResourceObject(resJson);
+    	for(Resource resourceIterator:Resource.resourceList)
+    	{
+    		//Template Channel equals Resource Channel
+    		if(resourceIterator.channel.equals(res.channel))
+    		{
+    			//Template contains owner and matches
+    			if (resourceIterator.owner.equals(res.owner))
+    			{
+    				
+    			}
+    			//Template does not contain Owner
+
+    		}
+    	}
+    	return "Not Found";
+    	
     	
     }
     
