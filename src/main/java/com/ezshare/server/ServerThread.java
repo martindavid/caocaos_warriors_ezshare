@@ -8,6 +8,7 @@ import java.net.Socket;
 
 import org.pmw.tinylog.Logger;
 
+import com.ezshare.Constant;
 import com.ezshare.FileTransfer;
 /**
  * @author mvalentino
@@ -36,11 +37,22 @@ public class ServerThread extends Thread {
 			while(true) {
 				if (streamIn.available() > 0) {
 					message = streamIn.readUTF();
+					Message messageObject=Utilities.toMessageObject(message);
+					String responseMessage="";
+					if (messageObject.command.equals(Constant.PUBLISH.toUpperCase()))
+					{
+						//do sth
+						PublishCommand publish=new PublishCommand(messageObject.resource);
+						responseMessage=publish.processResourceMessage();
+						
+					}
+					streamOut = new DataOutputStream(socket.getOutputStream());
+					streamOut.writeUTF(responseMessage);
+					
 					System.out.println(message);
 				}	
 			}
-			streamOut = new DataOutputStream(socket.getOutputStream());
-			out.writeUTF(data);
+			
                 }
 		catch (IOException ioe) {
 			// TODO: handle exception
