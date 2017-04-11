@@ -3,7 +3,7 @@ package com.ezshare.server;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import com.ezshare.PrivateKey;
+
 import com.ezshare.Resource;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -19,7 +19,7 @@ public class Utilities {
 	}
 	
 	/*** Returns an object of the Class Message ***/
-	public Message toMessageObject (String messageJson)
+	public static Message toMessageObject (String messageJson)
 	{
     	ObjectMapper mapper = new ObjectMapper();
     	Message obj=null;
@@ -40,7 +40,7 @@ public class Utilities {
 	}
 	
 	/*** Returns an Object of the class Resources***/
-	public Resource toResourceObject (String resourceJson){
+	public static Resource toResourceObject (String resourceJson){
     	ObjectMapper mapper = new ObjectMapper();
     	Resource obj=null;
 		try 
@@ -60,26 +60,6 @@ public class Utilities {
 		
 	}
 	
-	/*** Returns an Object of the class Private Key***/
-	public PrivateKey toPrivateKeyObject (String keyJson){
-    	ObjectMapper mapper = new ObjectMapper();
-    	PrivateKey obj=null;
-		try 
-		{
-			obj = mapper.readValue(keyJson, PrivateKey.class);
-		} catch (JsonParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (JsonMappingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-    	return obj;	
-		
-	}
 	/***
 	 * Checks if String has Single Star character
 	 * @param owner
@@ -129,21 +109,18 @@ public class Utilities {
     		resp.errorMessage="cannot remove resource";
     		return resp.toJson();
     	}
-    	else 
-    	{
-    		return "";
-    	}
+
     }
 	
 	/*** Code to check if it starts or ends with Whitespace
 	 * Reference:http://stackoverflow.com/questions/4067809/how-can-i-find-whitespace-space-in-a-string
 	***/
     public static boolean containsWhiteSpace(final String testCode){
-        if (Character.isWhitespace(testCode.charAt(0)) || Character.isWhitespace(testCode.charAt(testCode.length()-1)))
+        if (!testCode.isEmpty() && (Character.isWhitespace(testCode.charAt(0)) || Character.isWhitespace(testCode.charAt(testCode.length()-1))))
                 {
                     return true;
                 }
-        else if (testCode.contains("\0"))
+        else if (!testCode.isEmpty() && testCode.contains("\0"))
         {
         	return true;
         }
@@ -151,11 +128,7 @@ public class Utilities {
     }
     
     public static boolean isEmpty(final String testCode){
-    	if(testCode == null || testCode.isEmpty()){
-    		return true;
-    	}
-    	else
-    		return false;
+    	return (testCode == null || testCode.isEmpty());
     }
     /***
      * Validates if String has *
@@ -166,50 +139,7 @@ public class Utilities {
     	if(testString.equals("*")){return true;}
     	else return false;
     }
-    /***
-     * Creates a new resource when the conditions are correct
-     * @param resJson
-     * @return
-     * @throws JsonProcessingException
-     */
-    public String publishCommand(String resJson) throws JsonProcessingException{
-
-    	//How do I create a new resource to append it
-    	Resource res=toResourceObject(resJson);
-    	//Check String values
-    	if (containsWhiteSpace(res.description)||containsWhiteSpace(res.name)||containsWhiteSpace(res.channel)
-    			|| containsWhiteSpace(res.owner))
-	    	{
-	    		return messageReturn(2);
-	    	}
-    	//Check for present URI
-    	if(isEmpty(res.uri)) { return messageReturn(2); }
-    	//Check for Owner
-    	if(res.owner.equals("*")){return messageReturn(2);}
-    	
-    	for(Resource resourceIterator:Resource.resourceList){
-    		//Check for same primary key and overwrite
-            if(resourceIterator.owner.equals(res.owner) && resourceIterator.channel.equals(res.channel) 
-            		&& resourceIterator.uri.equals(res.uri))
-            	{
-            		resourceIterator.ezserver=res.ezserver;
-            		resourceIterator.tags=res.tags;
-            		resourceIterator.description=res.description;
-            		resourceIterator.name=res.name;
-            		Resource.addResource(res);
-            		return messageReturn(1);
-            		
-                }
-            //Check for primary key differences
-            else if (resourceIterator.channel.equals(res.channel) && resourceIterator.uri.equals(res.uri)
-            		&& resourceIterator.owner.equals(res.owner)==false)
-	            {
-            		return messageReturn(2);
-            		
-	            }
-            }
-    	return messageReturn(3);
-    }
+    
     /***
      * Deletes a Resource Object when the conditions meet
      * @param resJson
