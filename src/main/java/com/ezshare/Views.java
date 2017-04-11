@@ -6,5 +6,6 @@ public class Views {
 	public static class Fetch extends comm{};
 	public static class Query extends Fetch{};
 	public static class Share extends norm{};
+	public static class Exchange extends comm{};
 
 }
