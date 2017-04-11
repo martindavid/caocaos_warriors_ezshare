@@ -1,5 +1,4 @@
 package com.ezshare.server;
-
 import com.ezshare.Resource;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -30,9 +29,15 @@ public class PublishCommand {
 	    		return Utilities.messageReturn(2);
 	    	}
     	//Check for present URI
-    	if(Utilities.isEmpty(res.uri)) { return Utilities.messageReturn(2); }
+    	if(Utilities.isEmpty(res.uri)) 
+    	{ 
+    		return Utilities.messageReturn(2); 
+    	}
     	//Check for Owner
-    	if(res.owner.equals("*")){return Utilities.messageReturn(2);}
+    	if(res.owner.equals("*"))
+    	{
+    		return Utilities.messageReturn(2);
+    	}
     	
     	for(Resource resourceIterator:Resource.resourceList){
     		//Check for same primary key and overwrite
@@ -43,13 +48,12 @@ public class PublishCommand {
             		resourceIterator.tags=res.tags;
             		resourceIterator.description=res.description;
             		resourceIterator.name=res.name;
-            		Resource.addResource(res);
             		return Utilities.messageReturn(1);
             		
                 }
             //Check for primary key differences
             else if (resourceIterator.channel.equals(res.channel) && resourceIterator.uri.equals(res.uri)
-            		&& resourceIterator.owner.equals(res.owner)==false)
+            		&& !resourceIterator.owner.equals(res.owner))
 	            {
             		return Utilities.messageReturn(2);
             		
