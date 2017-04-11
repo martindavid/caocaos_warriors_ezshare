@@ -102,11 +102,18 @@ public class Utilities {
     		resp.errorMessage="missing resource";
     		return resp.toJson();
     	}
-    	else //if (type ==5)
+    	else if (type ==5)
     	{
     		Responses resp=new Responses();
     		resp.response="error";
     		resp.errorMessage="cannot remove resource";
+    		return resp.toJson();
+    	}
+    	else //if (type==6)
+    	{
+    		Responses resp=new Responses();
+    		resp.response="error";
+    		resp.errorMessage="invalid command";
     		return resp.toJson();
     	}
 
@@ -136,8 +143,7 @@ public class Utilities {
      * @return
      */
     public static boolean ownerValidation(String testString){
-    	if(testString.equals("*")){return true;}
-    	else return false;
+    	return (testString.equals("*"));
     }
     
     /***

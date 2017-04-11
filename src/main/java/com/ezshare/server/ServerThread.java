@@ -46,6 +46,16 @@ public class ServerThread extends Thread {
 						responseMessage=publish.processResourceMessage();
 						
 					}
+					else if (messageObject.command.equals(Constant.REMOVE.toUpperCase()))
+					{
+						RemoveCommand remove=new RemoveCommand(messageObject.resource);
+						responseMessage=remove.processResource();
+					}
+					//Taking into account cases where command is not found
+					else
+					{
+						responseMessage=Utilities.messageReturn(6);
+					}
 					streamOut = new DataOutputStream(socket.getOutputStream());
 					streamOut.writeUTF(responseMessage);
 					
