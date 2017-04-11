@@ -18,8 +18,6 @@ public class Resource {
 	public String channel;
 	public String owner;
 	public String ezserver;
-	public String secret;
-	public long resourceSize;
 	public static ArrayList<Resource> resourceList=new ArrayList<Resource>(); 
 	
 	public static void addResource(Resource res){
