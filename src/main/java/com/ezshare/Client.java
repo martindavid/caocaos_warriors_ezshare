@@ -55,7 +55,7 @@ public class Client {
 		}
 		
 		if (cmd.hasOption(Constant.TAGS)) {
-			message.resource.tags.add(cmd.getOptionValue(Constant.TAGS));
+			message.resource.tags = cmd.getOptionValue(Constant.TAGS).split("\\,");
 		}
 		
 		if (cmd.hasOption(Constant.URI)) {
