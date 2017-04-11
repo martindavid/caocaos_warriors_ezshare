@@ -1,13 +1,15 @@
 package com.ezshare.server;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
-import javax.annotation.Resources;
-
+import com.ezshare.PrivateKey;
+import com.ezshare.Resource;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.pmw.tinylog.Logger;
 
 public class Utilities {
 
@@ -38,12 +40,33 @@ public class Utilities {
 	}
 	
 	/*** Returns an Object of the class Resources***/
-	public Resources toResourceObject (String resourceJson){
+	public Resource toResourceObject (String resourceJson){
     	ObjectMapper mapper = new ObjectMapper();
-    	Resources obj=null;
+    	Resource obj=null;
 		try 
 		{
-			obj = mapper.readValue(resourceJson, Resources.class);
+			obj = mapper.readValue(resourceJson, Resource.class);
+		} catch (JsonParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	return obj;	
+		
+	}
+	
+	/*** Returns an Object of the class Private Key***/
+	public PrivateKey toPrivateKeyObject (String keyJson){
+    	ObjectMapper mapper = new ObjectMapper();
+    	PrivateKey obj=null;
+		try 
+		{
+			obj = mapper.readValue(keyJson, PrivateKey.class);
 		} catch (JsonParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -99,7 +122,7 @@ public class Utilities {
     		resp.errorMessage="missing resource";
     		return resp.toJson();
     	}
-    	else if (type ==5)
+    	else //if (type ==5)
     	{
     		Responses resp=new Responses();
     		resp.response="error";
@@ -120,7 +143,134 @@ public class Utilities {
                 {
                     return true;
                 }
+        else if (testCode.contains("\0"))
+        {
+        	return true;
+        }
         return false;
     }
+    
+    public static boolean isEmpty(final String testCode){
+    	if(testCode == null || testCode.isEmpty()){
+    		return true;
+    	}
+    	else
+    		return false;
+    }
+    /***
+     * Validates if String has *
+     * @param testString
+     * @return
+     */
+    public static boolean ownerValidation(String testString){
+    	if(testString.equals("*")){return true;}
+    	else return false;
+    }
+    /***
+     * Creates a new resource when the conditions are correct
+     * @param resJson
+     * @return
+     * @throws JsonProcessingException
+     */
+    public String publishCommand(String resJson) throws JsonProcessingException{
+
+    	//How do I create a new resource to append it
+    	Resource res=toResourceObject(resJson);
+    	//Check String values
+    	if (containsWhiteSpace(res.description)||containsWhiteSpace(res.name)||containsWhiteSpace(res.channel)
+    			|| containsWhiteSpace(res.owner))
+	    	{
+	    		return messageReturn(2);
+	    	}
+    	//Check for present URI
+    	if(isEmpty(res.uri)) { return messageReturn(2); }
+    	//Check for Owner
+    	if(res.owner.equals("*")){return messageReturn(2);}
+    	
+    	for(Resource resourceIterator:Resource.resourceList){
+    		//Check for same primary key and overwrite
+            if(resourceIterator.owner.equals(res.owner) && resourceIterator.channel.equals(res.channel) 
+            		&& resourceIterator.uri.equals(res.uri))
+            	{
+            		resourceIterator.ezserver=res.ezserver;
+            		resourceIterator.tags=res.tags;
+            		resourceIterator.description=res.description;
+            		resourceIterator.name=res.name;
+            		Resource.addResource(res);
+            		return messageReturn(1);
+            		
+                }
+            //Check for primary key differences
+            else if (resourceIterator.channel.equals(res.channel) && resourceIterator.uri.equals(res.uri)
+            		&& resourceIterator.owner.equals(res.owner)==false)
+	            {
+            		return messageReturn(2);
+            		
+	            }
+            }
+    	return messageReturn(3);
+    }
+    /***
+     * Deletes a Resource Object when the conditions meet
+     * @param resJson
+     * @return
+     * @throws JsonProcessingException
+     */
+    public String removeCommand(String resJson) throws JsonProcessingException{
+    	Resource res=toResourceObject(resJson);
+    	
+    	for(Resource resourceIterator:Resource.resourceList)
+    	{
+    		if(resourceIterator.owner.equals(res.owner) && resourceIterator.channel.equals(res.channel) 
+            		&& resourceIterator.uri.equals(res.uri))
+    		{
+    			Resource.deleteResource(res);
+    			return messageReturn(1);
+    		}
+    		if(ownerValidation(res.owner))
+    		{
+    			return messageReturn(3);
+    		}
+    	}
+    	return messageReturn(6);
+    	
+    }
+    
+    /***
+     * Query for a resource
+     * @param resJson
+     * @return
+     * @throws JsonProcessingException
+     */
+    public String queryCommand(String resJson) throws JsonProcessingException{
+    	ArrayList<Resource> returnList=new ArrayList<Resource>(); 
+    	Resource res=toResourceObject(resJson);
+    	for(Resource resourceIterator:Resource.resourceList)
+    	{
+    		//Template Channel equals Resource Channel
+    		if(resourceIterator.channel.equals(res.channel))
+    		{
+    			//Template contains owner and matches
+    			if (resourceIterator.owner.equals(res.owner))
+    			{
+    				//Template Contains URI
+    				if(resourceIterator.uri.equals(res.uri))
+    				{
+    					
+    				}
+    			}
+    			//Template does not contain Owner
+    			else
+    			{
+    				
+    			}
+
+    		}
+    	}
+    	return "Not Found";
+    	
+    	
+    }
+    
 
 }
