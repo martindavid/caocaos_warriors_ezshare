@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class Message {
 	public String command;
 	public Resource resource;
+	public String secret;
 
 	
 	public Message() {
@@ -16,8 +17,6 @@ public class Message {
 		resource.description="";
 		resource.owner="";
 		resource.channel="";
-		
-		
 	}
 	
 	public String toJson() {
