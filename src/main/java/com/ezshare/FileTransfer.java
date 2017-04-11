@@ -6,11 +6,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.RandomAccessFile;
 import java.net.Socket;
+import java.util.Arrays;
 
 public class FileTransfer {
-	FileInputStream filein;
-	FileOutputStream fileout;
 	InputStream streamin;
 	OutputStream streamout;
 	String filePath;
@@ -32,11 +32,11 @@ public class FileTransfer {
 	}
 	public void send() throws IOException{
 		try{
-			filein = new FileInputStream(file);
-			byte[] buffer = new byte[1024];
+			RandomAccessFile byteFile = new RandomAccessFile(file,"r");
+			byte[] buffer = new byte[1024*1024];
 			int subsize;
-			while((subsize = filein.read(buffer)) != -1){
-				streamout.write(buffer);
+			while((subsize = byteFile.read(buffer)) >0){
+				streamout.write(Arrays.copyOf(buffer, subsize));
 				streamout.flush();
 				size += subsize;
 			}
@@ -48,20 +48,28 @@ public class FileTransfer {
 	}
 	public void receive() throws IOException{
 		try{
-			fileout = new FileOutputStream(file);
-			int subsize;
-			byte[] buffer = new byte[1024];
-			while((subsize = streamin.read(buffer)) != -1){
-				fileout.write(buffer);
-				fileout.flush();
-				size += subsize;
+			String fileLocation = "client_file";
+			RandomAccessFile downloadingFile = new RandomAccessFile(fileLocation, "rw");
+			long fileSizeRemaining = file.length();
+			int chunkSize = 1024*1024;
+			if(fileSizeRemaining < chunkSize) chunkSize = (int) fileSizeRemaining;
+			byte[] buffer = new byte[chunkSize];
+			int num = -1;
+			while((num = streamin.read(buffer)) >0){
+				downloadingFile.write(Arrays.copyOf(buffer, num));
+				fileSizeRemaining -=num;
+				chunkSize = 1024*1024;
+				if(fileSizeRemaining < chunkSize) chunkSize = (int) fileSizeRemaining;
+				buffer = new byte[chunkSize];
+				if(fileSizeRemaining == 0){
+					break;
+				}
 			}
 			streamin.close();
-			fileout.close();
+			downloadingFile.close();
 			socket.close();
 		}catch (IOException e){
 			streamin.close();
-			fileout.close();
 			socket.close();
 		}
 	}

@@ -50,31 +50,27 @@ public class TCPClient {
             {
             	Socket fileSocket = new Socket(hostName, portNumber);
         		DataOutputStream filestreamOut = new DataOutputStream(fileSocket.getOutputStream());
-        		if (message.command == Constant.PUBLISH || message.command == Constant.SHARE){
-        	          fileTransfer = new FileTransfer(fileSocket, message.resource.uri);
-        	          fileTransfer.send();
-        	          fileTransfer.close();
-        	         }else if(message.command == Constant.FETCH){
-        	          fileTransfer = new FileTransfer(fileSocket, message.resource.uri);
-//        	          message.resource.resourceSize = fileTransfer.getFileSize();
-        	          fileTransfer.receive();
-        	          fileTransfer.close();}
+              if(message.command.equals("FETCH")){
+        	     fileTransfer = new FileTransfer(fileSocket, message.resource.uri);
+//        	     message.resource.resourceSize = fileTransfer.getFileSize();
+        	     fileTransfer.receive();
+        	     fileTransfer.close();}
             }
             
-    		String message = "";
+    		String message_echo = "";
     		try (
     				DataInputStream streamIn = 
     					new DataInputStream(new BufferedInputStream(echoSocket.getInputStream())))
     		{
     			while(true) {
     				if (streamIn.available() > 0) {
-    					message = streamIn.readUTF();
-    					System.out.println(message);
+    					message_echo = streamIn.readUTF();
+    					System.out.println(message_echo);
     					break;
     				}
     			}
-            }
-    		
+            
+    		}
     		catch (IOException ioe) {
     			// TODO: handle exception
     			Logger.error(ioe);
