@@ -1,24 +1,14 @@
 package com.ezshare;
 
+import java.util.Arrays;
+
 public class javaTest {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		String s="S";
-		String j="";
-		
-		String x ="a*";
-		String g="aaaa\0bbb";
-		
-		if (s != null && !s.isEmpty()){
-			System.out.println(1);
-		}
-		if (j == null || j.isEmpty()){
-			System.out.println(2);
-		}
-		if(g.contains("\0")){
-			System.out.println(3);
-		}
+		String[] tags=new String[] {"AB","BC","CD","AE"};
+		System.out.println(Arrays.asList(tags).contains("AB"));
 		
 
 	}

@@ -1,6 +1,7 @@
 package com.ezshare.server;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import com.ezshare.PrivateKey;
 import com.ezshare.Resource;
@@ -242,6 +243,7 @@ public class Utilities {
      * @throws JsonProcessingException
      */
     public String queryCommand(String resJson) throws JsonProcessingException{
+    	ArrayList<Resource> returnList=new ArrayList<Resource>(); 
     	Resource res=toResourceObject(resJson);
     	for(Resource resourceIterator:Resource.resourceList)
     	{
@@ -251,9 +253,17 @@ public class Utilities {
     			//Template contains owner and matches
     			if (resourceIterator.owner.equals(res.owner))
     			{
-    				
+    				//Template Contains URI
+    				if(resourceIterator.uri.equals(res.uri))
+    				{
+    					
+    				}
     			}
     			//Template does not contain Owner
+    			else
+    			{
+    				
+    			}
 
     		}
     	}
