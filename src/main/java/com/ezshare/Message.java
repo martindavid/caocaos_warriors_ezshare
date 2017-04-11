@@ -11,16 +11,14 @@ public class Message {
 	@JsonView(Views.Query.class)
 	public boolean relay;
 	
+	@JsonView(Views.Share.class)
+	public 	String secret;
+	
 	@JsonView(Views.norm.class)
 	public Resource resource;
 	
 	@JsonView(Views.Fetch.class)
 	public Resource resourceTemplate;
-	
-	@JsonView(Views.Share.class)
-	public 	String secret;
-	
-
 
 	
 	public Message() {
@@ -43,7 +41,7 @@ public class Message {
 				return mapper.writerWithView(Views.Fetch.class).writeValueAsString(this);
 			}else if(command.equals("QUERY")){
 				return mapper.writerWithView(Views.Query.class).writeValueAsString(this);
-			}else if(command.equals("Share")){
+			}else if(command.equals("SHARE")){
 				return mapper.writerWithView(Views.Share.class).writeValueAsString(this);
 			}else{
 				return mapper.writerWithView(Views.norm.class).writeValueAsString(this);

@@ -63,10 +63,9 @@ public class TCPClient {
     					new DataInputStream(new BufferedInputStream(echoSocket.getInputStream())))
     		{
     			while(true) {
-    				if (streamIn.available() > 0) {
+    				while (streamIn.available() > 0) {
     					message_echo = streamIn.readUTF();
     					System.out.println(message_echo);
-    					break;
     				}
     			}
             
