@@ -1,6 +1,11 @@
 package com.ezshare;
 
+import java.awt.List;
 import java.io.IOException;
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Map;
 
 import org.apache.commons.cli.CommandLine;
 import org.pmw.tinylog.Configurator;
@@ -50,7 +55,7 @@ public class Client {
 		}
 		
 		if (cmd.hasOption(Constant.TAGS)) {
-			message.resource.tags.add(cmd.getOptionValue(Constant.TAGS));
+			message.resource.tags = cmd.getOptionValue(Constant.TAGS).split("\\,");
 		}
 		
 		if (cmd.hasOption(Constant.URI)) {
@@ -70,7 +75,14 @@ public class Client {
 		}
 		
 		if (cmd.hasOption(Constant.SERVERS)) {
-			message.resource.ezserver = cmd.getOptionValue(Constant.SERVERS);
+			String server = cmd.getOptionValue(Constant.SERVERS);
+			String[] serverlist = server.split("\\,");
+			Exchange exchange = new Exchange();
+			for (int i = 0; i < serverlist.length; i++){
+				exchange.hostname = serverlist[i].split(":")[0];
+				exchange.port = Integer.parseInt(serverlist[i].split(":")[1]);
+				message.serverList.add(exchange);
+			}
 		}
 		
 		

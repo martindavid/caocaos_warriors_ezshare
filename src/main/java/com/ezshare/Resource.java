@@ -13,7 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class Resource {
 	public String name;
 	public String description;
-	public ArrayList<String> tags;
+	public String[] tags;
 	public String uri;
 	public String channel;
 	public String owner;
@@ -27,7 +27,6 @@ public class Resource {
 		resourceList.remove(res);
 	}
 	public Resource() {
-		this.tags = new ArrayList<String>();
 	}
 	
 	public String toJson() throws JsonProcessingException {
