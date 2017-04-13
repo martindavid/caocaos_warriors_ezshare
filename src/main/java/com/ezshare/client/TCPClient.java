@@ -20,7 +20,6 @@ public class TCPClient {
 	private Message message;
 	private int portNumber;
 	private String hostName;
-	private boolean isDebug;
 	private FileTransfer fileTransfer;
 	
 	public TCPClient(int portNumber, String hostName, Message message) {
@@ -46,30 +45,33 @@ public class TCPClient {
         	Logger.debug("[SENT]:" + message.toJson());
             streamOut.writeUTF(message.toJson());
             
-            if (message.resource.uri.length()>0)
-            {
-            	Socket fileSocket = new Socket(hostName, portNumber);
-        		DataOutputStream filestreamOut = new DataOutputStream(fileSocket.getOutputStream());
-              if(message.command.equals("FETCH")){
-        	     fileTransfer = new FileTransfer(fileSocket, message.resource.uri);
-//        	     message.resource.resourceSize = fileTransfer.getFileSize();
-        	     fileTransfer.receive();
-        	     fileTransfer.close();}
-            }
-            
+     
     		String message_echo = "";
     		try (
     				DataInputStream streamIn = 
     					new DataInputStream(new BufferedInputStream(echoSocket.getInputStream())))
     		{
-    			while(true) {
-    				while (streamIn.available() > 0) {
-    					message_echo = streamIn.readUTF();
-    					System.out.println(message_echo);
+    			if (message.command.equals("FETCH")){
+    				while(true){
+    					if(streamIn.available() > 0){
+    						message_echo = streamIn.readUTF();
+    						System.out.println(message_echo);
+    						fileTransfer = new FileTransfer(echoSocket, message.resourceTemplate.uri);
+    						fileTransfer.receive();
+    						message_echo = streamIn.readUTF();
+    						System.out.println(message_echo);
+    				}
+    				}
+    			}else{
+    				while(true) {
+    					while (streamIn.available() > 0) {
+    						message_echo = streamIn.readUTF();
+    						System.out.println(message_echo);
     				}
     			}
-            
-    		}
+    			}
+    			}
+    		
     		catch (IOException ioe) {
     			// TODO: handle exception
     			Logger.error(ioe);
