@@ -13,7 +13,7 @@ public class Message {
 	public String command;
 	
 	@JsonView(Views.Query.class)
-	public boolean relay;
+	public boolean relay = true;
 	
 	@JsonView(Views.Share.class)
 	public 	String secret;
@@ -37,7 +37,6 @@ public class Message {
 		resource.owner="";
 		resource.channel="";
 		resourceTemplate = resource;
-		relay = true;
 	}
 	
 	public String toJson() {
@@ -46,8 +45,6 @@ public class Message {
 			if (command.equals("FETCH")){
 				return mapper.writerWithView(Views.Fetch.class).writeValueAsString(this);
 			}else if(command.equals("QUERY")){
-				resourceTemplate.channel = "";
-				resourceTemplate.owner = "";
 				return mapper.writerWithView(Views.Query.class).writeValueAsString(this);
 			}else if(command.equals("SHARE")){
 				return mapper.writerWithView(Views.Share.class).writeValueAsString(this);

@@ -44,7 +44,6 @@ public class TCPClient {
     		Logger.debug("Setting Debug On");
         	Logger.debug("[SENT]:" + message.toJson());
             streamOut.writeUTF(message.toJson());
-            message.relay = false;
             
      
     		String message_echo = "";
