@@ -38,7 +38,6 @@ public class Message {
 		resource.channel="";
 		resourceTemplate = resource;
 		relay = true;
-		Relay isrelay = new Relay(resourceTemplate, relay);
 	}
 	
 	public String toJson() {
@@ -47,6 +46,8 @@ public class Message {
 			if (command.equals("FETCH")){
 				return mapper.writerWithView(Views.Fetch.class).writeValueAsString(this);
 			}else if(command.equals("QUERY")){
+				resourceTemplate.channel = "";
+				resourceTemplate.owner = "";
 				return mapper.writerWithView(Views.Query.class).writeValueAsString(this);
 			}else if(command.equals("SHARE")){
 				return mapper.writerWithView(Views.Share.class).writeValueAsString(this);
@@ -59,7 +60,7 @@ public class Message {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		return "";
 	}
 }
