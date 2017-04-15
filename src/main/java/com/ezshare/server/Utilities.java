@@ -109,11 +109,25 @@ public class Utilities {
     		resp.errorMessage="cannot remove resource";
     		return resp.toJson();
     	}
-    	else //if (type==6)
+    	else if (type==6)
     	{
     		Responses resp=new Responses();
     		resp.response="error";
     		resp.errorMessage="invalid command";
+    		return resp.toJson();
+    	}
+    	else if (type==7)
+    	{
+    		Responses resp=new Responses();
+    		resp.response="error";
+    		resp.errorMessage="invalid resource template";
+    		return resp.toJson();
+    	}
+    	else //if(type ==8)
+    	{
+    		Responses resp=new Responses();
+    		resp.response="error";
+    		resp.errorMessage="missing resource template";
     		return resp.toJson();
     	}
 

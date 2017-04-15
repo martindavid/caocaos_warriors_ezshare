@@ -19,13 +19,13 @@ public class RemoveCommand {
      */
     public String processResource() throws JsonProcessingException {
     	Resource res=this.resource;
-    	
+    	if(Utilities.ownerValidation(res.owner))
+		{
+			return Utilities.messageReturn(3);
+		}
     	for(Resource resourceIterator:Resource.resourceList)
     	{
-    		if(Utilities.ownerValidation(res.owner))
-    		{
-    			return Utilities.messageReturn(3);
-    		}
+    		
     		if(resourceIterator.owner.equals(res.owner) && resourceIterator.channel.equals(res.channel) 
             		&& resourceIterator.uri.equals(res.uri))
     		{
