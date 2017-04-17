@@ -24,7 +24,8 @@ public class ServerThread extends Thread {
 	private int ID = -1;
 	private DataInputStream streamIn = null;
 	private DataOutputStream streamOut;
-
+	private FileTransfer filesend;
+	
 	public ServerThread(Socket socket) {
 		this.socket = socket;
 		this.ID = socket.getPort();
@@ -92,9 +93,22 @@ public class ServerThread extends Thread {
 					{
 						responseMessage=Utilities.messageReturn(6);
 					}
+					
 					streamOut = new DataOutputStream(socket.getOutputStream());
 					streamOut.writeUTF(responseMessage);
-				}
+					if (messageObject.command.equals(Constant.FETCH.toUpperCase()))
+					{
+						FileTransfer Filesend = new FileTransfer(socket,messageObject.resource.uri);
+						Filesend.send();
+						addmessage addmes=new addmessage();
+						String Addmessage = addmes.toJson();
+						streamOut = new DataOutputStream(socket.getOutputStream());
+						streamOut.writeUTF(Addmessage);
+					}
+					
+					
+					System.out.println(message);
+				}	
 			}
 
 		} catch (IOException ioe) {
