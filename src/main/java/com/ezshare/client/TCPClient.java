@@ -28,6 +28,7 @@ public class TCPClient {
 	}
 	
     public void Execute() throws IOException {
+    	int sharon = 0;
         try (
                 Socket echoSocket = new Socket(hostName, portNumber);
         		DataOutputStream streamOut = new DataOutputStream(echoSocket.getOutputStream());
@@ -50,6 +51,7 @@ public class TCPClient {
     				DataInputStream streamIn = 
     					new DataInputStream(new BufferedInputStream(echoSocket.getInputStream())))
     		{
+    			
     			if (message.command.equals("FETCH")){
     				while(true){
     					if(streamIn.available() > 0){
@@ -59,16 +61,18 @@ public class TCPClient {
     						fileTransfer.receive();
     						message_echo = streamIn.readUTF();
     						System.out.println(message_echo);
+    						sharon = sharon+1;
     				}
-    					break;
+    					if (sharon==3) {break;}
     				}
     			}else{
     				while(true) {
     					while (streamIn.available() > 0) {
     						message_echo = streamIn.readUTF();
     						System.out.println(message_echo);
+    						sharon = 3;
     				}
-    					break;
+    					if (sharon==3) {break;}
     			}
     			}
     			}
@@ -77,7 +81,9 @@ public class TCPClient {
     			// TODO: handle exception
     			Logger.error(ioe);
     		}
-        } catch (UnknownHostException e) {
+        } 
+        
+        catch (UnknownHostException e) {
             System.err.println("Don't know about host " + hostName);
             System.exit(1);
         } catch (IOException e) {
