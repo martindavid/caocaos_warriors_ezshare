@@ -19,11 +19,13 @@ public class TCPServer implements Runnable {
 	private String hostName;
 	private ServerThread client;
 	private Thread thread;
+	private String secret;
 	private ServerSocket server = null;
 	
-	public TCPServer(String hostName, int portNumber) {
+	public TCPServer(String hostName, int portNumber, String secret) {
 		this.portNumber = portNumber;
 		this.hostName = hostName;
+		this.secret = secret;
 		try{
 			this.server = new ServerSocket(this.portNumber);
 		}
@@ -34,7 +36,7 @@ public class TCPServer implements Runnable {
 	
 	public void run() {
 		Logger.info("Starting the EZShare Server");
-		Logger.info("Using secret: "); // TODO: put a secret
+		Logger.info("Using secret: " + secret);
 		Logger.info("using advertised hostname: " + hostName);
 		Logger.info("bound to port: " + portNumber);
 		Logger.info("Waiting for a client.....");

@@ -1,8 +1,5 @@
 package com.ezshare;
-
-import java.awt.List;
 import java.util.ArrayList;
-import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -30,12 +27,6 @@ public class Message {
 	
 	public Message() throws JsonProcessingException {
 		resource = new Resource();
-		// Define the default value for resources
-		resource.uri = "";
-		resource.name="";
-		resource.description="";
-		resource.owner="";
-		resource.channel="";
 		resourceTemplate = resource;
 	}
 	

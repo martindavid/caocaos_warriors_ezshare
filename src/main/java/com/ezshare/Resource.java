@@ -1,9 +1,6 @@
 package com.ezshare;
-import java.util.*;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.core.JsonParseException;
@@ -24,14 +21,21 @@ public class Resource {
 	@JsonView(Views.FileReceive.class)
 	public long resourceSize;
 	
+	public Resource() {
+		this.uri = "";
+		this.name="";
+		this.description="";
+		this.owner="";
+		this.channel="";
+	}
+	
 	public static void addResource(Resource res){
 		resourceList.add(res);
 	}
 	public static void deleteResource(Resource res){
 		resourceList.remove(res);
 	}
-	public Resource() {
-	}
+	
 	/***
 	 * Copy Constructor to deep copy it
 	 * @param toCopy
@@ -43,11 +47,8 @@ public class Resource {
 		toCopy.channel=this.channel;
 		toCopy.owner=this.owner;
 		toCopy.ezserver=this.ezserver;
-		toCopy.secret=this.secret;
 		toCopy.tags=this.tags;
 		toCopy.resourceSize=this.resourceSize;
-		
-		
 	}
 	
 	public String toJson() throws JsonProcessingException {

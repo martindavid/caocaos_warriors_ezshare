@@ -44,7 +44,7 @@ public class ServerThread extends Thread {
 					if (messageObject.command.equals(Constant.PUBLISH.toUpperCase()))
 					{
 						//do sth
-						PublishCommand publish=new PublishCommand(messageObject.resource);
+						Publish publish=new Publish(messageObject.resource);
 						responseMessage=publish.processResourceMessage();
 						
 					}

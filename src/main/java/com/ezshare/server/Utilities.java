@@ -1,10 +1,12 @@
 package com.ezshare.server;
 
 import java.io.IOException;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 
 
 import com.ezshare.Resource;
+import com.ezshare.server.response.Response;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -12,10 +14,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.pmw.tinylog.Logger;
 
 public class Utilities {
+	
+	public static String generateRandomString(int len) {
+		String AB = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+		SecureRandom rnd = new SecureRandom();
 
-	public static void main(String[] args) 
-	{
-		
+		StringBuilder sb = new StringBuilder(len);
+		for( int i = 0; i < len; i++ ) 
+			sb.append( AB.charAt( rnd.nextInt(AB.length()) ) );
+		return sb.toString();
 	}
 	
 	/*** Returns an object of the Class Message ***/
@@ -38,6 +45,7 @@ public class Utilities {
 		}
     	return obj;	
 	}
+
 	
 	/*** Returns an Object of the class Resources***/
 	public static Resource toResourceObject (String resourceJson){
@@ -77,55 +85,55 @@ public class Utilities {
 	public static String messageReturn(int type) throws JsonProcessingException{
     	if (type==1)
     	{
-    		Responses resp=new Responses();
+    		Response resp=new Response();
     		resp.response="success";
     		return resp.toJson();
     	}
     	else if(type==2)
     	{
-    		Responses resp=new Responses();
+    		Response resp=new Response();
     		resp.response="error";
     		resp.errorMessage="cannot publish resource";
     		return resp.toJson();
     	}
     	else if (type==3)
     	{
-    		Responses resp=new Responses();
+    		Response resp=new Response();
     		resp.response="error";
     		resp.errorMessage="invalid resource";
     		return resp.toJson();
     	}
     	else if (type==4)
     	{
-    		Responses resp=new Responses();
+    		Response resp=new Response();
     		resp.response="error";
     		resp.errorMessage="missing resource";
     		return resp.toJson();
     	}
     	else if (type ==5)
     	{
-    		Responses resp=new Responses();
+    		Response resp=new Response();
     		resp.response="error";
     		resp.errorMessage="cannot remove resource";
     		return resp.toJson();
     	}
     	else if (type==6)
     	{
-    		Responses resp=new Responses();
+    		Response resp=new Response();
     		resp.response="error";
     		resp.errorMessage="invalid command";
     		return resp.toJson();
     	}
     	else if (type==7)
     	{
-    		Responses resp=new Responses();
+    		Response resp=new Response();
     		resp.response="error";
     		resp.errorMessage="invalid resource template";
     		return resp.toJson();
     	}
     	else //if(type ==8)
     	{
-    		Responses resp=new Responses();
+    		Response resp=new Response();
     		resp.response="error";
     		resp.errorMessage="missing resource template";
     		return resp.toJson();
