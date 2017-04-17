@@ -61,7 +61,7 @@ public class TCPClient {
     						fileTransfer.receive();
     						message_echo = streamIn.readUTF();
     						System.out.println(message_echo);
-    						sharon = sharon+1;
+    						sharon = 3;
     				}
     					if (sharon==3) {break;}
     				}
