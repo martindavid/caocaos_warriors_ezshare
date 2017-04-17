@@ -1,10 +1,6 @@
 package com.ezshare;
-import java.util.*;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -44,9 +40,7 @@ public class Resource {
 		toCopy.owner=this.owner;
 		toCopy.ezserver=this.ezserver;
 		toCopy.tags=this.tags;
-		toCopy.resourceSize=this.resourceSize;
-		
-		
+		toCopy.resourceSize=this.resourceSize;		
 	}
 	
 	public String toJson() throws JsonProcessingException {
