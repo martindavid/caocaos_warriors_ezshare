@@ -107,13 +107,13 @@ public class Utilities {
 		} else if (type == 7) {
 			Responses resp = new Responses();
 			resp.response = "error";
-			resp.errorMessage = "invalid resource template";
+			resp.errorMessage = "invalid resourcetemplate";
 			return resp.toJson();
 		} else // if(type ==8)
 		{
 			Responses resp = new Responses();
 			resp.response = "error";
-			resp.errorMessage = "missing resource template";
+			resp.errorMessage = "missing resourcetemplate";
 			return resp.toJson();
 		}
 

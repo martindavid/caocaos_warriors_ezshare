@@ -28,6 +28,7 @@ public class TCPClient {
 	}
 	
     public void Execute() throws IOException {
+    	int sharon = 0;
         try (
                 Socket echoSocket = new Socket(hostName, portNumber);
         		DataOutputStream streamOut = new DataOutputStream(echoSocket.getOutputStream());
@@ -59,16 +60,18 @@ public class TCPClient {
     						fileTransfer.receive();
     						message_echo = streamIn.readUTF();
     						System.out.println(message_echo);
+    						sharon = 3;
     				}
-    					break;
+    					if(sharon==3) break;
     				}
     			}else{
     				while(true) {
     					while (streamIn.available() > 0) {
     						message_echo = streamIn.readUTF();
     						System.out.println(message_echo);
+    						sharon = 3;
     				}
-    					break;
+    					if(sharon==3) break;
     			}
     			}
     			}
