@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -13,12 +14,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class Resource {
 	public String name;
 	public String description;
-	public String[] tags;
+	public String[] tags = new String[0];
 	public String uri;
 	public String channel;
 	public String owner;
 	public String ezserver;
 	public static ArrayList<Resource> resourceList=new ArrayList<Resource>(); 
+	
+	@JsonView(Views.FileReceive.class)
+	public long resourceSize;
 	
 	public static void addResource(Resource res){
 		resourceList.add(res);

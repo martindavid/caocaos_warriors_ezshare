@@ -13,7 +13,7 @@ public class Message {
 	public String command;
 	
 	@JsonView(Views.Query.class)
-	public boolean relay;
+	public boolean relay = true;
 	
 	@JsonView(Views.Share.class)
 	public 	String secret;
@@ -37,8 +37,6 @@ public class Message {
 		resource.owner="";
 		resource.channel="";
 		resourceTemplate = resource;
-		relay = true;
-		Relay isrelay = new Relay(resourceTemplate, relay);
 	}
 	
 	public String toJson() {
@@ -59,7 +57,7 @@ public class Message {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		return "";
 	}
 }
