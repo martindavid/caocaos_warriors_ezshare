@@ -1,4 +1,4 @@
-package com.ezshare;
+package com.ezshare.client;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -10,6 +10,7 @@ import java.util.Arrays;
 
 import org.pmw.tinylog.Logger;
 
+import com.ezshare.Resource;
 import com.ezshare.server.Utilities;
 
 /**

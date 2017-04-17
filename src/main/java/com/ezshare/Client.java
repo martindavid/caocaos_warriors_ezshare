@@ -8,6 +8,7 @@ import org.pmw.tinylog.Configurator;
 import org.pmw.tinylog.Level;
 import org.pmw.tinylog.Logger;
 
+import com.ezshare.client.Exchange;
 import com.ezshare.client.TCPClient;
 
 public class Client {

@@ -1,4 +1,4 @@
-package com.ezshare;
+package com.ezshare.client;
 
 public class Views {
 	public static class comm{};

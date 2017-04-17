@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import org.pmw.tinylog.Logger;
 
 import com.ezshare.Constant;
-import com.ezshare.FileTransfer;
 import com.ezshare.Resource;
 /**
  * @author mvalentino
@@ -24,7 +23,6 @@ public class ServerThread extends Thread {
 	private int ID = -1;
 	private DataInputStream streamIn = null;
 	private DataOutputStream streamOut;
-	private FileTransfer filerecive;
 	
 	public ServerThread(Socket socket) {
 		this.socket = socket;
@@ -85,8 +83,6 @@ public class ServerThread extends Thread {
 					}
 					streamOut = new DataOutputStream(socket.getOutputStream());
 					streamOut.writeUTF(responseMessage);
-					
-					System.out.println(message);
 				}	
 			}
 			

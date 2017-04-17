@@ -1,6 +1,8 @@
 package com.ezshare;
 import java.io.IOException;
 import java.util.ArrayList;
+
+import com.ezshare.client.Views;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;

@@ -6,7 +6,6 @@ import java.net.UnknownHostException;
 
 import org.pmw.tinylog.Logger;
 
-import com.ezshare.FileTransfer;
 import com.ezshare.Message;
 import com.ezshare.server.Responses;
 

@@ -2,6 +2,9 @@ package com.ezshare;
 
 import java.util.ArrayList;
 import org.pmw.tinylog.Logger;
+
+import com.ezshare.client.Exchange;
+import com.ezshare.client.Views;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
