@@ -40,9 +40,7 @@ public class Resource {
 		toCopy.owner=this.owner;
 		toCopy.ezserver=this.ezserver;
 		toCopy.tags=this.tags;
-		toCopy.resourceSize=this.resourceSize;
-		
-		
+		toCopy.resourceSize=this.resourceSize;		
 	}
 	
 	public String toJson() throws JsonProcessingException {
