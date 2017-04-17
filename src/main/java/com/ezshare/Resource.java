@@ -43,11 +43,8 @@ public class Resource {
 		toCopy.channel=this.channel;
 		toCopy.owner=this.owner;
 		toCopy.ezserver=this.ezserver;
-		toCopy.secret=this.secret;
 		toCopy.tags=this.tags;
-		toCopy.resourceSize=this.resourceSize;
-		
-		
+		toCopy.resourceSize=this.resourceSize;		
 	}
 	
 	public String toJson() throws JsonProcessingException {
