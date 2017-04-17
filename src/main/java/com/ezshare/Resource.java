@@ -32,6 +32,23 @@ public class Resource {
 	}
 	public Resource() {
 	}
+	/***
+	 * Copy Constructor to deep copy it
+	 * @param toCopy
+	 */
+	public Resource(Resource toCopy){
+		toCopy.name=this.name;
+		toCopy.description=this.description;
+		toCopy.uri=this.uri;
+		toCopy.channel=this.channel;
+		toCopy.owner=this.owner;
+		toCopy.ezserver=this.ezserver;
+		toCopy.secret=this.secret;
+		toCopy.tags=this.tags;
+		toCopy.resourceSize=this.resourceSize;
+		
+		
+	}
 	
 	public String toJson() throws JsonProcessingException {
 		ObjectMapper mapper = new ObjectMapper();

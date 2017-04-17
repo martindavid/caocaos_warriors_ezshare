@@ -5,11 +5,13 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.ArrayList;
 
 import org.pmw.tinylog.Logger;
 
 import com.ezshare.Constant;
 import com.ezshare.FileTransfer;
+import com.ezshare.Resource;
 /**
  * @author mvalentino
  * 
@@ -50,6 +52,31 @@ public class ServerThread extends Thread {
 					{
 						RemoveCommand remove=new RemoveCommand(messageObject.resource);
 						responseMessage=remove.processResource();
+					}
+					else if (messageObject.command.equals(Constant.QUERY.toUpperCase()))
+					{
+						QueryCommand query=new QueryCommand(messageObject.resource);
+						//Process the Query
+						QueryResponse qresponse=query.processQuery();
+						//Variable to store the List answer
+						ArrayList<Resource> responseList=qresponse.getResultList();
+						//Get the response message
+						String resMess=qresponse.getResponseMessage();
+						//Check to append the resources
+						if (responseList.size()!=0)
+						{
+							for (Resource resourceIterator:Resource.resourceList)
+							{
+								resMess=resMess+"\n"+resourceIterator.toJson();
+							}
+							responseMessage=resMess;
+						}
+						else
+						{
+							responseMessage=resMess;
+						}
+
+					
 					}
 					//Taking into account cases where command is not found
 					else
