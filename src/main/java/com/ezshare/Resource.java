@@ -17,6 +17,15 @@ public class Resource {
 	public String ezserver;
 	public static ArrayList<Resource> resourceList=new ArrayList<Resource>(); 
 	
+	public Resource() {
+		// Define the default value for resources
+		this.uri = "";
+		this.name = "";
+		this.description = "";
+		this.owner = "";
+		this.channel = "";
+	}
+	
 	@JsonView(Views.FileReceive.class)
 	public long resourceSize;
 	
@@ -26,8 +35,7 @@ public class Resource {
 	public static void deleteResource(Resource res){
 		resourceList.remove(res);
 	}
-	public Resource() {
-	}
+	
 	/***
 	 * Copy Constructor to deep copy it
 	 * @param toCopy
@@ -45,28 +53,12 @@ public class Resource {
 	
 	public String toJson() throws JsonProcessingException {
 		ObjectMapper mapper = new ObjectMapper();
-	
 		return mapper.writeValueAsString(this);
 	}
 	
-	public static Resource fromJson(String jsonString) {
+	public static Resource fromJson(String jsonString) throws JsonParseException, JsonMappingException, IOException {
 		ObjectMapper mapper = new ObjectMapper();
-		
-		Resource parsedValue = null;
-		try {
-			parsedValue = mapper.readValue(jsonString, Resource.class);
-		} catch (JsonParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (JsonMappingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		return parsedValue;
+		return mapper.readValue(jsonString, Resource.class);
 	}
 	
 }

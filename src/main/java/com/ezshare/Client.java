@@ -1,11 +1,7 @@
 package com.ezshare;
 
-import java.awt.List;
 import java.io.IOException;
-import java.util.AbstractMap;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
 
 import org.apache.commons.cli.CommandLine;
 import org.pmw.tinylog.Configurator;
@@ -17,7 +13,6 @@ import com.ezshare.client.TCPClient;
 public class Client {
 	
 	public static void main(String[] args) throws IOException {
-		Logger.info("Client is running");
 		Message message = new Message();
 		int portNumber = 0;
 		String hostName = "localhost";
@@ -76,15 +71,8 @@ public class Client {
 		
 		if (cmd.hasOption(Constant.SERVERS)) {
 			String server = cmd.getOptionValue(Constant.SERVERS);
-			String[] serverlist = server.split("\\,");
-			Exchange exchange = new Exchange();
-			for (int i = 0; i < serverlist.length; i++){
-				exchange.hostname = serverlist[i].split(":")[0];
-				exchange.port = Integer.parseInt(serverlist[i].split(":")[1]);
-				message.serverList.add(exchange);
-			}
+			message.serverList = parseServerList(server);
 		}
-		
 		
 		if (cmd.hasOption(Constant.DEBUG)) {
 			Configurator.currentConfig().level(Level.DEBUG).activate();
@@ -94,7 +82,16 @@ public class Client {
 		client.Execute();
 	}
 	
-	public void constructMessage(CommandLine cmd) {
-		
+	private static ArrayList<Exchange> parseServerList(String serverList) {
+		ArrayList<Exchange> result = new ArrayList<>();
+		String[] serverArr = serverList.split("\\,");
+		String serverName = "";
+		int port = 0;
+		for (String serverString : serverArr){
+			serverName = serverString.split(":")[0];
+			port = Integer.parseInt(serverString.split(":")[1]);
+			result.add(new Exchange(serverName, port));
+		}
+		return result;
 	}
 }

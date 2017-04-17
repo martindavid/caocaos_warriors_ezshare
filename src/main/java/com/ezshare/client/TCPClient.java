@@ -8,6 +8,7 @@ import org.pmw.tinylog.Logger;
 
 import com.ezshare.FileTransfer;
 import com.ezshare.Message;
+import com.ezshare.server.Responses;
 
 /**
  * Created by mvalentino on 20/3/17.
@@ -20,80 +21,74 @@ public class TCPClient {
 	private int portNumber;
 	private String hostName;
 	private FileTransfer fileTransfer;
-	
+
 	public TCPClient(int portNumber, String hostName, Message message) {
 		this.portNumber = portNumber;
 		this.hostName = hostName;
 		this.message = message;
 	}
-	
-    public void Execute() throws IOException {
-    	int sharon = 0;
-        try (
-                Socket echoSocket = new Socket(hostName, portNumber);
-        		DataOutputStream streamOut = new DataOutputStream(echoSocket.getOutputStream());
-        ) {
-        	// Print all of the information
-        	Logger.info("Starting the EZShare Server");
-        	Logger.info("using secret: "); // TODO: create functionality to generate secret
-    		Logger.info("using advertised hostname: " + hostName);
-    		Logger.info("bound to port " + portNumber);
-    		Logger.info("started");
-    		
-    		// Log it first and send to the server
-    		Logger.debug("Setting Debug On");
-        	Logger.debug("[SENT]:" + message.toJson());
-            streamOut.writeUTF(message.toJson());
-            
-     
-    		String message_echo = "";
-    		try (
-    				DataInputStream streamIn = 
-    					new DataInputStream(new BufferedInputStream(echoSocket.getInputStream())))
-    		{
-    			
-    			if (message.command.equals("FETCH")){
-    				while(true){
-    					if(streamIn.available() > 0){
-    						message_echo = streamIn.readUTF();
-    						System.out.println(message_echo);
-    						fileTransfer = new FileTransfer(echoSocket, message.resourceTemplate.uri);
-    						fileTransfer.receive();
-    						message_echo = streamIn.readUTF();
-    						System.out.println(message_echo);
-    						sharon = 3;
-    				}
-    					if (sharon==3) {break;}
-    				}
-    			}else{
-    				while(true) {
-    					while (streamIn.available() > 0) {
-    						message_echo = streamIn.readUTF();
-    						System.out.println(message_echo);
-    						sharon = 3;
-    				}
-    					if (sharon==3) {break;}
-    			}
-    			}
-    			}
-    		
-    		catch (IOException ioe) {
-    			// TODO: handle exception
-    			Logger.error(ioe);
-    		}
-        } 
-        
-        catch (UnknownHostException e) {
-            System.err.println("Don't know about host " + hostName);
-            System.exit(1);
-        } catch (IOException e) {
-            System.err.println("Couldn't get I/O for the connection to " +
-                    hostName);
-            System.exit(1);
-        }
-        catch(Exception e) {
-        	Logger.error(e);
-        }
 
-    }
+	public void Execute() throws IOException {
+		try (Socket echoSocket = new Socket(hostName, portNumber);
+				DataOutputStream streamOut = new DataOutputStream(echoSocket.getOutputStream());) {
+			// Print all of the information
+			Logger.info("Starting the EZShare Server");
+			Logger.info("using secret: "); // TODO: create functionality to
+											// generate secret
+			Logger.info("using advertised hostname: " + hostName);
+			Logger.info("bound to port " + portNumber);
+			Logger.info("started");
+
+			// Log it first and send to the server
+			Logger.debug("Setting Debug On");
+			Logger.debug("[SENT]:" + message.toJson());
+			streamOut.writeUTF(message.toJson());
+
+			String response = "";
+			try (DataInputStream streamIn = new DataInputStream(new BufferedInputStream(echoSocket.getInputStream()))) {
+			    int exitCounter = 0;
+				if (message.command.equals("FETCH")) {
+					while (true) {
+						if (streamIn.available() > 0) {
+							// Receive 
+							response = streamIn.readUTF();
+							Logger.info(response);
+							Responses serverResponse = Responses.fromJson(response);
+							
+							// Only fetch the file the response is not an error
+							if (!serverResponse.response.equals("error")) {
+								fileTransfer = new FileTransfer(echoSocket, message.resourceTemplate.uri);
+								fileTransfer.receive();
+								response = streamIn.readUTF();
+								Logger.info(response);
+							}
+							exitCounter = 3;
+						}
+						if (exitCounter == 3) { break; }
+					}
+				} else {
+					while (true) {
+						if (streamIn.available() > 0) {
+							response = streamIn.readUTF();
+							System.out.println(response);
+							exitCounter = 3;
+						}
+						if (exitCounter == 3) { break; }
+					}
+				}
+			}
+			catch (IOException ioe) {
+				Logger.error(ioe);
+			}
+		} catch (UnknownHostException e) {
+			Logger.error("Don't know about host " + hostName);
+			System.exit(1);
+		} catch (IOException e) {
+			Logger.error("Couldn't get I/O for the connection to " + hostName);
+			System.exit(1);
+		} catch (Exception e) {
+			Logger.error(e);
+		}
+
+	}
 }
