@@ -1,10 +1,6 @@
 package com.ezshare;
-import java.util.*;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -43,7 +39,6 @@ public class Resource {
 		toCopy.channel=this.channel;
 		toCopy.owner=this.owner;
 		toCopy.ezserver=this.ezserver;
-		toCopy.secret=this.secret;
 		toCopy.tags=this.tags;
 		toCopy.resourceSize=this.resourceSize;
 		

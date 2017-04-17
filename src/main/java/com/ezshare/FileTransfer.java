@@ -3,17 +3,17 @@ package com.ezshare;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.net.Socket;
 import java.util.Arrays;
 
-import com.ezshare.server.Message;
 import com.ezshare.server.Utilities;
+
+/**
+ * A class that handle transferring files
+ *
+ */
 
 public class FileTransfer {
 	DataInputStream streamin;
@@ -42,7 +42,6 @@ public class FileTransfer {
 			int subsize;
 			while((subsize = byteFile.read(buffer)) >0){
 				streamout.write(Arrays.copyOf(buffer, subsize));
-				streamout.flush();
 				size += subsize;
 			}
 		}catch(IOException e) {
@@ -57,7 +56,7 @@ public class FileTransfer {
 				message = streamin.readUTF();
 				System.out.println(message);
 				Resource resourceObject=Utilities.toResourceObject(message);
-				String fileLocation = "client_files/" + resourceObject.name;
+				String fileLocation = resourceObject.name;
 				RandomAccessFile downloadingFile = new RandomAccessFile(fileLocation, "rw");
 				long fileSizeRemaining = resourceObject.resourceSize;
 				int chunkSize = setChunkSize(fileSizeRemaining);
