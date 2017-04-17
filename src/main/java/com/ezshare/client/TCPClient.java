@@ -61,6 +61,7 @@ public class TCPClient {
     						message_echo = streamIn.readUTF();
     						System.out.println(message_echo);
     				}
+    					break;
     				}
     			}else{
     				while(true) {
@@ -68,6 +69,7 @@ public class TCPClient {
     						message_echo = streamIn.readUTF();
     						System.out.println(message_echo);
     				}
+    					break;
     			}
     			}
     			}
