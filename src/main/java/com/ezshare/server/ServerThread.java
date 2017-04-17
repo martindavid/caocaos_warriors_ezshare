@@ -67,9 +67,30 @@ public class ServerThread extends Thread {
 						}
 
 					}
-					// Taking into account cases where command is not found
-					else {
-						responseMessage = Utilities.messageReturn(6);
+					else if (messageObject.command.equals(Constant.FETCH.toUpperCase()))
+					{
+						
+						if (messageObject.resource!=null){
+						Fetch fetch = new Fetch(messageObject.resource);
+						FetchResponse fetchsponse = fetch.proceFetch();
+						Resource resp = fetchsponse.getResource();
+						String resMess = fetchsponse.getResponseMessage();
+						resMess=resMess+"\n"+resp.toJson();
+						responseMessage=resMess;}
+						else
+						{
+							responseMessage=Utilities.messageReturn(8);
+						}
+						
+						
+						
+						
+					}
+					
+					//Taking into account cases where command is not found
+					else
+					{
+						responseMessage=Utilities.messageReturn(6);
 					}
 					streamOut = new DataOutputStream(socket.getOutputStream());
 					streamOut.writeUTF(responseMessage);
