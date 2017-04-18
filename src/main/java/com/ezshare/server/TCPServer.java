@@ -152,7 +152,7 @@ public class TCPServer implements Runnable {
 	 */
 	public void addThread(Socket socket) {
 		Logger.info("Client connected: " + socket);
-		client = new ServerThread(socket);
+		client = new ServerThread(socket, this.secret);
 		client.start();
 	}
 	

@@ -5,11 +5,8 @@ import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Random;
 
 import org.pmw.tinylog.Logger;
 
@@ -29,9 +26,11 @@ public class ServerThread extends Thread {
 	private int ID = -1;
 	private DataInputStream streamIn = null;
 	private DataOutputStream streamOut;
+	private String secret;
 
-	public ServerThread(Socket socket) {
+	public ServerThread(Socket socket, String secret) {
 		this.socket = socket;
+		this.secret = secret;
 		this.ID = socket.getPort();
 	}
 
