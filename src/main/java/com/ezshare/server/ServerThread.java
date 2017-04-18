@@ -46,13 +46,12 @@ public class ServerThread extends Thread {
 					Message messageObject = Utilities.toMessageObject(message);
 					String responseMessage = "";
 					if (messageObject.command.equals(Constant.PUBLISH.toUpperCase())) {
-						// do sth
 						Publish publish = new Publish(messageObject.resource);
 						responseMessage = publish.processResourceMessage();
 
 					}else if (messageObject.command.equals(Constant.SHARE.toUpperCase())){
-						//ShareCommand sharec = new ShareCommand(messageObject.resource,this.secret);
-						//responseMessage = sharec.processResourceMessage();
+						ShareCommand sharec = new ShareCommand(messageObject.resource,messageObject.secret,this.secret);
+						responseMessage = sharec.processResourceMessage();
 					}
 					else if (messageObject.command.equals(Constant.REMOVE.toUpperCase())) {
 						RemoveCommand remove = new RemoveCommand(messageObject.resource);

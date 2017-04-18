@@ -8,10 +8,12 @@ import org.apache.commons.validator.routines.UrlValidator;
 public class ShareCommand {
 	private Resource resource;
 	private String secret;
+	private String machineSecret;
 
-	public ShareCommand(Resource resource,String secret) {
+	public ShareCommand(Resource resource,String secret,String machineSecret) {
 		this.secret=secret;
 		this.resource = resource;
+		this.machineSecret=machineSecret;
 	}
 	public boolean uriValidator(String uri)
 	{
@@ -33,17 +35,17 @@ public class ShareCommand {
 		{
 			return Utilities.messageReturn(4);
 		}
-		String currentSecret="";
+		String currentSecret=machineSecret;
 		
 		//TODO get secret
 		//Validate Secret
+		if (!this.secret.equals(currentSecret))
+		{
+			return Utilities.messageReturn(12);
+		}
 		if(this.secret.isEmpty())
 		{
 			return Utilities.messageReturn(11);
-		}
-		if(!this.secret.equals(currentSecret))
-		{
-			return Utilities.messageReturn(10);
 		}
 		//Validate URI
 		if(uriValidator(res.uri))
