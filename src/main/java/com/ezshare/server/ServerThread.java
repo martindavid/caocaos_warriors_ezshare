@@ -1,11 +1,15 @@
 package com.ezshare.server;
+//import com.ezshare.Message;
 
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Random;
 
 import org.pmw.tinylog.Logger;
 
@@ -25,7 +29,7 @@ public class ServerThread extends Thread {
 	private int ID = -1;
 	private DataInputStream streamIn = null;
 	private DataOutputStream streamOut;
-	
+
 	public ServerThread(Socket socket) {
 		this.socket = socket;
 		this.ID = socket.getPort();
@@ -50,6 +54,9 @@ public class ServerThread extends Thread {
 					} else if (messageObject.command.equals(Constant.REMOVE.toUpperCase())) {
 						RemoveCommand remove = new RemoveCommand(messageObject.resource);
 						responseMessage = remove.processResource();
+					} else if (messageObject.command.equals(Constant.EXCHANGE.toUpperCase())) {
+					    ExchangeCommand exchange = new ExchangeCommand(messageObject.serverList);
+					    responseMessage = exchange.processCommand();
 					} else if (messageObject.command.equals(Constant.QUERY.toUpperCase())) {
 						QueryCommand query = new QueryCommand(messageObject.resource);
 						// Process the Query
@@ -92,9 +99,7 @@ public class ServerThread extends Thread {
 								responseMessage = Utilities.messageReturn(7);
 							}
 						}
-						
 					}
-					
 					//Taking into account cases where command is not found
 					else
 					{

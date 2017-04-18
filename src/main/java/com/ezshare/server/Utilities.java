@@ -109,13 +109,42 @@ public class Utilities {
 			resp.response = "error";
 			resp.errorMessage = "invalid resourcetemplate";
 			return resp.toJson();
-		} else // if(type ==8)
+		} else if(type ==8)
 		{
 			Responses resp = new Responses();
 			resp.response = "error";
 			resp.errorMessage = "missing resourcetemplate";
 			return resp.toJson();
 		}
+		else if (type==9)
+		{
+			Responses resp = new Responses();
+			resp.response = "error";
+			resp.errorMessage = "missing or invalid server list";
+			return resp.toJson();
+		}
+		else if (type==10)
+		{
+			Responses resp = new Responses();
+			resp.response = "error";
+			resp.errorMessage = "incorrect secret";
+			return resp.toJson();
+		}
+		else if (type==11)
+		{
+			Responses resp = new Responses();
+			resp.response = "error";
+			resp.errorMessage = "missing resource and or secret";
+			return resp.toJson();
+		}
+		else //if (type==12)
+		{
+			Responses resp = new Responses();
+			resp.response = "error";
+			resp.errorMessage = "cannot share resource";
+			return resp.toJson();
+		}
+
 
 	}
 
