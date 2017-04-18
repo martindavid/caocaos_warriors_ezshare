@@ -69,7 +69,10 @@ public class TCPClient {
 					while (true) {
 						if (streamIn.available() > 0) {
 							response = streamIn.readUTF();
-							System.out.println(response);
+							Logger.info(response);
+							if (!message.command.equals("QUERY") || response.contains("resultSize")) {
+							    break;
+							}
 						}
 					}
 				}

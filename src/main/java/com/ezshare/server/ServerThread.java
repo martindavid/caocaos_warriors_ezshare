@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import org.pmw.tinylog.Logger;
 
 import com.ezshare.Constant;
+import com.ezshare.FileTransfer;
 import com.ezshare.Resource;
 
 /**
@@ -24,7 +25,7 @@ public class ServerThread extends Thread {
 	private int ID = -1;
 	private DataInputStream streamIn = null;
 	private DataOutputStream streamOut;
-
+	
 	public ServerThread(Socket socket) {
 		this.socket = socket;
 		this.ID = socket.getPort();
@@ -35,7 +36,8 @@ public class ServerThread extends Thread {
 		String message = "";
 		try {
 			streamIn = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
-			while (true) {
+			streamOut = new DataOutputStream(socket.getOutputStream());
+			while(true) {
 				if (streamIn.available() > 0) {
 					message = streamIn.readUTF();
 					Message messageObject = Utilities.toMessageObject(message);
@@ -67,13 +69,42 @@ public class ServerThread extends Thread {
 						}
 
 					}
-					// Taking into account cases where command is not found
-					else {
-						responseMessage = Utilities.messageReturn(6);
+					else if (messageObject.command.equals(Constant.FETCH.toUpperCase()))
+					{
+						
+						if(!message.contains("resourceTemplate")){
+							responseMessage = Utilities.messageReturn(8);
+						} else {
+							Fetch fetch = new Fetch(messageObject.resource);
+							FetchResponse fetchsponse = fetch.proceFetch();
+							if(messageObject.resourceTemplate.uri.contains("file") && fetchsponse != null){
+								String resMess = fetchsponse.getResponseMessage();
+								streamOut.writeUTF(resMess);
+								if(fetchsponse.res != null){
+									Resource resp = fetchsponse.getResource();
+									FileTransfer file = new FileTransfer(socket, messageObject.resource.uri);
+									resp.resourceSize = file.getFileSize();
+									streamOut.writeUTF(resp.toJson());
+									file.send();
+								}
+								responseMessage = fetchsponse.adsize.toJson();
+							}else{
+								responseMessage = Utilities.messageReturn(7);
+							}
+						}
+						
 					}
-					streamOut = new DataOutputStream(socket.getOutputStream());
+					
+					//Taking into account cases where command is not found
+					else
+					{
+						responseMessage=Utilities.messageReturn(6);
+					}
+					
 					streamOut.writeUTF(responseMessage);
-				}
+					
+					System.out.println(message);
+				}	
 			}
 
 		} catch (IOException ioe) {

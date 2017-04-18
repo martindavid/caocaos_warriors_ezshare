@@ -8,5 +8,6 @@ public class Message {
 	public Resource resource;
 	public String secret;
 	public String relay;
+	public Resource resourceTemplate = new Resource();
 	
 }
