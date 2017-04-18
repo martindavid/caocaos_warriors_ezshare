@@ -57,9 +57,8 @@ public class TCPClient {
 							// Only fetch the file the response is not an error
 							if (!serverResponse.response.equals("error")) {
 								fileTransfer = new FileTransfer(echoSocket, message.resourceTemplate.uri);
+								fileTransfer.streamin = streamIn;
 								fileTransfer.receive();
-								response = streamIn.readUTF();
-								Logger.info(response);
 							}
 							exitCounter = 3;
 						}

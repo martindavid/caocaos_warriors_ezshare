@@ -65,13 +65,18 @@ public class ServerThread extends Thread {
 						// Get the response message
 						String resMess = qresponse.getResponseMessage();
 						// Check to append the resources
-						if (responseList.size() != 0) {
-							for (Resource resourceIterator : Resource.resourceList) {
-								resMess = resMess + "\n" + resourceIterator.toJson();
+						if (!message.contains("resourceTemplate")){
+							responseMessage = Utilities.messageReturn(8);
+						} else if(messageObject.resourceTemplate.uri != ""){
+							if (responseList.size() != 0) {
+								for (Resource resourceIterator : Resource.resourceList) {
+									resMess = resMess + "\n" + resourceIterator.toJson();
+								}
 							}
-							responseMessage = resMess;
+							streamOut.writeUTF(resMess);
+							responseMessage = qresponse.adsize.toJson();
 						} else {
-							responseMessage = resMess;
+							responseMessage = Utilities.messageReturn(7);
 						}
 
 					}

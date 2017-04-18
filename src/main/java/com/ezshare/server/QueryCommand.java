@@ -116,7 +116,7 @@ public class QueryCommand {
 		}
 		if (resultList.size()<=0)
 		{
-			QueryResponse resp=new QueryResponse(Utilities.messageReturn(7));
+			QueryResponse resp=new QueryResponse(Utilities.messageReturn(1));
 			return resp;
 		}
 		else

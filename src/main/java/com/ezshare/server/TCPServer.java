@@ -54,7 +54,7 @@ public class TCPServer implements Runnable {
 		ServerList serverListObject=TCPServer.serverList.get(index);
 		
 		String servHostName=serverListObject.hostname;
-		int portNumber=serverListObject.portNumber;
+		int portNumber=serverListObject.port;
 		try {
 			if(servHostName.equals(InetAddress.getLocalHost().getHostName()))
 			{
@@ -63,7 +63,7 @@ public class TCPServer implements Runnable {
 				ServerList serverListObject1=TCPServer.serverList.get(index);
 				
 				servHostName=serverListObject1.hostname;
-				portNumber=serverListObject1.portNumber;
+				portNumber=serverListObject1.port;
 			}
 		} catch (UnknownHostException e2) 
 		{
@@ -78,7 +78,7 @@ public class TCPServer implements Runnable {
 		for (ServerList systemList : TCPServer.serverList)
 		{
 			exchange.hostname = systemList.hostname;
-			exchange.port = systemList.portNumber;
+			exchange.port = systemList.port;
 			mes.serverList.add(exchange);
 		}
 		//Create Connection

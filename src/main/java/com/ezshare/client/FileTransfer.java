@@ -57,32 +57,33 @@ public class FileTransfer {
 	public void receive() throws IOException {
 		String message = "";
 		try {
-			if (streamin.available() > 0) {
+			message = streamin.readUTF();
+			Logger.info(message);
+			if(message.contains("resourceSize")){
+				Resource resourceObject = Utilities.toResourceObject(message);
+				int loc = resourceObject.uri.lastIndexOf("/");
+				String fileLocation = resourceObject.uri.substring(loc + 1);
+				RandomAccessFile downloadingFile = new RandomAccessFile(fileLocation, "rw");
+				long fileSizeRemaining = resourceObject.resourceSize;
+				int chunkSize = setChunkSize(fileSizeRemaining);
+				byte[] buffer = new byte[chunkSize];
+				int num;
+				Logger.info("Downloading file");
+				while ((num = streamin.read(buffer)) > 0) {
+					downloadingFile.write(Arrays.copyOf(buffer, num));
+					fileSizeRemaining -= num;
+					chunkSize = setChunkSize(fileSizeRemaining);
+					buffer = new byte[chunkSize];
+					if (fileSizeRemaining == 0) {
+						break;
+					}
+				}
+				Logger.info("File received!");
+				downloadingFile.close();
 				message = streamin.readUTF();
 				Logger.info(message);
-				if(message.contains("resourceSize")){
-					Resource resourceObject = Utilities.toResourceObject(message);
-					int loc = resourceObject.uri.lastIndexOf("/");
-					String fileLocation = resourceObject.uri.substring(loc + 1);
-					RandomAccessFile downloadingFile = new RandomAccessFile(fileLocation, "rw");
-					long fileSizeRemaining = resourceObject.resourceSize;
-					int chunkSize = setChunkSize(fileSizeRemaining);
-					byte[] buffer = new byte[chunkSize];
-					int num;
-					Logger.info("Downloading file");
-					while ((num = streamin.read(buffer)) > 0) {
-						downloadingFile.write(Arrays.copyOf(buffer, num));
-						fileSizeRemaining -= num;
-						chunkSize = setChunkSize(fileSizeRemaining);
-						buffer = new byte[chunkSize];
-						if (fileSizeRemaining == 0) {
-							break;
-						}
-					}
-					Logger.info("File received!");
-					downloadingFile.close();
 				}
-			}
+			
 		} catch (IOException e) {
 			Logger.error(e);
 		}

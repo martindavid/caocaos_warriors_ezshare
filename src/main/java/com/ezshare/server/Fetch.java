@@ -23,14 +23,10 @@ public class Fetch {
 				FetchResponse resp = new FetchResponse(Utilities.messageReturn(1),resourcetest);
 				return resp;
 			}
-			else
-			{
-				FetchResponse resp = new FetchResponse(Utilities.messageReturn(1));
-				return resp;
-				
-			}
 			
-		}	
-		return null;
+		}
+		
+		FetchResponse resp = new FetchResponse(Utilities.messageReturn(1));
+		return resp;
 	}
 }
