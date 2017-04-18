@@ -78,18 +78,17 @@ public class ServerThread extends Thread {
 					}
 					else if (messageObject.command.equals(Constant.FETCH.toUpperCase()))
 					{
-						
 						if(!message.contains("resourceTemplate")){
 							responseMessage = Utilities.messageReturn(8);
 						} else {
-							Fetch fetch = new Fetch(messageObject.resource);
+							Fetch fetch = new Fetch(messageObject.resourceTemplate);
 							FetchResponse fetchsponse = fetch.proceFetch();
-							if(messageObject.resourceTemplate.uri.contains("file") && fetchsponse != null){
+							if(messageObject.resourceTemplate.uri != "" && fetchsponse != null){
 								String resMess = fetchsponse.getResponseMessage();
 								streamOut.writeUTF(resMess);
-								if(fetchsponse.res != null){
-									Resource resp = fetchsponse.getResource();
-									FileTransfer file = new FileTransfer(socket, messageObject.resource.uri);
+								Resource resp = fetchsponse.getResource();
+								if (resp != null){
+									FileTransfer file = new FileTransfer(socket, messageObject.resourceTemplate.uri);
 									resp.resourceSize = file.getFileSize();
 									streamOut.writeUTF(resp.toJson());
 									file.send();
