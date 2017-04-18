@@ -22,7 +22,7 @@ public class ExchangeCommand {
 		{
 			for (ServerList systemList : TCPServer.serverList)
 			{
-				if(objectList.portNumber==systemList.portNumber && objectList.hostname.equals(systemList.hostname))
+				if(objectList.port==systemList.port && objectList.hostname.equals(systemList.hostname))
 				{
 					found=true;
 					continue;
