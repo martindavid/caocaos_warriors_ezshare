@@ -41,7 +41,6 @@ public class TCPServer implements Runnable {
 		Logger.info("bound to port: " + portNumber);
 		Logger.info("Waiting for a client.....");
 		
-		
 		while (thread != null) {
 			try {
 				addThread(server.accept());

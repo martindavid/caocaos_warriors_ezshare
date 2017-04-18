@@ -70,9 +70,7 @@ public class TCPClient {
 						if (streamIn.available() > 0) {
 							response = streamIn.readUTF();
 							System.out.println(response);
-							exitCounter = 3;
 						}
-						if (exitCounter == 3) { break; }
 					}
 				}
 			}

@@ -9,7 +9,7 @@ public class QueryCommand {
 	private Resource resource;
 	public QueryCommand(Resource resource)
 	{
-		this.resource=resource;
+		this.resource = resource;
 	}
 	
 	private Resource checkOwner(Resource res)
@@ -17,7 +17,7 @@ public class QueryCommand {
 		if (!Utilities.isEmpty(res.owner))
 		{
 			Resource resCopy=new Resource(res);
-			resCopy.owner="*";
+			resCopy.owner = "*";
 			return resCopy;
 		}
 		else

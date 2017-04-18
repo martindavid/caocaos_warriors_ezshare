@@ -59,27 +59,29 @@ public class FileTransfer {
 	public void receive() throws IOException {
 		String message = "";
 		try {
-			message = streamin.readUTF();
-			Logger.info(message);
-			Resource resourceObject = Utilities.toResourceObject(message);
-			String fileLocation = resourceObject.name;
-			RandomAccessFile downloadingFile = new RandomAccessFile(fileLocation, "rw");
-			long fileSizeRemaining = resourceObject.resourceSize;
-			int chunkSize = setChunkSize(fileSizeRemaining);
-			byte[] buffer = new byte[chunkSize];
-			int num;
-			Logger.info("Downloading file");
-			while ((num = streamin.read(buffer)) > 0) {
-				downloadingFile.write(Arrays.copyOf(buffer, num));
-				fileSizeRemaining -= num;
-				chunkSize = setChunkSize(fileSizeRemaining);
-				buffer = new byte[chunkSize];
-				if (fileSizeRemaining == 0) {
-					break;
+			if (streamin.available() > 0) {
+				message = streamin.readUTF();
+				Logger.info(message);
+				Resource resourceObject = Utilities.toResourceObject(message);
+				String fileLocation = resourceObject.name;
+				RandomAccessFile downloadingFile = new RandomAccessFile(fileLocation, "rw");
+				long fileSizeRemaining = resourceObject.resourceSize;
+				int chunkSize = setChunkSize(fileSizeRemaining);
+				byte[] buffer = new byte[chunkSize];
+				int num;
+				Logger.info("Downloading file");
+				while ((num = streamin.read(buffer)) > 0) {
+					downloadingFile.write(Arrays.copyOf(buffer, num));
+					fileSizeRemaining -= num;
+					chunkSize = setChunkSize(fileSizeRemaining);
+					buffer = new byte[chunkSize];
+					if (fileSizeRemaining == 0) {
+						break;
+					}
 				}
+				Logger.info("File received!");
+				downloadingFile.close();
 			}
-			Logger.info("File received!");
-			downloadingFile.close();
 		} catch (IOException e) {
 			Logger.error(e);
 		}
