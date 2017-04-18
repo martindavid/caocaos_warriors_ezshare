@@ -10,4 +10,7 @@ public class Message {
 	public String relay;
 	public Resource resourceTemplate = new Resource();
 	
+	public ServerList[] serverList;
+	//TODO serverList object?
+
 }
