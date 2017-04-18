@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import org.pmw.tinylog.Logger;
 
 import com.ezshare.Constant;
+import com.ezshare.FileTransfer;
 import com.ezshare.Resource;
 
 /**
@@ -24,7 +25,6 @@ public class ServerThread extends Thread {
 	private int ID = -1;
 	private DataInputStream streamIn = null;
 	private DataOutputStream streamOut;
-	private FileTransfer filesend;
 	
 	public ServerThread(Socket socket) {
 		this.socket = socket;
@@ -36,7 +36,8 @@ public class ServerThread extends Thread {
 		String message = "";
 		try {
 			streamIn = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
-			while (true) {
+			streamOut = new DataOutputStream(socket.getOutputStream());
+			while(true) {
 				if (streamIn.available() > 0) {
 					message = streamIn.readUTF();
 					Message messageObject = Utilities.toMessageObject(message);
@@ -71,20 +72,26 @@ public class ServerThread extends Thread {
 					else if (messageObject.command.equals(Constant.FETCH.toUpperCase()))
 					{
 						
-						if (messageObject.resource!=null){
-						Fetch fetch = new Fetch(messageObject.resource);
-						FetchResponse fetchsponse = fetch.proceFetch();
-						Resource resp = fetchsponse.getResource();
-						String resMess = fetchsponse.getResponseMessage();
-						resMess=resMess+"\n"+resp.toJson();
-						responseMessage=resMess;}
-						else
-						{
-							responseMessage=Utilities.messageReturn(8);
+						if(!message.contains("resourceTemplate")){
+							responseMessage = Utilities.messageReturn(8);
+						} else {
+							Fetch fetch = new Fetch(messageObject.resource);
+							FetchResponse fetchsponse = fetch.proceFetch();
+							if(messageObject.resourceTemplate.uri.contains("file") && fetchsponse != null){
+								String resMess = fetchsponse.getResponseMessage();
+								streamOut.writeUTF(resMess);
+								if(fetchsponse.res != null){
+									Resource resp = fetchsponse.getResource();
+									FileTransfer file = new FileTransfer(socket, messageObject.resource.uri);
+									resp.resourceSize = file.getFileSize();
+									streamOut.writeUTF(resp.toJson());
+									file.send();
+								}
+								responseMessage = fetchsponse.adsize.toJson();
+							}else{
+								responseMessage = Utilities.messageReturn(7);
+							}
 						}
-						
-						
-						
 						
 					}
 					
@@ -94,18 +101,7 @@ public class ServerThread extends Thread {
 						responseMessage=Utilities.messageReturn(6);
 					}
 					
-					streamOut = new DataOutputStream(socket.getOutputStream());
 					streamOut.writeUTF(responseMessage);
-					if (messageObject.command.equals(Constant.FETCH.toUpperCase()))
-					{
-						FileTransfer Filesend = new FileTransfer(socket,messageObject.resource.uri);
-						Filesend.send();
-						addmessage addmes=new addmessage();
-						String Addmessage = addmes.toJson();
-						streamOut = new DataOutputStream(socket.getOutputStream());
-						streamOut.writeUTF(Addmessage);
-					}
-					
 					
 					System.out.println(message);
 				}	

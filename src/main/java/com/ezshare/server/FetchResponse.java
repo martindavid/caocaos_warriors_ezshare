@@ -1,29 +1,29 @@
 package com.ezshare.server;
 
-import java.util.ArrayList;
-
 import com.ezshare.Resource;
 //  the response type from the sever
 public class FetchResponse {
-	private String responseMessage;
-	private Resource res;
+	public String responseMessage;
+	public Resource res;
+	public addmessage adsize = new addmessage();
 	
 	public FetchResponse(String message,Resource resource){
-		this.responseMessage=message;
-		this.res= resource;
+		this.responseMessage = message;
+		this.res = resource;
+		adsize.resultSize = 1;
 	}
 	public FetchResponse(String message){
-		this.responseMessage=message;
-		this.res=new Resource();
+		this.responseMessage = message;
+		adsize.resultSize = 0;
 	}
 	
 	
 	public String getResponseMessage() {
-		return this.responseMessage;
+		return responseMessage;
 	}
 
 	public Resource getResource() {
-		return this.res;
+		return res;
 	}
 	
 	

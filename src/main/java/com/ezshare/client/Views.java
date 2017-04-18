@@ -8,5 +8,7 @@ public class Views {
 	public static class Share extends norm{};
 	public static class Exchange extends comm{};
 	public static class FileReceive{};
+	public static class response{};
+	public static class errorMessage extends response{};
 
 }

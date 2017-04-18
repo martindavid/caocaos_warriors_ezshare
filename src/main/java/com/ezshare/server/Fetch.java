@@ -1,12 +1,11 @@
 package com.ezshare.server;
 
-import java.util.ArrayList;
-
 import com.ezshare.Resource;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 public class Fetch {
 	private Resource resource;
+	
 	public Fetch(Resource resource)
 	{
 		this.resource=resource;
@@ -16,7 +15,6 @@ public class Fetch {
 	public FetchResponse proceFetch() throws JsonProcessingException
 	{
 		Resource res=this.resource;
-		ArrayList<Resource> resultList=new ArrayList<Resource>();
 		
 		for (Resource resourcetest:Resource.resourceList)
 		{
@@ -27,29 +25,12 @@ public class Fetch {
 			}
 			else
 			{
-				FetchResponse resp = new FetchResponse(Utilities.messageReturn(7));
+				FetchResponse resp = new FetchResponse(Utilities.messageReturn(1));
 				return resp;
 				
 			}
 			
-		}
-		
-		
-		
-		
-		
-		
-		
-		
+		}	
 		return null;
-		
 	}
-	
-	
-	
-	
-	
-	
-	
-
 }

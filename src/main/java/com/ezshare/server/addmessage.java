@@ -5,9 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class addmessage {
 	public int resultSize;
-	public String toJson;
+
 	public addmessage(){
-		resultSize = 1;
+		
 	}
 	
 	public String toJson() throws JsonProcessingException {
