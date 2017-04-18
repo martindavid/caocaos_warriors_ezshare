@@ -59,7 +59,14 @@ public class FileTransfer {
 			System.out.println(message);
 			if(message.contains("resourceSize")){
 				Resource resourceObject=Utilities.toResourceObject(message);
-				String fileLocation = resourceObject.name;
+				String fileLocation;
+				if (resourceObject.name != ""){
+					fileLocation = resourceObject.name;
+				}
+				else
+				{
+					fileLocation = Utilities.generateRandomString(5);
+				}
 				RandomAccessFile downloadingFile = new RandomAccessFile(fileLocation, "rw");
 				long fileSizeRemaining = resourceObject.resourceSize;
 				int chunkSize = setChunkSize(fileSizeRemaining);

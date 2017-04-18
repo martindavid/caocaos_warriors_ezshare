@@ -21,7 +21,6 @@ import com.ezshare.server.Utilities;
 public class FileTransfer {
 	DataInputStream streamin;
 	DataOutputStream streamout;
-	String filePath;
 	File file;
 	Socket socket;
 
@@ -30,9 +29,8 @@ public class FileTransfer {
 	public FileTransfer(Socket s, String FilePath) throws IOException {
 		streamin = new DataInputStream(s.getInputStream());
 		streamout = new DataOutputStream(s.getOutputStream());
-		filePath = FilePath;
-		file = new File(filePath);
-		this.socket = s;
+		file = new File(FilePath);
+		socket = s;
 	}
 
 	public void close() throws IOException {
@@ -49,8 +47,8 @@ public class FileTransfer {
 			int subsize;
 			while ((subsize = byteFile.read(buffer)) > 0) {
 				streamout.write(Arrays.copyOf(buffer, subsize));
-				size += subsize;
 			}
+			byteFile.close();
 		} catch (IOException e) {
 			streamout.close();
 		}
@@ -62,25 +60,35 @@ public class FileTransfer {
 			if (streamin.available() > 0) {
 				message = streamin.readUTF();
 				Logger.info(message);
-				Resource resourceObject = Utilities.toResourceObject(message);
-				String fileLocation = resourceObject.name;
-				RandomAccessFile downloadingFile = new RandomAccessFile(fileLocation, "rw");
-				long fileSizeRemaining = resourceObject.resourceSize;
-				int chunkSize = setChunkSize(fileSizeRemaining);
-				byte[] buffer = new byte[chunkSize];
-				int num;
-				Logger.info("Downloading file");
-				while ((num = streamin.read(buffer)) > 0) {
-					downloadingFile.write(Arrays.copyOf(buffer, num));
-					fileSizeRemaining -= num;
-					chunkSize = setChunkSize(fileSizeRemaining);
-					buffer = new byte[chunkSize];
-					if (fileSizeRemaining == 0) {
-						break;
+				if(message.contains("resourceSize")){
+					Resource resourceObject = Utilities.toResourceObject(message);
+					String fileLocation;
+					if (resourceObject.name != "")
+					{
+						fileLocation = resourceObject.name;
 					}
+					else
+					{
+						fileLocation = Utilities.generateRandomString(5);
+					}
+					RandomAccessFile downloadingFile = new RandomAccessFile(fileLocation, "rw");
+					long fileSizeRemaining = resourceObject.resourceSize;
+					int chunkSize = setChunkSize(fileSizeRemaining);
+					byte[] buffer = new byte[chunkSize];
+					int num;
+					Logger.info("Downloading file");
+					while ((num = streamin.read(buffer)) > 0) {
+						downloadingFile.write(Arrays.copyOf(buffer, num));
+						fileSizeRemaining -= num;
+						chunkSize = setChunkSize(fileSizeRemaining);
+						buffer = new byte[chunkSize];
+						if (fileSizeRemaining == 0) {
+							break;
+						}
+					}
+					Logger.info("File received!");
+					downloadingFile.close();
 				}
-				Logger.info("File received!");
-				downloadingFile.close();
 			}
 		} catch (IOException e) {
 			Logger.error(e);
