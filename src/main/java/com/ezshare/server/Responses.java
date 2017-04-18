@@ -16,6 +16,9 @@ public class Responses {
 	@JsonView(Views.errorMessage.class)
 	public String errorMessage;
 	
+	@JsonView(Views.errorMessage.class)
+	public String resultSize;
+	
 	public String toJson() throws JsonProcessingException {
 		ObjectMapper mapper = new ObjectMapper();
 		

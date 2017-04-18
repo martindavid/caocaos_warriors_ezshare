@@ -29,7 +29,12 @@ public class ShareCommand {
 	public String processResourceMessage() throws JsonProcessingException
 	{
 		Resource res = this.resource;
+		if(res==null)
+		{
+			return Utilities.messageReturn(4);
+		}
 		String currentSecret="";
+		
 		//TODO get secret
 		//Validate Secret
 		if(this.secret.isEmpty())

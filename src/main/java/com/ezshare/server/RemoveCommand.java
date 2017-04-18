@@ -29,7 +29,7 @@ public class RemoveCommand {
     		if(resourceIterator.owner.equals(res.owner) && resourceIterator.channel.equals(res.channel) 
             		&& resourceIterator.uri.equals(res.uri))
     		{
-    			Resource.deleteResource(res);
+    			Resource.deleteResource(resourceIterator);
     			return Utilities.messageReturn(1);
     		}
     		

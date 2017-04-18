@@ -50,14 +50,18 @@ public class ServerThread extends Thread {
 						Publish publish = new Publish(messageObject.resource);
 						responseMessage = publish.processResourceMessage();
 
-					} else if (messageObject.command.equals(Constant.REMOVE.toUpperCase())) {
+					}else if (messageObject.command.equals(Constant.SHARE.toUpperCase())){
+						//ShareCommand sharec = new ShareCommand(messageObject.resource,this.secret);
+						//responseMessage = sharec.processResourceMessage();
+					}
+					else if (messageObject.command.equals(Constant.REMOVE.toUpperCase())) {
 						RemoveCommand remove = new RemoveCommand(messageObject.resource);
 						responseMessage = remove.processResource();
 					} else if (messageObject.command.equals(Constant.EXCHANGE.toUpperCase())) {
 					    ExchangeCommand exchange = new ExchangeCommand(messageObject.serverList);
 					    responseMessage = exchange.processCommand();
 					} else if (messageObject.command.equals(Constant.QUERY.toUpperCase())) {
-						QueryCommand query = new QueryCommand(messageObject.resource);
+						QueryCommand query = new QueryCommand(messageObject.resourceTemplate);
 						// Process the Query
 						QueryResponse qresponse = query.processQuery();
 						// Variable to store the List answer
@@ -66,11 +70,16 @@ public class ServerThread extends Thread {
 						String resMess = qresponse.getResponseMessage();
 						// Check to append the resources
 						if (responseList.size() != 0) {
-							for (Resource resourceIterator : Resource.resourceList) {
+							for (Resource resourceIterator : responseList) {
 								resMess = resMess + "\n" + resourceIterator.toJson();
 							}
-							responseMessage = resMess;
-						} else {
+							Responses resp = new Responses();
+							resp.response = "error";
+							int size=responseList.size();
+							resp.resultSize = Integer.toString(size);
+							responseMessage = resMess+resp.toJson();
+						} 
+						else {
 							responseMessage = resMess;
 						}
 
