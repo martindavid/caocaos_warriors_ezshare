@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import org.pmw.tinylog.Logger;
 
 import com.ezshare.Constant;
-import com.ezshare.FileTransfer;
+import com.ezshare.client.FileTransfer;
 import com.ezshare.Resource;
 
 /**
@@ -43,7 +43,7 @@ public class ServerThread extends Thread {
 			while(true) {
 				if (streamIn.available() > 0) {
 					message = streamIn.readUTF();
-					Message messageObject = Utilities.toMessageObject(message);
+					Message messageObject = Utilities.convertJsonToObject(message, Message.class);
 					String responseMessage = "";
 					if (messageObject.command.equals(Constant.PUBLISH.toUpperCase())) {
 						Publish publish = new Publish(messageObject.resource);
@@ -95,7 +95,7 @@ public class ServerThread extends Thread {
 								streamOut.writeUTF(resMess);
 								Resource resp = fetchsponse.getResource();
 								if (resp != null){
-									FileTransfer file = new FileTransfer(socket, messageObject.resourceTemplate.uri);
+									FileTransfer file = new FileTransfer(streamIn, streamOut, messageObject.resourceTemplate.uri);
 									resp.resourceSize = file.getFileSize();
 									streamOut.writeUTF(resp.toJson());
 									file.send();

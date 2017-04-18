@@ -5,11 +5,11 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.net.Socket;
 import java.util.Arrays;
 
 import org.pmw.tinylog.Logger;
 
+import com.ezshare.Constant;
 import com.ezshare.Resource;
 import com.ezshare.server.Utilities;
 
@@ -17,70 +17,68 @@ import com.ezshare.server.Utilities;
  * A class that handle transferring files
  *
  */
-
 public class FileTransfer {
-	DataInputStream streamin;
-	DataOutputStream streamout;
 	File file;
-	Socket socket;
+	DataInputStream streamIn;
+	DataOutputStream streamOut;
 
 	long size = 0;
-
-	public FileTransfer(Socket s, String FilePath) throws IOException {
-		streamin = new DataInputStream(s.getInputStream());
-		streamout = new DataOutputStream(s.getOutputStream());
-		file = new File(FilePath);
-		socket = s;
+	
+	public FileTransfer(DataInputStream streamIn, DataOutputStream streamOut, String filePath) {
+		this.streamIn = streamIn;
+		this.streamOut = streamOut;
+		this.file = new File(filePath);
 	}
-
-	public void close() throws IOException {
-		streamin.close();
-		streamout.close();
+	
+	public long getFileSize() {
+		return file.length();
 	}
-
+	
 	public void send() throws IOException {
-		try (
-			RandomAccessFile byteFile = new RandomAccessFile(file, "r")
-		)	
+		try (RandomAccessFile byteFile = new RandomAccessFile(file, "r"))	
 		{
 			byte[] buffer = new byte[1024 * 1024];
 			int subsize;
 			while ((subsize = byteFile.read(buffer)) > 0) {
-				streamout.write(Arrays.copyOf(buffer, subsize));
+				streamOut.write(Arrays.copyOf(buffer, subsize));
 			}
-			byteFile.close();
 		} catch (IOException e) {
-			streamout.close();
+			Logger.error(e);
 		}
 	}
 
-	public void receive() throws IOException {
+	public void receiveFile() throws IOException {
 		String message = "";
-		try {
-			if (streamin.available() > 0) {
-				message = streamin.readUTF();
+		try
+		{
+			if (streamIn.available() > 0) {
+				message = streamIn.readUTF();
 				Logger.info(message);
-				if(message.contains("resourceSize")){
-					Resource resourceObject = Utilities.toResourceObject(message);
-					int loc = resourceObject.uri.lastIndexOf("/");
-					String fileLocation = resourceObject.uri.substring(loc + 1);
-					RandomAccessFile downloadingFile = new RandomAccessFile(fileLocation, "rw");
-					long fileSizeRemaining = resourceObject.resourceSize;
+				if(message.contains(Constant.RESULT_SIZE)){
+					Resource resource = Utilities.convertJsonToObject(message, Resource.class);
+					String fileName = resource.uri.substring(resource.uri.lastIndexOf("/") + 1);
+					
+					long fileSizeRemaining = resource.resourceSize;
 					int chunkSize = setChunkSize(fileSizeRemaining);
 					byte[] buffer = new byte[chunkSize];
 					int num;
-					Logger.info("Downloading file");
-					while ((num = streamin.read(buffer)) > 0) {
-						downloadingFile.write(Arrays.copyOf(buffer, num));
-						fileSizeRemaining -= num;
-						chunkSize = setChunkSize(fileSizeRemaining);
-						buffer = new byte[chunkSize];
-						if (fileSizeRemaining == 0) {
-							break;
+					
+					try (RandomAccessFile downloadingFile = new RandomAccessFile(fileName, "rw")) {
+						Logger.info("Downloading file");
+						while ((num = streamIn.read(buffer)) > 0) {
+							downloadingFile.write(Arrays.copyOf(buffer, num));
+							fileSizeRemaining -= num;
+							chunkSize = setChunkSize(fileSizeRemaining);
+							buffer = new byte[chunkSize];
+							if (fileSizeRemaining == 0) {
+								break;
+							}
 						}
+						Logger.info("File received!");
 					}
-					Logger.info("File received!");
-					downloadingFile.close();
+					catch(Exception e) {
+						Logger.error(e);
+					}
 				}
 			}
 		} catch (IOException e) {
@@ -95,17 +93,4 @@ public class FileTransfer {
 		}
 		return chunkSize;
 	}
-
-	public boolean isClosed() {
-		return socket.isClosed() && socket.isConnected();
-	}
-
-	public long getFileSize() {
-		return file.length();
-	}
-
-	public long getDealSize() {
-		return size;
-	}
-
 }

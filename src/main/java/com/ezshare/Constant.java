@@ -22,4 +22,8 @@ public class Constant {
 	public static final String SHARE = "share";
 	public static final String TAGS = "tags";
 	public static final String URI = "uri";
+	
+	public static final String RESULT_SIZE = "resultSize";
+	public static final String ERROR = "error";
+	public static final String SUCCESS = "success";
 }

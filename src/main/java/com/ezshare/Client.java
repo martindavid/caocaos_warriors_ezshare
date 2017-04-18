@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import org.apache.commons.cli.CommandLine;
 import org.pmw.tinylog.Configurator;
 import org.pmw.tinylog.Level;
-import org.pmw.tinylog.Logger;
 
 import com.ezshare.client.Exchange;
 import com.ezshare.client.TCPClient;
@@ -19,13 +18,6 @@ public class Client {
 		String hostName = "localhost";
 		
 		CommandLine cmd = new Cli(args).parseClient();
-		
-		if (cmd.hasOption(Constant.HOST)) {
-			hostName = cmd.getOptionValue(Constant.HOST);
-		}
-		if (cmd.hasOption(Constant.SECRET)) {
-			message.secret = cmd.getOptionValue(Constant.SECRET);
-		}
 		
 		if (cmd.hasOption(Constant.PUBLISH)) {
 			message.command = Constant.PUBLISH.toUpperCase();
@@ -41,6 +33,13 @@ public class Client {
 			message.command = Constant.EXCHANGE.toUpperCase();
 		}
 		
+		if (cmd.hasOption(Constant.HOST)) {
+			hostName = cmd.getOptionValue(Constant.HOST);
+		}
+		
+		if (cmd.hasOption(Constant.SECRET)) {
+			message.secret = cmd.getOptionValue(Constant.SECRET);
+		}
 		
 		if (cmd.hasOption(Constant.NAME)) {
 			message.resource.name = cmd.getOptionValue(Constant.NAME);
