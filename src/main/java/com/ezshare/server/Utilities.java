@@ -7,11 +7,17 @@ import java.util.ArrayList;
 import com.ezshare.Resource;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class Utilities {
 
+	/**
+	 * Generate random string with specific length
+	 * @param len
+	 * @return random string with len length
+	 */
 	public static String generateRandomString(int len) {
 		String AB = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 		SecureRandom rnd = new SecureRandom();
@@ -20,24 +26,21 @@ public class Utilities {
 			sb.append(AB.charAt(rnd.nextInt(AB.length())));
 		return sb.toString();
 	}
-
-	/*** Returns an object of the Class Message ***/
-	public static Message toMessageObject(String messageJson) {
+	
+	/**
+	 * Generic method to convert from jsonString to T object where T is class
+	 * @param jsonString
+	 * @param target
+	 * @return T instance
+	 * @throws JsonParseException
+	 * @throws JsonMappingException
+	 * @throws IOException
+	 */
+	public static <T> T convertJsonToObject(String jsonString, Class<T> target) 
+			throws JsonParseException, JsonMappingException, IOException {
 		ObjectMapper mapper = new ObjectMapper();
-		Message obj = null;
-		try {
-			obj = mapper.readValue(messageJson, Message.class);
-		} catch (JsonParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (JsonMappingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return obj;
+		
+		return mapper.readValue(jsonString, target);
 	}
 
 	/*** Returns an Object of the class Resources ***/

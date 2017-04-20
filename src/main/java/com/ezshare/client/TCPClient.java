@@ -6,8 +6,10 @@ import java.net.UnknownHostException;
 
 import org.pmw.tinylog.Logger;
 
+import com.ezshare.Constant;
 import com.ezshare.Message;
 import com.ezshare.server.Responses;
+import com.ezshare.server.Utilities;
 
 /**
  * Created by mvalentino on 20/3/17.
@@ -32,59 +34,65 @@ public class TCPClient {
 				DataOutputStream streamOut = new DataOutputStream(echoSocket.getOutputStream());) {
 			// Print all of the information
 			Logger.info("Starting the EZShare Server");
-			Logger.info("using secret: "); // TODO: create functionality to
-											// generate secret
+			Logger.info("using secret: ");
 			Logger.info("using advertised hostname: " + hostName);
 			Logger.info("bound to port " + portNumber);
 			Logger.info("started");
 
-			// Log it first and send to the server
 			Logger.debug("Setting Debug On");
 			Logger.debug("[SENT]:" + message.toJson());
+
 			streamOut.writeUTF(message.toJson());
 
 			String response = "";
 			try (DataInputStream streamIn = new DataInputStream(new BufferedInputStream(echoSocket.getInputStream()))) {
-			    int exitCounter = 0;
-				if (message.command.equals("FETCH")) {
+				boolean exitLoop = false;
+				if (message.command.equals(Constant.FETCH.toUpperCase())) {
 					while (true) {
 						if (streamIn.available() > 0) {
-							// Receive 
+							// Receive response from server (success or error)
 							response = streamIn.readUTF();
 							Logger.info(response);
-							Responses serverResponse = Responses.fromJson(response);
-							
+							Responses serverResponse = Utilities.convertJsonToObject(response, Responses.class);
+
 							// Only fetch the file the response is not an error
-							if (!serverResponse.response.equals("error")) {
-								fileTransfer = new FileTransfer(echoSocket, message.resourceTemplate.uri);
-								fileTransfer.receive();
+							if (!serverResponse.response.equals(Constant.ERROR)) {
+								// Receiving the file
+								fileTransfer = new FileTransfer(streamIn, streamOut, message.resourceTemplate.uri);
+								fileTransfer.receiveFile();
+
+								// Read resource size response
 								response = streamIn.readUTF();
 								Logger.info(response);
 							}
-							exitCounter = 3;
+							exitLoop = true;
 						}
-						if (exitCounter == 3) { break; }
+						if (exitLoop) {
+							break;
+						}
 					}
 				} else {
 					while (true) {
 						if (streamIn.available() > 0) {
 							response = streamIn.readUTF();
 							Logger.info(response);
-							if (!message.command.equals("QUERY") || response.contains("resultSize")) {
-							    break;
+							if (!message.command.equals(Constant.QUERY.toUpperCase())
+									|| response.contains(Constant.RESULT_SIZE)) {
+								break;
 							}
 						}
 					}
 				}
-			}
-			catch (IOException ioe) {
+			} catch (IOException ioe) {
 				Logger.error(ioe);
 			}
 		} catch (UnknownHostException e) {
 			Logger.error("Don't know about host " + hostName);
+			Logger.error(e);
 			System.exit(1);
 		} catch (IOException e) {
 			Logger.error("Couldn't get I/O for the connection to " + hostName);
+			Logger.error(e);
 			System.exit(1);
 		} catch (Exception e) {
 			Logger.error(e);

@@ -36,16 +36,17 @@ public class Message {
 	public String toJson() {
 		ObjectMapper mapper = new ObjectMapper();
 		try {
-			if (command.equals("FETCH")) {
-				return mapper.writerWithView(Views.Fetch.class).writeValueAsString(this);
-			} else if (command.equals("QUERY")) {
-				return mapper.writerWithView(Views.Query.class).writeValueAsString(this);
-			} else if (command.equals("SHARE")) {
-				return mapper.writerWithView(Views.Share.class).writeValueAsString(this);
-			} else if (command.equals("EXCHANGE")) {
-				return mapper.writerWithView(Views.Exchange.class).writeValueAsString(this);
-			} else {
-				return mapper.writerWithView(Views.norm.class).writeValueAsString(this);
+			switch (this.command.toLowerCase()) {
+				case Constant.FETCH:
+					return mapper.writerWithView(Views.Fetch.class).writeValueAsString(this);
+				case Constant.QUERY:
+					return mapper.writerWithView(Views.Query.class).writeValueAsString(this);
+				case Constant.SHARE:
+					return mapper.writerWithView(Views.Share.class).writeValueAsString(this);
+				case Constant.EXCHANGE:
+					return mapper.writerWithView(Views.Exchange.class).writeValueAsString(this);
+				default:
+					return mapper.writerWithView(Views.norm.class).writeValueAsString(this);
 			}
 		} catch (JsonProcessingException e) {
 			Logger.error(e);
