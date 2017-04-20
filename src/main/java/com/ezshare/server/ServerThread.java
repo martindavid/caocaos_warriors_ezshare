@@ -24,7 +24,7 @@ import com.ezshare.Resource;
 public class ServerThread extends Thread {
 	private Socket socket = null;
 	private int ID = -1;
-	private DataInputStream streamIn = null;
+	private DataInputStream streamIn;
 	private DataOutputStream streamOut;
 	private String secret;
 
@@ -35,98 +35,78 @@ public class ServerThread extends Thread {
 	}
 
 	public void run() {
-		Logger.info("Server thread " + ID + " running");
+		Logger.debug("Server thread " + ID + " running");
 		String message = "";
 		try {
 			streamIn = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
 			streamOut = new DataOutputStream(socket.getOutputStream());
-			while(true) {
+
+			while (true) {
 				if (streamIn.available() > 0) {
 					message = streamIn.readUTF();
+					Logger.debug(message);
 					Message messageObject = Utilities.convertJsonToObject(message, Message.class);
+					CommandHandler handler = new CommandHandler(messageObject, this.secret);
 					String responseMessage = "";
-					if (messageObject.command.equals(Constant.PUBLISH.toUpperCase())) {
-						Publish publish = new Publish(messageObject.resource);
-						responseMessage = publish.processResourceMessage();
 
-					}else if (messageObject.command.equals(Constant.SHARE.toUpperCase())){
-						ShareCommand sharec = new ShareCommand(messageObject.resource,messageObject.secret,this.secret);
-						responseMessage = sharec.processResourceMessage();
-					}
-					else if (messageObject.command.equals(Constant.REMOVE.toUpperCase())) {
-						RemoveCommand remove = new RemoveCommand(messageObject.resource);
-						responseMessage = remove.processResource();
-					} else if (messageObject.command.equals(Constant.EXCHANGE.toUpperCase())) {
-					    ExchangeCommand exchange = new ExchangeCommand(messageObject.serverList);
-					    responseMessage = exchange.processCommand();
-					} else if (messageObject.command.equals(Constant.QUERY.toUpperCase())) {
-						QueryCommand query = new QueryCommand(messageObject.resourceTemplate);
-						// Process the Query
-						QueryResponse qresponse = query.processQuery();
-						// Variable to store the List answer
-						ArrayList<Resource> responseList = qresponse.getResultList();
-						// Get the response message
-						String resMess = qresponse.getResponseMessage();
-						// Check to append the resources
-						if (responseList.size() != 0) {
-							for (Resource resourceIterator : responseList) {
-								resMess = resMess + "\n" + resourceIterator.toJson();
-							}
-							Responses resp = new Responses();
-							resp.response = "error";
-							int size=responseList.size();
-							resp.resultSize = Integer.toString(size);
-							responseMessage = resMess+resp.toJson();
-						} 
-						else {
-							responseMessage = resMess;
-						}
-
-					}
-					else if (messageObject.command.equals(Constant.FETCH.toUpperCase()))
-					{
-						if(!message.contains("resourceTemplate")){
+					if (messageObject.command.equals(Constant.FETCH.toUpperCase())) {
+						if (!message.contains("resourceTemplate")) {
 							responseMessage = Utilities.messageReturn(8);
 						} else {
 							Fetch fetch = new Fetch(messageObject.resourceTemplate);
 							FetchResponse fetchsponse = fetch.proceFetch();
-							if(messageObject.resourceTemplate.uri != "" && fetchsponse != null){
+							if (messageObject.resourceTemplate.uri != "" && fetchsponse != null) {
 								String resMess = fetchsponse.getResponseMessage();
 								streamOut.writeUTF(resMess);
 								Resource resp = fetchsponse.getResource();
-								if (resp != null){
-									FileTransfer file = new FileTransfer(streamIn, streamOut, messageObject.resourceTemplate.uri);
+								if (resp != null) {
+									FileTransfer file = new FileTransfer(streamIn, streamOut,
+											messageObject.resourceTemplate.uri);
 									resp.resourceSize = file.getFileSize();
 									streamOut.writeUTF(resp.toJson());
 									file.send();
 								}
 								responseMessage = fetchsponse.adsize.toJson();
-							}else{
+							} else {
 								responseMessage = Utilities.messageReturn(7);
 							}
+							streamOut.writeUTF(responseMessage);
 						}
-					}
-					//Taking into account cases where command is not found
-					else
-					{
-						responseMessage=Utilities.messageReturn(6);
-					}
-					
-					streamOut.writeUTF(responseMessage);
-					
-					System.out.println(message);
-				}	
-			}
+					} else if (messageObject.command.equals(Constant.QUERY.toUpperCase())) {
+						Query query = new Query(messageObject.resourceTemplate);
+						ArrayList<Resource> resourceList = query.processQuery();
 
+						if (resourceList.size() > 0) {
+							String successResponse = new Responses(Constant.SUCCESS, "").toJson();
+							streamOut.writeUTF(successResponse);
+							for (Resource res : resourceList) {
+								streamOut.writeUTF(res.toJson());
+							}
+							streamOut.writeUTF("{\"resultSize\":" + resourceList.size() + "}");
+						} else {
+							streamOut.writeUTF(Utilities.messageReturn(7));
+						}
+					} else {
+						responseMessage = handler.processMessage();
+						streamOut.writeUTF(responseMessage);
+					}
+				}
+			}
 		} catch (IOException ioe) {
 			Logger.error(ioe);
+		} finally { // Close the conection
+			try {
+				if (socket != null)
+					socket.close();
+				if (streamIn != null)
+					streamIn.close();
+				if (streamOut != null) {
+					streamOut.close();
+				}
+				Logger.debug("Server thread " + ID + " closed");
+			} catch (IOException e) {
+				Logger.error(e);
+			}
 		}
-	}
-
-	public void close() throws IOException {
-		if (socket != null)
-			socket.close();
-		if (streamIn != null)
-			streamIn.close();
 	}
 }
