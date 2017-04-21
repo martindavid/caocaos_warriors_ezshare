@@ -1,5 +1,9 @@
 package com.ezshare.server;
 
+import java.util.Arrays;
+
+import org.pmw.tinylog.Logger;
+
 import com.ezshare.Constant;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -18,6 +22,8 @@ public class CommandHandler {
 		switch (this.message.command.toLowerCase()) {
 		case Constant.PUBLISH:
 			responseMessage = new Publish(this.message.resource).processResourceMessage();
+			Logger.debug("PUBLISH: response message: " + responseMessage);
+			Logger.debug("PUBLISH: Resource Size: " + Storage.resourceList.size());
 			break;
 		case Constant.REMOVE:
 			responseMessage = new RemoveCommand(this.message.resource).processResource();
@@ -33,9 +39,11 @@ public class CommandHandler {
 			break;
 		case Constant.EXCHANGE:
 			responseMessage = new ExchangeCommand(this.message.serverList).processCommand();
+			Logger.debug("EXCHANGE: response message: " + responseMessage);
+			Logger.debug("EXCHANGE: Server List: " + Arrays.toString(Storage.serverList.toArray()));
 			break;
 		default:
-			responseMessage = Utilities.messageReturn(6);
+			responseMessage = Utilities.getReturnMessage(6);
 			break;
 		}
 

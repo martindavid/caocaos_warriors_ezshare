@@ -20,46 +20,45 @@ public class Publish {
 	public String processResourceMessage() throws JsonProcessingException {
 		Resource res = this.resource;
 		if (res == null) {
-			return Utilities.messageReturn(4);
+			return Utilities.getReturnMessage(4);
 		}
 
 		boolean isValid = validateResource(res);
 		if (!isValid) {
-			return Utilities.messageReturn(2);
+			return Utilities.getReturnMessage(2);
 		}
 
-		for (Resource resourceIterator : Resource.resourceList) {
+		for (Resource localRes : Storage.resourceList) {
 			// Check for same primary key and overwrite
-			if (resourceIterator.owner.equals(res.owner) && resourceIterator.channel.equals(res.channel)
-					&& resourceIterator.uri.equals(res.uri)) {
-				resourceIterator.ezserver = res.ezserver;
-				resourceIterator.tags = res.tags;
-				resourceIterator.description = res.description;
-				resourceIterator.name = res.name;
-				return Utilities.messageReturn(1);
-
+			if (localRes.owner.equals(res.owner) && localRes.channel.equals(res.channel)
+					&& localRes.uri.equals(res.uri)) {
+				localRes.ezserver = res.ezserver;
+				localRes.tags = res.tags;
+				localRes.description = res.description;
+				localRes.name = res.name;
+				return Utilities.getReturnMessage(1);
 			}
 			// Check for primary key differences
-			else if (resourceIterator.channel.equals(res.channel) && resourceIterator.uri.equals(res.uri)
-					&& !resourceIterator.owner.equals(res.owner)) {
-				return Utilities.messageReturn(2);
-
+			else if (localRes.channel.equals(res.channel) && localRes.uri.equals(res.uri)
+					&& !localRes.owner.equals(res.owner)) {
+				return Utilities.getReturnMessage(2);
 			}
 		}
-		Resource.addResource(res);
-		return Utilities.messageReturn(1);
+
+		Storage.resourceList.add(res);
+		return Utilities.getReturnMessage(1);
 	}
 
-	public boolean validateResource(Resource res) {
+	private boolean validateResource(Resource res) {
 		boolean isValid = true;
 		// check for empty String
 		// Check String values
-		if (Utilities.containsWhiteSpace(res.description) || Utilities.containsWhiteSpace(res.name)
-				|| Utilities.containsWhiteSpace(res.channel) || Utilities.containsWhiteSpace(res.owner)) {
+		if (isContainsWhiteSpace(res.description) || isContainsWhiteSpace(res.name) || isContainsWhiteSpace(res.channel)
+				|| isContainsWhiteSpace(res.owner)) {
 			isValid = false;
 		}
 		// Check for present URI
-		if (Utilities.isEmpty(res.uri) && !res.uri.contains("file:")) {
+		if (isEmpty(res.uri) && !res.uri.contains("file:")) {
 			isValid = false;
 		}
 		// Check for Owner
@@ -68,5 +67,23 @@ public class Publish {
 		}
 
 		return isValid;
+	}
+
+	/***
+	 * Code to check if it starts or ends with Whitespace
+	 * Reference:http://stackoverflow.com/questions/4067809/how-can-i-find-whitespace-space-in-a-string
+	 ***/
+	private static boolean isContainsWhiteSpace(final String testCode) {
+		if (!testCode.isEmpty() && (Character.isWhitespace(testCode.charAt(0))
+				|| Character.isWhitespace(testCode.charAt(testCode.length() - 1)))) {
+			return true;
+		} else if (!testCode.isEmpty() && testCode.contains("\0")) {
+			return true;
+		}
+		return false;
+	}
+
+	private static boolean isEmpty(final String testCode) {
+		return (testCode == null || testCode.isEmpty());
 	}
 }

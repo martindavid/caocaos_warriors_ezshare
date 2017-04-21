@@ -29,21 +29,21 @@ public class ShareCommand {
 	public String processResourceMessage() throws JsonProcessingException {
 		Resource res = this.resource;
 		if (res == null) {
-			return Utilities.messageReturn(4);
+			return Utilities.getReturnMessage(4);
 		}
 		String currentSecret = machineSecret;
 
 		// TODO get secret
 		// Validate Secret
 		if (!this.secret.equals(currentSecret)) {
-			return Utilities.messageReturn(12);
+			return Utilities.getReturnMessage(12);
 		}
 		if (this.secret.isEmpty()) {
-			return Utilities.messageReturn(11);
+			return Utilities.getReturnMessage(11);
 		}
 		// Validate URI
 		if (uriValidator(res.uri)) {
-			return Utilities.messageReturn(12);
+			return Utilities.getReturnMessage(12);
 		} else {
 			Publish publish = new Publish(this.resource);
 			return publish.processResourceMessage();

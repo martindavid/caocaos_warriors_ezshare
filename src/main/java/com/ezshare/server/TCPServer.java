@@ -15,15 +15,14 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
 import java.util.Random;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Created by mvalentino on 20/3/17.
  */
 public class TCPServer implements Runnable {
-	public static ArrayList<ServerList> serverList = new ArrayList<ServerList>();
-
 	public Resource[] resources;
 
 	private int portNumber;
@@ -33,12 +32,14 @@ public class TCPServer implements Runnable {
 	private String secret;
 	private ServerSocket server = null;
 	private int exchangeInterval;
+	private ExecutorService es;
 
 	public TCPServer(String hostName, int portNumber, String secret, int exchangeInterval) {
 		this.portNumber = portNumber;
 		this.hostName = hostName;
 		this.secret = secret;
 		this.exchangeInterval = exchangeInterval;
+		this.es = Executors.newCachedThreadPool();
 
 		try {
 			this.server = new ServerSocket(this.portNumber);
@@ -50,16 +51,16 @@ public class TCPServer implements Runnable {
 	public void runExchange() throws JsonProcessingException {
 		// Select a random item from serverList
 		Random randomGenerator = new Random();
-		int index = randomGenerator.nextInt(TCPServer.serverList.size());
-		ServerList serverListObject = TCPServer.serverList.get(index);
+		int index = randomGenerator.nextInt(Storage.serverList.size());
+		ServerList serverListObject = Storage.serverList.get(index);
 
 		String servHostName = serverListObject.hostname;
 		int portNumber = serverListObject.port;
 		try {
 			if (servHostName.equals(InetAddress.getLocalHost().getHostName())) {
 				randomGenerator = new Random();
-				index = randomGenerator.nextInt(TCPServer.serverList.size());
-				ServerList serverListObject1 = TCPServer.serverList.get(index);
+				index = randomGenerator.nextInt(Storage.serverList.size());
+				ServerList serverListObject1 = Storage.serverList.get(index);
 
 				servHostName = serverListObject1.hostname;
 				portNumber = serverListObject1.port;
@@ -74,7 +75,7 @@ public class TCPServer implements Runnable {
 		mes.command = Constant.EXCHANGE.toUpperCase();
 		String hostName = "";
 		int port = 0;
-		for (ServerList systemList : TCPServer.serverList) {
+		for (ServerList systemList : Storage.serverList) {
 			hostName = systemList.hostname;
 			port = systemList.port;
 			mes.serverList.add(new Exchange(hostName, port));
@@ -88,30 +89,24 @@ public class TCPServer implements Runnable {
 				while (true) {
 					while (streamIn.available() > 0) {
 						message_echo = streamIn.readUTF();
-						System.out.println(message_echo);
+						Logger.debug(message_echo);
 					}
 					break;
 				}
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				TCPServer.serverList.remove(serverListObject);
-				e.printStackTrace();
+				Storage.serverList.remove(serverListObject);
+				Logger.error(e);
 			}
 		} catch (UnknownHostException e1) {
-			// TODO Auto-generated catch block
-			TCPServer.serverList.remove(serverListObject);
+			Storage.serverList.remove(serverListObject);
 			e1.printStackTrace();
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			TCPServer.serverList.remove(serverListObject);
+			Storage.serverList.remove(serverListObject);
 			e1.printStackTrace();
 		}
 	}
 
 	public void run() {
-		// int MINUTES = 10; // The delay in minutes
-		// Timer timer = new Timer();
-		// timer.schedule(task, delay);
 		Logger.info("Starting the EZShare Server");
 		Logger.info("Using secret: " + secret);
 		Logger.info("using advertised hostname: " + hostName);
@@ -119,7 +114,7 @@ public class TCPServer implements Runnable {
 		Logger.info("Waiting for a client.....");
 		
 		Logger.debug("Setting debug on");
-
+		
 		while (thread != null) {
 			try {
 				addThread(server.accept());
@@ -149,7 +144,8 @@ public class TCPServer implements Runnable {
 	 */
 	public void addThread(Socket socket) {
 		Logger.debug("Client connected: " + socket);
+		Logger.debug("Client with IP: " + socket.getInetAddress() + " connected");
 		client = new ServerThread(socket, this.secret);
-		client.start();
+		this.es.execute(client);
 	}
 }

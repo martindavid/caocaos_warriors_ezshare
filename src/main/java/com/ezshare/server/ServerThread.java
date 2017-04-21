@@ -24,8 +24,6 @@ import com.ezshare.Resource;
 public class ServerThread extends Thread {
 	private Socket socket = null;
 	private int ID = -1;
-	private DataInputStream streamIn;
-	private DataOutputStream streamOut;
 	private String secret;
 
 	public ServerThread(Socket socket, String secret) {
@@ -34,24 +32,25 @@ public class ServerThread extends Thread {
 		this.ID = socket.getPort();
 	}
 
+	@Override
 	public void run() {
 		Logger.debug("Server thread " + ID + " running");
 		String message = "";
-		try {
-			streamIn = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
-			streamOut = new DataOutputStream(socket.getOutputStream());
-
+		try (DataInputStream streamIn = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
+				DataOutputStream streamOut = new DataOutputStream(socket.getOutputStream());) {
 			while (true) {
 				if (streamIn.available() > 0) {
 					message = streamIn.readUTF();
+
 					Logger.debug(message);
+
 					Message messageObject = Utilities.convertJsonToObject(message, Message.class);
 					CommandHandler handler = new CommandHandler(messageObject, this.secret);
 					String responseMessage = "";
 
 					if (messageObject.command.equals(Constant.FETCH.toUpperCase())) {
 						if (!message.contains("resourceTemplate")) {
-							responseMessage = Utilities.messageReturn(8);
+							responseMessage = Utilities.getReturnMessage(8);
 						} else {
 							Fetch fetch = new Fetch(messageObject.resourceTemplate);
 							FetchResponse fetchsponse = fetch.proceFetch();
@@ -68,14 +67,15 @@ public class ServerThread extends Thread {
 								}
 								responseMessage = fetchsponse.adsize.toJson();
 							} else {
-								responseMessage = Utilities.messageReturn(7);
+								responseMessage = Utilities.getReturnMessage(7);
 							}
 							streamOut.writeUTF(responseMessage);
+							break;
 						}
 					} else if (messageObject.command.equals(Constant.QUERY.toUpperCase())) {
-						Query query = new Query(messageObject.resourceTemplate);
+						Query query = new Query(messageObject.resourceTemplate, messageObject.relay);
 						ArrayList<Resource> resourceList = query.getResourceList();
-						String successResponse = new Responses(Constant.SUCCESS, "").toJson();
+						String successResponse = new Responses().toJson();
 						streamOut.writeUTF(successResponse);
 						if (resourceList.size() > 0) {
 							for (Resource res : resourceList) {
@@ -83,9 +83,11 @@ public class ServerThread extends Thread {
 							}
 						}
 						streamOut.writeUTF("{\"resultSize\":" + resourceList.size() + "}");
+						break;
 					} else {
 						responseMessage = handler.processMessage();
 						streamOut.writeUTF(responseMessage);
+						break;
 					}
 				}
 			}
@@ -93,12 +95,9 @@ public class ServerThread extends Thread {
 			Logger.error(ioe);
 		} finally { // Close the conection
 			try {
-				if (socket != null)
+				if (socket != null) {
 					socket.close();
-				if (streamIn != null)
-					streamIn.close();
-				if (streamOut != null) {
-					streamOut.close();
+					Logger.debug("Socket on thread " + ID + " closed");
 				}
 				Logger.debug("Server thread " + ID + " closed");
 			} catch (IOException e) {

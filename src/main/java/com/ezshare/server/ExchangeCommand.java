@@ -13,10 +13,10 @@ public class ExchangeCommand {
 		boolean found = false;
 		boolean added = false;
 		if (this.listServer.length <= 0) {
-			return Utilities.messageReturn(9);
+			return Utilities.getReturnMessage(9);
 		}
 		for (ServerList objectList : this.listServer) {
-			for (ServerList systemList : TCPServer.serverList) {
+			for (ServerList systemList : Storage.serverList) {
 				if (objectList.port == systemList.port && objectList.hostname.equals(systemList.hostname)) {
 					found = true;
 					continue;
@@ -26,14 +26,14 @@ public class ExchangeCommand {
 				found = false;
 				continue;
 			} else {
-				TCPServer.serverList.add(objectList);
+				Storage.serverList.add(objectList);
 				added = true;
 			}
 		}
 		if (added == false) {
-			return Utilities.messageReturn(9);
+			return Utilities.getReturnMessage(9);
 		} else {
-			return Utilities.messageReturn(1);
+			return Utilities.getReturnMessage(1);
 		}
 	}
 

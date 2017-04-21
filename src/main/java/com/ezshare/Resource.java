@@ -1,7 +1,5 @@
 package com.ezshare;
 
-import java.util.ArrayList;
-
 import com.ezshare.client.Views;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -18,8 +16,6 @@ public class Resource {
 	@JsonView(Views.FileReceive.class)
 	public long resourceSize;
 
-	public static ArrayList<Resource> resourceList = new ArrayList<Resource>();
-
 	/**
 	 * Resource constructor, set default value for all properties
 	 */
@@ -35,7 +31,7 @@ public class Resource {
 	/***
 	 * Copy Constructor to deep copy it
 	 * 
-	 * @param toCopy
+	 * @param res
 	 */
 	public Resource(Resource res) {
 		this.name = res.name;
@@ -46,14 +42,6 @@ public class Resource {
 		this.ezserver = res.ezserver;
 		this.tags = res.tags;
 		this.resourceSize = res.resourceSize;
-	}
-
-	public static void addResource(Resource res) {
-		resourceList.add(res);
-	}
-
-	public static void deleteResource(Resource res) {
-		resourceList.remove(res);
 	}
 
 	public String toJson() throws JsonProcessingException {

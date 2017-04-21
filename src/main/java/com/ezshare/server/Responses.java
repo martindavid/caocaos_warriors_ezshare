@@ -8,10 +8,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class Responses {
 	
-	public Responses() {}
+	public Responses() {
+		this.response = Constant.SUCCESS;
+	}
 	
-	public Responses(String response, String errorMessage) {
-		this.response = response;
+	public Responses(String errorMessage) {
+		this.response = Constant.ERROR;
 		this.errorMessage = errorMessage;
 	}
 	

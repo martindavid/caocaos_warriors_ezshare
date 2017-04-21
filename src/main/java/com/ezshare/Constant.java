@@ -24,6 +24,19 @@ public class Constant {
 	public static final String URI = "uri";
 	
 	public static final String RESULT_SIZE = "resultSize";
+	
+	// Response message
 	public static final String ERROR = "error";
 	public static final String SUCCESS = "success";
+	public static final String CANNOT_PUBLISH_RESOURCE = "cannot publish resource";
+	public static final String INVALID_RESOURCE = "invalid resource";
+	public static final String MISSING_RESOURCE = "missing resource";
+	public static final String CANNOT_REMOVE_RESOURCE = "cannot remove resource";
+	public static final String INVALID_COMMAND = "invalid command";
+	public static final String INVALID_RESOURCE_TEMPLATE = "invalid resourcetemplate";
+	public static final String MISSING_RESOURCE_TEMPLATE = "missing resource template";
+	public static final String MISSING_OR_INVALID_SERVER_LIST = "missing or invalid server list";
+	public static final String INCORRECT_SECRET = "incorrect secret";
+	public static final String MISSING_RESOURCE_OR_SECRET = "missing resource and or secret";
+	public static final String CANNOT_SHARE_RESOURCE = "cannot share resource";
 }
