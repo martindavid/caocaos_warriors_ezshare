@@ -41,6 +41,7 @@ public class Resource {
 		this.owner = res.owner;
 		this.ezserver = res.ezserver;
 		this.tags = res.tags;
+		this.resourceSize = res.resourceSize;
 	}
 
 	public String toJson() throws JsonProcessingException {
