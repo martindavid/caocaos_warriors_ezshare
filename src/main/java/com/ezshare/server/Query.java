@@ -42,8 +42,8 @@ public class Query {
 				&& ((!res.name.isEmpty() && res.name.contains(template.name))
 						|| (!res.description.isEmpty() && res.description.contains(template.description))
 						|| (template.name.isEmpty() && template.description.isEmpty()))) {
-			if (template.tags.length > 0 && Arrays.asList(res.tags).contains(template.tags)) {
-				result = true;
+			if (template.tags.length > 0) {
+				result = Arrays.asList(res.tags).containsAll(Arrays.asList(template.tags));
 			} else {
 				result = true;
 			}
@@ -114,17 +114,5 @@ public class Query {
 		}
 
 		return resultList;
-		// if (resultList.size() <= 0) {
-		// QueryResponse resp = new QueryResponse(Utilities.messageReturn(7));
-		// return resp;
-		// } else {
-		// // TODO RETURN LIST
-		// // return Utilities.messageReturn(1);
-		// QueryResponse resp = new QueryResponse(Utilities.messageReturn(1),
-		// resultList);
-		// return resp;
-		//
-		// }
-
 	}
 }
