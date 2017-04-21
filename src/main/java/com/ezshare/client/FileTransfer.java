@@ -52,41 +52,39 @@ public class FileTransfer {
 		try
 		{
 			// Read resource or result size response
-			if (streamIn.available() > 0) {
+			message = streamIn.readUTF();
+			Logger.info(message);
+				
+			//file receive
+			if(!message.contains(Constant.RESULT_SIZE)){
+				Resource resource = Utilities.convertJsonToObject(message, Resource.class);
+				String fileName = resource.uri.substring(resource.uri.lastIndexOf("/") + 1);
+					
+				long fileSizeRemaining = resource.resourceSize;
+				int chunkSize = setChunkSize(fileSizeRemaining);
+				byte[] buffer = new byte[chunkSize];
+				int num;
+					
+				try (RandomAccessFile downloadingFile = new RandomAccessFile(fileName, "rw")) {
+					Logger.info("Downloading file");
+					while ((num = streamIn.read(buffer)) > 0) {
+						downloadingFile.write(Arrays.copyOf(buffer, num));
+						fileSizeRemaining -= num;
+						chunkSize = setChunkSize(fileSizeRemaining);
+						buffer = new byte[chunkSize];
+						if (fileSizeRemaining == 0) {
+							break;
+						}
+					}
+					Logger.info("File received!");
+				}
+				catch(Exception e) {
+					Logger.error(e);
+				}
+					
+				// Read result size response
 				message = streamIn.readUTF();
 				Logger.info(message);
-				
-				//file receive
-				if(!message.contains(Constant.RESULT_SIZE)){
-					Resource resource = Utilities.convertJsonToObject(message, Resource.class);
-					String fileName = resource.uri.substring(resource.uri.lastIndexOf("/") + 1);
-					
-					long fileSizeRemaining = resource.resourceSize;
-					int chunkSize = setChunkSize(fileSizeRemaining);
-					byte[] buffer = new byte[chunkSize];
-					int num;
-					
-					try (RandomAccessFile downloadingFile = new RandomAccessFile(fileName, "rw")) {
-						Logger.info("Downloading file");
-						while ((num = streamIn.read(buffer)) > 0) {
-							downloadingFile.write(Arrays.copyOf(buffer, num));
-							fileSizeRemaining -= num;
-							chunkSize = setChunkSize(fileSizeRemaining);
-							buffer = new byte[chunkSize];
-							if (fileSizeRemaining == 0) {
-								break;
-							}
-						}
-						Logger.info("File received!");
-					}
-					catch(Exception e) {
-						Logger.error(e);
-					}
-					
-					// Read result size response
-					message = streamIn.readUTF();
-					Logger.info(message);
-				}
 			}
 		} catch (IOException e) {
 			Logger.error(e);
