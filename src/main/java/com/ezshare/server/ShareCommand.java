@@ -35,12 +35,13 @@ public class ShareCommand {
 
 		// TODO get secret
 		// Validate Secret
-		if (!this.secret.equals(currentSecret)) {
-			return Utilities.getReturnMessage(12);
-		}
 		if (this.secret.isEmpty()) {
 			return Utilities.getReturnMessage(11);
 		}
+		if (!this.secret.equals(currentSecret)) {
+			return Utilities.getReturnMessage(12);
+		}
+		
 		// Validate URI
 		if (uriValidator(res.uri)) {
 			return Utilities.getReturnMessage(12);

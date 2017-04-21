@@ -60,10 +60,6 @@ public class TCPClient {
 								// Receiving the file
 								fileTransfer = new FileTransfer(streamIn, streamOut, message.resourceTemplate.uri);
 								fileTransfer.receiveFile();
-
-								// Read resource size response
-								response = streamIn.readUTF();
-								Logger.info(response);
 							}
 							exitLoop = true;
 						}

@@ -51,10 +51,13 @@ public class FileTransfer {
 		String message = "";
 		try
 		{
+			// Read resource or result size response
 			if (streamIn.available() > 0) {
 				message = streamIn.readUTF();
 				Logger.info(message);
-				if(message.contains(Constant.RESULT_SIZE)){
+				
+				//file receive
+				if(!message.contains(Constant.RESULT_SIZE)){
 					Resource resource = Utilities.convertJsonToObject(message, Resource.class);
 					String fileName = resource.uri.substring(resource.uri.lastIndexOf("/") + 1);
 					
@@ -79,6 +82,10 @@ public class FileTransfer {
 					catch(Exception e) {
 						Logger.error(e);
 					}
+					
+					// Read result size response
+					message = streamIn.readUTF();
+					Logger.info(message);
 				}
 			}
 		} catch (IOException e) {
