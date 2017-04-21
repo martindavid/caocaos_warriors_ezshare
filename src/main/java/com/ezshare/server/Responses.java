@@ -7,6 +7,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class Responses {
+	
+	public Responses() {}
+	
+	public Responses(String response, String errorMessage) {
+		this.response = response;
+		this.errorMessage = errorMessage;
+	}
+	
 	@JsonView(Views.response.class)
 	public String response;
 

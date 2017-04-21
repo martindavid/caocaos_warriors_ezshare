@@ -2,12 +2,10 @@ package com.ezshare.server;
 
 import java.io.IOException;
 import java.security.SecureRandom;
-import java.util.ArrayList;
 
 import com.ezshare.Resource;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -179,60 +177,4 @@ public class Utilities {
 	public static boolean ownerValidation(String testString) {
 		return (testString.equals("*"));
 	}
-
-	/***
-	 * Deletes a Resource Object when the conditions meet
-	 * 
-	 * @param resJson
-	 * @return
-	 * @throws JsonProcessingException
-	 */
-	public String removeCommand(String resJson) throws JsonProcessingException {
-		Resource res = toResourceObject(resJson);
-
-		for (Resource resourceIterator : Resource.resourceList) {
-			if (resourceIterator.owner.equals(res.owner) && resourceIterator.channel.equals(res.channel)
-					&& resourceIterator.uri.equals(res.uri)) {
-				Resource.deleteResource(res);
-				return messageReturn(1);
-			}
-			if (ownerValidation(res.owner)) {
-				return messageReturn(3);
-			}
-		}
-		return messageReturn(6);
-
-	}
-
-	/***
-	 * Query for a resource
-	 * 
-	 * @param resJson
-	 * @return
-	 * @throws JsonProcessingException
-	 */
-	public String queryCommand(String resJson) throws JsonProcessingException {
-		ArrayList<Resource> returnList = new ArrayList<Resource>();
-		Resource res = toResourceObject(resJson);
-		for (Resource resourceIterator : Resource.resourceList) {
-			// Template Channel equals Resource Channel
-			if (resourceIterator.channel.equals(res.channel)) {
-				// Template contains owner and matches
-				if (resourceIterator.owner.equals(res.owner)) {
-					// Template Contains URI
-					if (resourceIterator.uri.equals(res.uri)) {
-
-					}
-				}
-				// Template does not contain Owner
-				else {
-
-				}
-
-			}
-		}
-		return "Not Found";
-
-	}
-
 }

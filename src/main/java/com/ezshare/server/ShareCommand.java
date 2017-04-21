@@ -2,7 +2,6 @@ package com.ezshare.server;
 
 import com.ezshare.Resource;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import java.lang.Object;
 import org.apache.commons.validator.routines.UrlValidator;
 
 public class ShareCommand {
@@ -10,54 +9,46 @@ public class ShareCommand {
 	private String secret;
 	private String machineSecret;
 
-	public ShareCommand(Resource resource,String secret,String machineSecret) {
-		this.secret=secret;
+	public ShareCommand(Resource resource, String secret, String machineSecret) {
+		this.secret = secret;
 		this.resource = resource;
-		this.machineSecret=machineSecret;
+		this.machineSecret = machineSecret;
 	}
-	public boolean uriValidator(String uri)
-	{
-		String[] schemes = {"http","https"};
+
+	public boolean uriValidator(String uri) {
+		String[] schemes = { "http", "https" };
 		UrlValidator urlValidator = new UrlValidator(schemes);
-		if (urlValidator.isValid(uri)) 
-		{
-			//Means this is an URL so not working for URI
+		if (urlValidator.isValid(uri)) {
+			// Means this is an URL so not working for URI
 			return true;
-		} else 
-		{
-		    return false;
+		} else {
+			return false;
 		}
 	}
-	public String processResourceMessage() throws JsonProcessingException
-	{
+
+	public String processResourceMessage() throws JsonProcessingException {
 		Resource res = this.resource;
-		if(res==null)
-		{
+		if (res == null) {
 			return Utilities.messageReturn(4);
 		}
-		String currentSecret=machineSecret;
-		
-		//TODO get secret
-		//Validate Secret
-		if (!this.secret.equals(currentSecret))
-		{
+		String currentSecret = machineSecret;
+
+		// TODO get secret
+		// Validate Secret
+		if (!this.secret.equals(currentSecret)) {
 			return Utilities.messageReturn(12);
 		}
-		if(this.secret.isEmpty())
-		{
+		if (this.secret.isEmpty()) {
 			return Utilities.messageReturn(11);
 		}
-		//Validate URI
-		if(uriValidator(res.uri))
-		{
+		// Validate URI
+		if (uriValidator(res.uri)) {
 			return Utilities.messageReturn(12);
-		}
-		else
-		{
-			Publish publish=new Publish(this.resource);
+		} else {
+			Publish publish = new Publish(this.resource);
 			return publish.processResourceMessage();
 		}
-		
+
 	}
 
 }

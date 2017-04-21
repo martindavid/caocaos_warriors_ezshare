@@ -17,8 +17,6 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Random;
-import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  * Created by mvalentino on 20/3/17.
@@ -34,11 +32,14 @@ public class TCPServer implements Runnable {
 	private Thread thread;
 	private String secret;
 	private ServerSocket server = null;
+	private int exchangeInterval;
 
-	public TCPServer(String hostName, int portNumber, String secret) {
+	public TCPServer(String hostName, int portNumber, String secret, int exchangeInterval) {
 		this.portNumber = portNumber;
 		this.hostName = hostName;
 		this.secret = secret;
+		this.exchangeInterval = exchangeInterval;
+
 		try {
 			this.server = new ServerSocket(this.portNumber);
 		} catch (IOException ioe) {
@@ -63,8 +64,8 @@ public class TCPServer implements Runnable {
 				servHostName = serverListObject1.hostname;
 				portNumber = serverListObject1.port;
 			}
-		} catch (UnknownHostException e2) {
-			e2.printStackTrace();
+		} catch (UnknownHostException e) {
+			Logger.error(e);
 		}
 		// Construct Message
 		com.ezshare.Message mes;
@@ -116,12 +117,13 @@ public class TCPServer implements Runnable {
 		Logger.info("using advertised hostname: " + hostName);
 		Logger.info("bound to port: " + portNumber);
 		Logger.info("Waiting for a client.....");
+		
+		Logger.debug("Setting debug on");
 
 		while (thread != null) {
 			try {
 				addThread(server.accept());
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				Logger.error(e);
 			}
 		}
@@ -146,14 +148,8 @@ public class TCPServer implements Runnable {
 	 * @param socket
 	 */
 	public void addThread(Socket socket) {
-		Logger.info("Client connected: " + socket);
+		Logger.debug("Client connected: " + socket);
 		client = new ServerThread(socket, this.secret);
 		client.start();
-	}
-
-	public void publishResource() throws JsonProcessingException {
-
-		Resource res = new Resource();
-		res.toJson();
 	}
 }

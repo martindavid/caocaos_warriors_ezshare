@@ -1,50 +1,38 @@
 package com.ezshare.server;
 
-import com.ezshare.Resource;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 public class ExchangeCommand {
 	private ServerList[] listServer;
 
 	public ExchangeCommand(ServerList[] listServer) {
-		this.listServer=listServer;
+		this.listServer = listServer;
 	}
-	
-	public String processCommand() throws JsonProcessingException
-	{
-		boolean found=false;
-		boolean added=false;
-		if (this.listServer.length<=0)
-		{
+
+	public String processCommand() throws JsonProcessingException {
+		boolean found = false;
+		boolean added = false;
+		if (this.listServer.length <= 0) {
 			return Utilities.messageReturn(9);
 		}
-		for (ServerList objectList : this.listServer)
-		{
-			for (ServerList systemList : TCPServer.serverList)
-			{
-				if(objectList.port==systemList.port && objectList.hostname.equals(systemList.hostname))
-				{
-					found=true;
+		for (ServerList objectList : this.listServer) {
+			for (ServerList systemList : TCPServer.serverList) {
+				if (objectList.port == systemList.port && objectList.hostname.equals(systemList.hostname)) {
+					found = true;
 					continue;
 				}
 			}
-			if (found==true)
-			{
-				found=false;
+			if (found == true) {
+				found = false;
 				continue;
-			}
-			else
-			{
+			} else {
 				TCPServer.serverList.add(objectList);
-				added=true;
+				added = true;
 			}
 		}
-		if (added==false)
-		{
+		if (added == false) {
 			return Utilities.messageReturn(9);
-		}
-		else
-		{
+		} else {
 			return Utilities.messageReturn(1);
 		}
 	}

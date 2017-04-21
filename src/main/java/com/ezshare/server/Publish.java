@@ -19,8 +19,7 @@ public class Publish {
 	 */
 	public String processResourceMessage() throws JsonProcessingException {
 		Resource res = this.resource;
-		if(res==null)
-		{
+		if (res == null) {
 			return Utilities.messageReturn(4);
 		}
 
