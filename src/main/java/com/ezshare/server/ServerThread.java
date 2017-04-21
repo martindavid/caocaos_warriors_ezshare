@@ -74,18 +74,15 @@ public class ServerThread extends Thread {
 						}
 					} else if (messageObject.command.equals(Constant.QUERY.toUpperCase())) {
 						Query query = new Query(messageObject.resourceTemplate);
-						ArrayList<Resource> resourceList = query.processQuery();
-
+						ArrayList<Resource> resourceList = query.getResourceList();
+						String successResponse = new Responses(Constant.SUCCESS, "").toJson();
+						streamOut.writeUTF(successResponse);
 						if (resourceList.size() > 0) {
-							String successResponse = new Responses(Constant.SUCCESS, "").toJson();
-							streamOut.writeUTF(successResponse);
 							for (Resource res : resourceList) {
 								streamOut.writeUTF(res.toJson());
 							}
-							streamOut.writeUTF("{\"resultSize\":" + resourceList.size() + "}");
-						} else {
-							streamOut.writeUTF(Utilities.messageReturn(7));
 						}
+						streamOut.writeUTF("{\"resultSize\":" + resourceList.size() + "}");
 					} else {
 						responseMessage = handler.processMessage();
 						streamOut.writeUTF(responseMessage);

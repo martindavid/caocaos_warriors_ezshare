@@ -38,14 +38,14 @@ public class Resource {
 	 * @param toCopy
 	 */
 	public Resource(Resource res) {
-		res.name = this.name;
-		res.description = this.description;
-		res.uri = this.uri;
-		res.channel = this.channel;
-		res.owner = this.owner;
-		res.ezserver = this.ezserver;
-		res.tags = this.tags;
-		res.resourceSize = this.resourceSize;
+		this.name = res.name;
+		this.description = res.description;
+		this.uri = res.uri;
+		this.channel = res.channel;
+		this.owner = res.owner;
+		this.ezserver = res.ezserver;
+		this.tags = res.tags;
+		this.resourceSize = res.resourceSize;
 	}
 
 	public static void addResource(Resource res) {

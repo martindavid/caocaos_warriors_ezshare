@@ -3,6 +3,8 @@ package com.ezshare.server;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import org.pmw.tinylog.Logger;
+
 import com.ezshare.Resource;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -25,10 +27,14 @@ public class Query {
 
 	public ArrayList<Resource> getResourceList() {
 		ArrayList<Resource> result = new ArrayList<Resource>();
-
+		Logger.debug("Resource list size: " + Resource.resourceList.size());
 		for (Resource res : Resource.resourceList) {
-			if (isMatch(res, this.resource)) {
-				result.add(res);
+			Resource newRes = new Resource(res);
+			if (isMatch(newRes, this.resource)) {
+				if (!newRes.owner.isEmpty()) {
+					newRes.owner = "*";
+				}
+				result.add(newRes);
 			}
 		}
 
@@ -37,16 +43,21 @@ public class Query {
 
 	private Boolean isMatch(Resource res, Resource template) {
 		Boolean result = false;
-
-		if (res.channel.equals(template.channel) && res.owner.equals(template.owner) && res.uri.equals(template.uri)
-				&& ((!res.name.isEmpty() && res.name.contains(template.name))
-						|| (!res.description.isEmpty() && res.description.contains(template.description))
-						|| (template.name.isEmpty() && template.description.isEmpty()))) {
+		Logger.debug(res.channel);
+		Logger.debug(res.owner);
+		Logger.debug(res.uri);
+		
+		if ((res.channel.equals(template.channel)) && 
+			(res.name.contains(template.name) || (template.name.isEmpty()))&& 
+			(res.description.contains(template.description) || (template.description.isEmpty()))&& 
+			(res.uri.contains(template.uri) || (template.uri.isEmpty()))&& 
+			(res.owner.contains(template.owner) || (template.owner.isEmpty()))) {
 			if (template.tags.length > 0) {
 				result = Arrays.asList(res.tags).containsAll(Arrays.asList(template.tags));
 			} else {
 				result = true;
 			}
+
 		}
 
 		return result;
