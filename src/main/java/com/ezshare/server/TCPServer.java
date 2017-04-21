@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
@@ -32,13 +33,15 @@ public class TCPServer implements Runnable {
 	private String secret;
 	private ServerSocket server = null;
 	private int exchangeInterval;
+	private int connIntervalLimit;
 	private ExecutorService es;
 
-	public TCPServer(String hostName, int portNumber, String secret, int exchangeInterval) {
+	public TCPServer(String hostName, int portNumber, String secret, int exchangeInterval, int connIntervalLimit) {
 		this.portNumber = portNumber;
 		this.hostName = hostName;
 		this.secret = secret;
 		this.exchangeInterval = exchangeInterval;
+		this.connIntervalLimit = connIntervalLimit;
 		this.es = Executors.newCachedThreadPool();
 
 		try {
@@ -145,7 +148,12 @@ public class TCPServer implements Runnable {
 	public void addThread(Socket socket) {
 		Logger.debug("Client connected: " + socket);
 		Logger.debug("Client with IP: " + socket.getInetAddress() + " connected");
-		client = new ServerThread(socket, this.secret);
-		this.es.execute(client);
+		try {
+			client = new ServerThread(socket, this.secret, this.connIntervalLimit);
+			this.es.execute(client);
+		} catch (SocketException e) {
+			Logger.error(e);
+		}
+		
 	}
 }

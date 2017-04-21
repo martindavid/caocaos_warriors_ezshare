@@ -18,7 +18,8 @@ public class Server {
 		int port = 3030;
 		String hostName;
 		String secret = Utilities.generateRandomString(40);
-		int exchangeInterval = 10;
+		int exchangeInterval = 600;
+		int connectionIntervalLimit = 1;
 
 		try {
 			hostName = InetAddress.getLocalHost().getHostName();
@@ -38,15 +39,19 @@ public class Server {
 			secret = cmd.getOptionValue(Constant.SECRET);
 		}
 
+		if (cmd.hasOption(Constant.EXCHANGE_INTERVAL)) {
+			exchangeInterval = Integer.parseInt(cmd.getOptionValue(Constant.EXCHANGE_INTERVAL));
+		}
+		
 		if (cmd.hasOption(Constant.CONNECTION_INTERVAL_LIMIT)) {
-			exchangeInterval = Integer.parseInt(cmd.getOptionValue(Constant.CONNECTION_INTERVAL_LIMIT));
+			connectionIntervalLimit = Integer.parseInt(cmd.getOptionValue(Constant.CONNECTION_INTERVAL_LIMIT));
 		}
 
 		if (cmd.hasOption(Constant.DEBUG)) {
 			Configurator.currentConfig().level(Level.DEBUG).activate();
 		}
 
-		TCPServer server = new TCPServer(hostName, port, secret, exchangeInterval);
+		TCPServer server = new TCPServer(hostName, port, secret, exchangeInterval, connectionIntervalLimit);
 		server.start();
 	}
 }

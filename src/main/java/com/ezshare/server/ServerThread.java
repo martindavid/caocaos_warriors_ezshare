@@ -6,6 +6,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.ArrayList;
 
 import org.pmw.tinylog.Logger;
@@ -26,8 +27,9 @@ public class ServerThread extends Thread {
 	private int ID = -1;
 	private String secret;
 
-	public ServerThread(Socket socket, String secret) {
+	public ServerThread(Socket socket, String secret, int connIntervalLimit) throws SocketException {
 		this.socket = socket;
+		this.socket.setSoTimeout(connIntervalLimit * 1000);;
 		this.secret = secret;
 		this.ID = socket.getPort();
 	}
