@@ -17,7 +17,7 @@ public class Message {
 	public boolean relay = true;
 
 	@JsonView(Views.Share.class)
-	public String secret;
+	public String secret = "";
 
 	@JsonView(Views.norm.class)
 	public Resource resource;
