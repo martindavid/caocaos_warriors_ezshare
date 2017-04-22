@@ -32,7 +32,6 @@ public class Cli {
 		
 		try {
 			cmd = parser.parse(options, args);
-			System.out.println(cmd.getOptions());
 			
 			if (cmd.hasOption("h")) {
 				help(options);
@@ -61,9 +60,8 @@ public class Cli {
 			if (cmd.hasOption("h")) {
 				help(options);
 			}
-			
 		} catch(ParseException e) {
-			Logger.error(e);
+			Logger.error("Invalid option");
 			help(options);
 		}
 		

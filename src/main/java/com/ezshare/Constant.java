@@ -24,6 +24,7 @@ public class Constant {
 	public static final String URI = "uri";
 	
 	public static final String RESULT_SIZE = "resultSize";
+	public static final String FILE_SCHEME = "file";
 	
 	// Response message
 	public static final String ERROR = "error";

@@ -42,8 +42,6 @@ public class FileTransfer {
 			while ((subsize = byteFile.read(buffer)) > 0) {
 				streamOut.write(Arrays.copyOf(buffer, subsize));
 			}
-		} catch (IOException e) {
-			Logger.error(e);
 		}
 	}
 

@@ -16,11 +16,11 @@ import com.ezshare.Message;
 import com.ezshare.Resource;
 
 public class QueryRelay {
-	
+
 	String hostName;
 	int portNumber;
 	Message message;
-	
+
 	public QueryRelay(String hostName, int portNumber, Message message) {
 		this.hostName = hostName;
 		this.portNumber = portNumber;
@@ -44,6 +44,10 @@ public class QueryRelay {
 						}
 						if (!response.contains(Constant.SUCCESS)) {
 							Resource res = Utilities.convertJsonToObject(response, Resource.class);
+							if (!res.owner.isEmpty() && res.owner != "*") {
+								res.owner = "*";
+							}
+							res.ezserver = String.format("%s:%d", hostName, portNumber);
 							result.add(res);
 						}
 					}

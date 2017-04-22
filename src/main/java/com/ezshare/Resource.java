@@ -6,12 +6,19 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class Resource {
+	@JsonView(Views.Common.class)
 	public String name;
+	@JsonView(Views.Common.class)
 	public String description;
+	@JsonView(Views.Common.class)
 	public String[] tags;
+	@JsonView(Views.Common.class)
 	public String uri;
+	@JsonView(Views.Common.class)
 	public String channel;
+	@JsonView(Views.Common.class)
 	public String owner;
+	@JsonView(Views.Common.class)
 	public String ezserver;
 	@JsonView(Views.FileReceive.class)
 	public long resourceSize;
@@ -41,11 +48,15 @@ public class Resource {
 		this.owner = res.owner;
 		this.ezserver = res.ezserver;
 		this.tags = res.tags;
-		this.resourceSize = res.resourceSize;
+	}
+
+	public String toFetchResultJson() throws JsonProcessingException {
+		ObjectMapper mapper = new ObjectMapper();
+		return mapper.writerWithView(Views.FileReceive.class).writeValueAsString(this);
 	}
 
 	public String toJson() throws JsonProcessingException {
 		ObjectMapper mapper = new ObjectMapper();
-		return mapper.writeValueAsString(this);
+		return mapper.writerWithView(Views.Common.class).writeValueAsString(this);
 	}
 }
