@@ -1,5 +1,9 @@
 package com.ezshare.server;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
+import com.ezshare.Constant;
 import com.ezshare.Resource;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -45,6 +49,8 @@ public class Publish {
 			}
 		}
 
+		// Update ezserver value before add to list
+		res.ezserver = String.format("%s:%d", Storage.hostName, Storage.port);
 		Storage.resourceList.add(res);
 		return Utilities.getReturnMessage(1);
 	}
@@ -58,9 +64,10 @@ public class Publish {
 			isValid = false;
 		}
 		// Check for present URI
-		if (isEmpty(res.uri) && !res.uri.contains("file:")) {
+		if (!isValidUri(res.uri)) {
 			isValid = false;
 		}
+
 		// Check for Owner
 		if (res.owner.equals("*")) {
 			isValid = false;
@@ -83,7 +90,15 @@ public class Publish {
 		return false;
 	}
 
-	private static boolean isEmpty(final String testCode) {
-		return (testCode == null || testCode.isEmpty());
+	private static boolean isValidUri(String stringUri) {
+		boolean isValid = true;
+		try {
+			URI uri = new URI(stringUri);
+			isValid = uri != null && uri.isAbsolute() && !uri.getScheme().equals(Constant.FILE_SCHEME);
+		} catch (URISyntaxException e) {
+			isValid = false;
+		}
+
+		return isValid;
 	}
 }

@@ -27,6 +27,8 @@ public class CommandHandler {
 			break;
 		case Constant.REMOVE:
 			responseMessage = new RemoveCommand(this.message.resource).processResource();
+			Logger.debug("REMOVE: response message: " + responseMessage);
+			Logger.debug("REMOVE: Resource Size: " + Storage.resourceList.size());
 			break;
 		case Constant.SHARE:
 			responseMessage = new ShareCommand(this.message.resource, this.message.secret, this.serverSecret)

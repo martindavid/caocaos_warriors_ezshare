@@ -118,6 +118,11 @@ public class TCPServer implements Runnable {
 		
 		Logger.debug("Setting debug on");
 		
+		// Update global variable
+		Storage.hostName = this.hostName;
+		Storage.port = this.portNumber;
+		Storage.secret = this.secret;
+		
 		while (thread != null) {
 			try {
 				addThread(server.accept());
@@ -149,7 +154,7 @@ public class TCPServer implements Runnable {
 		Logger.debug("Client connected: " + socket);
 		Logger.debug("Client with IP: " + socket.getInetAddress() + " connected");
 		try {
-			client = new ServerThread(socket, this.secret, this.connIntervalLimit);
+			client = new ServerThread(socket, this.connIntervalLimit);
 			this.es.execute(client);
 		} catch (SocketException e) {
 			Logger.error(e);

@@ -25,12 +25,10 @@ import com.ezshare.Resource;
 public class ServerThread extends Thread {
 	private Socket socket = null;
 	private int ID = -1;
-	private String secret;
 
-	public ServerThread(Socket socket, String secret, int connIntervalLimit) throws SocketException {
+	public ServerThread(Socket socket, int connIntervalLimit) throws SocketException {
 		this.socket = socket;
-		this.socket.setSoTimeout(connIntervalLimit * 1000);;
-		this.secret = secret;
+		this.socket.setSoTimeout(connIntervalLimit * 1000);
 		this.ID = socket.getPort();
 	}
 
@@ -47,7 +45,7 @@ public class ServerThread extends Thread {
 					Logger.debug(message);
 
 					Message messageObject = Utilities.convertJsonToObject(message, Message.class);
-					CommandHandler handler = new CommandHandler(messageObject, this.secret);
+					CommandHandler handler = new CommandHandler(messageObject, Storage.secret);
 					String responseMessage = "";
 
 					if (messageObject.command.equals(Constant.FETCH.toUpperCase())) {
@@ -56,19 +54,24 @@ public class ServerThread extends Thread {
 						} else {
 							Fetch fetch = new Fetch(messageObject.resourceTemplate);
 							FetchResponse fetchsponse = fetch.proceFetch();
-							if (messageObject.resourceTemplate.uri != "" && fetchsponse != null) {
-								String resMess = fetchsponse.getResponseMessage();
-								streamOut.writeUTF(resMess);
-								Resource resp = fetchsponse.getResource();
-								if (resp != null) {
-									FileTransfer file = new FileTransfer(streamIn, streamOut,
-											messageObject.resourceTemplate.uri);
-									resp.resourceSize = file.getFileSize();
-									streamOut.writeUTF(resp.toJson());
-									file.send();
+							try {
+								if (!messageObject.resourceTemplate.uri.isEmpty() && fetchsponse != null) {
+									String resMess = fetchsponse.getResponseMessage();
+									streamOut.writeUTF(resMess);
+									Resource resp = fetchsponse.getResource();
+									if (resp != null) {
+										FileTransfer file = new FileTransfer(streamIn, streamOut,
+												messageObject.resourceTemplate.uri);
+										resp.resourceSize = file.getFileSize();
+										streamOut.writeUTF(resp.toFetchResultJson());
+										file.send();
+									}
+									responseMessage = fetchsponse.adsize.toJson();
+								} else {
+									responseMessage = Utilities.getReturnMessage(7);
 								}
-								responseMessage = fetchsponse.adsize.toJson();
-							} else {
+							} catch (Exception e) {
+								Logger.error(e);
 								responseMessage = Utilities.getReturnMessage(7);
 							}
 							streamOut.writeUTF(responseMessage);

@@ -31,17 +31,19 @@ public class Query {
 			}
 		}
 
-		if (relay) {
+		if (relay) { // Fetch resource from other server
 			try {
 				// Construct client message to be passed to relay server
 				Message clientMessage = new Message();
 				clientMessage.command = Constant.QUERY.toUpperCase();
 				clientMessage.resourceTemplate = this.resource;
+				clientMessage.relay = false;
 				for (ServerList server : Storage.serverList) {
+					Logger.debug("Fetch resource from %s:%d", server.hostname, server.port);
 					ArrayList<Resource> relayRes = new QueryRelay(server.hostname, server.port, clientMessage)
 							.fetchResourceList();
-					Logger.debug(
-							String.format("Get %d resource from %s:%d", relayRes.size(), server.hostname, server.port));
+					Logger.debug(String.format("Fetched %d resource from %s:%d", relayRes.size(), server.hostname,
+							server.port));
 					if (relayRes.size() > 0) {
 						result.addAll(relayRes);
 					}

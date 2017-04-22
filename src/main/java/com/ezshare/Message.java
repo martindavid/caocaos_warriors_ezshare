@@ -10,7 +10,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class Message {
-	@JsonView(Views.comm.class)
+	@JsonView(Views.Command.class)
 	public String command;
 
 	@JsonView(Views.Query.class)
@@ -19,7 +19,7 @@ public class Message {
 	@JsonView(Views.Share.class)
 	public String secret = "";
 
-	@JsonView(Views.norm.class)
+	@JsonView(Views.Common.class)
 	public Resource resource;
 
 	@JsonView(Views.Fetch.class)
@@ -46,7 +46,7 @@ public class Message {
 				case Constant.EXCHANGE:
 					return mapper.writerWithView(Views.Exchange.class).writeValueAsString(this);
 				default:
-					return mapper.writerWithView(Views.norm.class).writeValueAsString(this);
+					return mapper.writerWithView(Views.Common.class).writeValueAsString(this);
 			}
 		} catch (JsonProcessingException e) {
 			Logger.error(e);

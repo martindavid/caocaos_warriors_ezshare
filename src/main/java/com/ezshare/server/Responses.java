@@ -17,19 +17,19 @@ public class Responses {
 		this.errorMessage = errorMessage;
 	}
 	
-	@JsonView(Views.response.class)
+	@JsonView(Views.Response.class)
 	public String response;
 
-	@JsonView(Views.errorMessage.class)
+	@JsonView(Views.ErrorMessage.class)
 	public String errorMessage;
 
 	public String toJson() throws JsonProcessingException {
 		ObjectMapper mapper = new ObjectMapper();
 
 		if (response.equals(Constant.SUCCESS)) {
-			return mapper.writerWithView(Views.response.class).writeValueAsString(this);
+			return mapper.writerWithView(Views.Response.class).writeValueAsString(this);
 		} else {
-			return mapper.writerWithView(Views.errorMessage.class).writeValueAsString(this);
+			return mapper.writerWithView(Views.ErrorMessage.class).writeValueAsString(this);
 		}
 	}
 }
