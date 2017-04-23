@@ -39,12 +39,17 @@ public class Query {
 				clientMessage.command = Constant.QUERY.toUpperCase();
 				clientMessage.resourceTemplate = new ResourceTemplate(this.resource);
 				clientMessage.relay = false;
+				Logger.debug("QUERY: Client message for relay server");
+				Logger.debug(String.format("QUERY: Channel: %s, Owner: %s, Uri: %s, Name: %s, Description: %s",
+						clientMessage.resourceTemplate.channel, clientMessage.resourceTemplate.owner,
+						clientMessage.resourceTemplate.uri, clientMessage.resourceTemplate.name,
+						clientMessage.resourceTemplate.description));
 				for (ServerList server : Storage.serverList) {
-					Logger.debug(String.format("Fetch resource from %s:%d", server.hostname, server.port));
+					Logger.debug(String.format("QUERY: Fetch resource from %s:%d", server.hostname, server.port));
 					ArrayList<Resource> relayRes = new QueryRelay(server.hostname, server.port, clientMessage)
 							.fetchResourceList();
-					Logger.debug(String.format("Fetched %d resource from %s:%d", relayRes.size(), server.hostname,
-							server.port));
+					Logger.debug(String.format("QUERY: Fetched %d resource from %s:%d", relayRes.size(),
+							server.hostname, server.port));
 					if (relayRes.size() > 0) {
 						result.addAll(relayRes);
 					}
@@ -59,9 +64,9 @@ public class Query {
 
 	private Boolean isMatch(Resource res, Resource template) {
 		Boolean result = false;
-
-		Logger.debug(String.format("Channel: %s, Owner: %s, Uri: %s, Name: %s, Description: %s", res.channel, res.owner,
-				res.uri, res.name, res.description));
+		Logger.debug("QUERY: validate resource");
+		Logger.debug(String.format("QUERY: Channel: %s, Owner: %s, Uri: %s, Name: %s, Description: %s", res.channel,
+				res.owner, res.uri, res.name, res.description));
 
 		if ((res.channel.equals(template.channel)) && (res.name.contains(template.name) || (template.name.isEmpty()))
 				&& (res.description.contains(template.description) || (template.description.isEmpty()))
