@@ -10,12 +10,12 @@ import java.net.URISyntaxException;
 
 import org.pmw.tinylog.Logger;
 
-public class ShareCommand {
+public class Share {
 	private Resource resource;
 	private String secret;
 	private String machineSecret;
 
-	public ShareCommand(Resource resource, String secret, String machineSecret) {
+	public Share(Resource resource, String secret, String machineSecret) {
 		this.secret = secret;
 		this.resource = resource;
 		this.machineSecret = machineSecret;
@@ -24,23 +24,23 @@ public class ShareCommand {
 	public String processResourceMessage() throws JsonProcessingException {
 		Resource res = this.resource;
 		if (res == null) {
-			return Utilities.getReturnMessage(4);
+			return Utilities.getReturnMessage(Constant.MISSING_RESOURCE);
 		}
 
 		// Validate Secret
 		if (this.secret.isEmpty()) {
 			Logger.debug("SHARE: secret is empty");
-			return Utilities.getReturnMessage(11);
+			return Utilities.getReturnMessage(Constant.MISSING_RESOURCE_OR_SECRET);
 		}
 		if (!this.secret.equals(this.machineSecret)) {
 			Logger.debug("SHARE: secret is not match");
-			return Utilities.getReturnMessage(12);
+			return Utilities.getReturnMessage(Constant.CANNOT_SHARE_RESOURCE);
 		}
 
 		// Validate URI
 		if (!isValidFileUri(res.uri)) {
 			Logger.debug("SHARE: not a valid URI");
-			return Utilities.getReturnMessage(12);
+			return Utilities.getReturnMessage(Constant.CANNOT_SHARE_RESOURCE);
 		} else {
 
 			for (Resource localRes : Storage.resourceList) {
@@ -52,12 +52,12 @@ public class ShareCommand {
 					localRes.tags = res.tags;
 					localRes.description = res.description;
 					localRes.name = res.name;
-					return Utilities.getReturnMessage(1);
+					return Utilities.getReturnMessage(Constant.SUCCESS);
 				}
 				// Check for primary key differences
 				else if (localRes.channel.equals(res.channel) && localRes.uri.equals(res.uri)
 						&& !localRes.owner.equals(res.owner)) {
-					return Utilities.getReturnMessage(2);
+					return Utilities.getReturnMessage(Constant.CANNOT_PUBLISH_RESOURCE);
 				}
 			}
 			Logger.debug("SHARE: insert new resource");
@@ -65,7 +65,7 @@ public class ShareCommand {
 			res.ezserver = String.format("%s:%d", Storage.hostName, Storage.port);
 			
 			Storage.resourceList.add(res);
-			return Utilities.getReturnMessage(1);
+			return Utilities.getReturnMessage(Constant.SUCCESS);
 		}
 	}
 

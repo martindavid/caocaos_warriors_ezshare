@@ -31,13 +31,13 @@ public class CommandHandler {
 			Logger.debug("PUBLISH: Resource Size: " + Storage.resourceList.size());
 			break;
 		case Constant.REMOVE:
-			responseMessage = new RemoveCommand(this.message.resource).processResource();
+			responseMessage = new Remove(this.message.resource).processResource();
 			streamOut.writeUTF(responseMessage);
 			Logger.debug("REMOVE: response message: " + responseMessage);
 			Logger.debug("REMOVE: Resource Size: " + Storage.resourceList.size());
 			break;
 		case Constant.SHARE:
-			responseMessage = new ShareCommand(this.message.resource, this.message.secret, this.serverSecret)
+			responseMessage = new Share(this.message.resource, this.message.secret, this.serverSecret)
 					.processResourceMessage();
 			streamOut.writeUTF(responseMessage);
 			Logger.debug("SHARE: response message: " + responseMessage);
@@ -60,13 +60,13 @@ public class CommandHandler {
 			fetch.processFetch();
 			break;
 		case Constant.EXCHANGE:
-			responseMessage = new ExchangeCommand(this.message.serverList).processCommand();
+			responseMessage = new Exchange(this.message.serverList).processCommand();
 			streamOut.writeUTF(responseMessage);
 			Logger.debug("EXCHANGE: response message: " + responseMessage);
 			Logger.debug("EXCHANGE: Server List Size: " + Storage.serverList.size());
 			break;
 		default:
-			responseMessage = Utilities.getReturnMessage(6);
+			responseMessage = Utilities.getReturnMessage(Constant.INVALID_COMMAND);
 			streamOut.writeUTF(responseMessage);
 			break;
 		}

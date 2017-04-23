@@ -24,12 +24,12 @@ public class Publish {
 	public String processResourceMessage() throws JsonProcessingException {
 		Resource res = this.resource;
 		if (res == null) {
-			return Utilities.getReturnMessage(4);
+			return Utilities.getReturnMessage(Constant.MISSING_RESOURCE);
 		}
 
 		boolean isValid = validateResource(res);
 		if (!isValid) {
-			return Utilities.getReturnMessage(2);
+			return Utilities.getReturnMessage(Constant.CANNOT_PUBLISH_RESOURCE);
 		}
 
 		for (Resource localRes : Storage.resourceList) {
@@ -40,19 +40,19 @@ public class Publish {
 				localRes.tags = res.tags;
 				localRes.description = res.description;
 				localRes.name = res.name;
-				return Utilities.getReturnMessage(1);
+				return Utilities.getReturnMessage(Constant.SUCCESS);
 			}
 			// Check for primary key differences
 			else if (localRes.channel.equals(res.channel) && localRes.uri.equals(res.uri)
 					&& !localRes.owner.equals(res.owner)) {
-				return Utilities.getReturnMessage(2);
+				return Utilities.getReturnMessage(Constant.CANNOT_PUBLISH_RESOURCE);
 			}
 		}
 
 		// Update ezserver value before add to list
 		res.ezserver = String.format("%s:%d", Storage.hostName, Storage.port);
 		Storage.resourceList.add(res);
-		return Utilities.getReturnMessage(1);
+		return Utilities.getReturnMessage(Constant.SUCCESS);
 	}
 
 	private boolean validateResource(Resource res) {

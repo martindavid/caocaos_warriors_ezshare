@@ -45,7 +45,7 @@ public class ServerThread extends Thread {
 
 					if (messageObject.command.equals(Constant.FETCH.toUpperCase())
 							&& !message.contains("resourceTemplate")) {
-						streamOut.writeUTF(Utilities.getReturnMessage(8));
+						streamOut.writeUTF(Utilities.getReturnMessage(Constant.MISSING_RESOURCE_TEMPLATE));
 						break;
 					} else {
 						CommandHandler handler = new CommandHandler(messageObject, streamOut, Storage.secret);

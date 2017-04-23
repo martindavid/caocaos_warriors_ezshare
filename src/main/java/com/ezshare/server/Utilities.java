@@ -39,37 +39,12 @@ public class Utilities {
 	public static <T> T convertJsonToObject(String jsonString, Class<T> target)
 			throws JsonParseException, JsonMappingException, IOException {
 		ObjectMapper mapper = new ObjectMapper();
-
 		return mapper.readValue(jsonString, target);
 	}
 
 	/*** Print assistant ***/
-	public static String getReturnMessage(int type) throws JsonProcessingException {
-		switch (type) {
-		case 1:
-			return new Responses().toJson();
-		case 2:
-			return new Responses(Constant.CANNOT_PUBLISH_RESOURCE).toJson();
-		case 3:
-			return new Responses(Constant.INVALID_RESOURCE).toJson();
-		case 4:
-			return new Responses(Constant.MISSING_RESOURCE).toJson();
-		case 5:
-			return new Responses(Constant.CANNOT_REMOVE_RESOURCE).toJson();
-		case 6:
-			return new Responses(Constant.INVALID_COMMAND).toJson();
-		case 7:
-			return new Responses(Constant.INVALID_RESOURCE_TEMPLATE).toJson();
-		case 8:
-			return new Responses(Constant.MISSING_RESOURCE_TEMPLATE).toJson();
-		case 9:
-			return new Responses(Constant.MISSING_OR_INVALID_SERVER_LIST).toJson();
-		case 10:
-			return new Responses(Constant.INCORRECT_SECRET).toJson();
-		case 11:
-			return new Responses(Constant.MISSING_RESOURCE_OR_SECRET).toJson();
-		default:
-			return new Responses(Constant.CANNOT_SHARE_RESOURCE).toJson();
-		}
+	public static String getReturnMessage(String message) throws JsonProcessingException {
+		return message.equals(Constant.SUCCESS) ? 
+				new Responses().toJson() : new Responses(message).toJson();
 	}
 }

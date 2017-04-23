@@ -9,6 +9,7 @@ import java.util.Arrays;
 
 import org.pmw.tinylog.Logger;
 
+import com.ezshare.Constant;
 import com.ezshare.Resource;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -31,7 +32,7 @@ public class Fetch {
 			try {
 				// Send success message
 				Logger.debug("FETCH: send success message");
-				streamOut.writeUTF(Utilities.getReturnMessage(1));
+				streamOut.writeUTF(Utilities.getReturnMessage(Constant.SUCCESS));
 				// Send file use FileTransfer class
 				URI uri = new URI(res.uri);
 				File file = new File(uri.getPath());
@@ -53,10 +54,10 @@ public class Fetch {
 				streamOut.writeUTF("{\"resultSize\":1}"); 
 			} catch (Exception e) {
 				Logger.error(e);
-				streamOut.writeUTF(Utilities.getReturnMessage(7));
+				streamOut.writeUTF(Utilities.getReturnMessage(Constant.INVALID_RESOURCE_TEMPLATE));
 			}
 		} else {
-			streamOut.writeUTF(Utilities.getReturnMessage(7));
+			streamOut.writeUTF(Utilities.getReturnMessage(Constant.INVALID_RESOURCE_TEMPLATE));
 		}
 	}
 }
