@@ -1,8 +1,6 @@
 package com.ezshare.server;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.security.SecureRandom;
 
 import com.ezshare.Constant;

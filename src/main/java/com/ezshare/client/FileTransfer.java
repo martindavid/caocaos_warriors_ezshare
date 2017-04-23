@@ -1,8 +1,6 @@
 package com.ezshare.client;
 
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.Arrays;
@@ -18,34 +16,13 @@ import com.ezshare.server.Utilities;
  *
  */
 public class FileTransfer {
-	File file;
 	DataInputStream streamIn;
-	DataOutputStream streamOut;
-
-	long size = 0;
 	
-	public FileTransfer(DataInputStream streamIn, DataOutputStream streamOut, String filePath) {
+	public FileTransfer(DataInputStream streamIn) {
 		this.streamIn = streamIn;
-		this.streamOut = streamOut;
-		this.file = new File(filePath);
-	}
-	
-	public long getFileSize() {
-		return file.length();
-	}
-	
-	public void send() throws IOException {
-		try (RandomAccessFile byteFile = new RandomAccessFile(file, "r"))	
-		{
-			byte[] buffer = new byte[1024 * 1024];
-			int subsize;
-			while ((subsize = byteFile.read(buffer)) > 0) {
-				streamOut.write(Arrays.copyOf(buffer, subsize));
-			}
-		}
 	}
 
-	public void receiveFile() throws IOException {
+	public void download() throws IOException {
 		String message = "";
 		try
 		{

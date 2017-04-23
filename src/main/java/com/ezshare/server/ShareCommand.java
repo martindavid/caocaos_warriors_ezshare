@@ -8,6 +8,8 @@ import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import org.pmw.tinylog.Logger;
+
 public class ShareCommand {
 	private Resource resource;
 	private String secret;
@@ -27,14 +29,17 @@ public class ShareCommand {
 
 		// Validate Secret
 		if (this.secret.isEmpty()) {
+			Logger.debug("SHARE: secret is empty");
 			return Utilities.getReturnMessage(11);
 		}
 		if (!this.secret.equals(this.machineSecret)) {
+			Logger.debug("SHARE: secret is not match");
 			return Utilities.getReturnMessage(12);
 		}
 
 		// Validate URI
 		if (!isValidFileUri(res.uri)) {
+			Logger.debug("SHARE: not a valid URI");
 			return Utilities.getReturnMessage(12);
 		} else {
 
@@ -42,6 +47,7 @@ public class ShareCommand {
 				// Check for same primary key and overwrite
 				if (localRes.owner.equals(res.owner) && localRes.channel.equals(res.channel)
 						&& localRes.uri.equals(res.uri)) {
+					Logger.debug("SHARE: update existing resource");
 					localRes.ezserver = res.ezserver;
 					localRes.tags = res.tags;
 					localRes.description = res.description;
@@ -54,29 +60,34 @@ public class ShareCommand {
 					return Utilities.getReturnMessage(2);
 				}
 			}
-
+			Logger.debug("SHARE: insert new resource");
 			// Update ezserver value before add to list
 			res.ezserver = String.format("%s:%d", Storage.hostName, Storage.port);
+			
 			Storage.resourceList.add(res);
 			return Utilities.getReturnMessage(1);
 		}
 	}
 
 	private boolean isValidFileUri(String stringUri) {
-		boolean isValid = true;
+		Logger.debug(String.format("SHARE: validate uri - %s", stringUri));
+		if (stringUri.isEmpty()) return false;
 		try {
 			URI uri = new URI(stringUri);
+			Logger.debug(String.format("SHARE: uri path: %s", uri.getPath()));
 			if (uri != null && uri.isAbsolute() && uri.getScheme().equals(Constant.FILE_SCHEME)){
 				File f = new File(uri.getPath());
 				if (!f.isFile()) {
-					isValid = false;
+					Logger.debug("SHARE: uri is not a file");
+					return false;
 				}
 			}
 		} catch (URISyntaxException e) {
-			isValid = false;
+			Logger.error(e);
+			return false;
 		}
 
-		return isValid;
+		return true;
 	}
 
 }

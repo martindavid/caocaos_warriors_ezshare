@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import org.pmw.tinylog.Logger;
 import com.ezshare.Resource;
+import com.ezshare.ResourceTemplate;
 import com.ezshare.Constant;
 import com.ezshare.Message;
 
@@ -36,10 +37,10 @@ public class Query {
 				// Construct client message to be passed to relay server
 				Message clientMessage = new Message();
 				clientMessage.command = Constant.QUERY.toUpperCase();
-				clientMessage.resourceTemplate = this.resource;
+				clientMessage.resourceTemplate = new ResourceTemplate(this.resource);
 				clientMessage.relay = false;
 				for (ServerList server : Storage.serverList) {
-					Logger.debug("Fetch resource from %s:%d", server.hostname, server.port);
+					Logger.debug(String.format("Fetch resource from %s:%d", server.hostname, server.port));
 					ArrayList<Resource> relayRes = new QueryRelay(server.hostname, server.port, clientMessage)
 							.fetchResourceList();
 					Logger.debug(String.format("Fetched %d resource from %s:%d", relayRes.size(), server.hostname,

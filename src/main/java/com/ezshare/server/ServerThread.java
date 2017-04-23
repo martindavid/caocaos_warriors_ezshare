@@ -7,13 +7,10 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketException;
-import java.util.ArrayList;
 
 import org.pmw.tinylog.Logger;
 
 import com.ezshare.Constant;
-import com.ezshare.client.FileTransfer;
-import com.ezshare.Resource;
 
 /**
  * @author mvalentino
@@ -45,53 +42,14 @@ public class ServerThread extends Thread {
 					Logger.debug(message);
 
 					Message messageObject = Utilities.convertJsonToObject(message, Message.class);
-					CommandHandler handler = new CommandHandler(messageObject, Storage.secret);
-					String responseMessage = "";
 
-					if (messageObject.command.equals(Constant.FETCH.toUpperCase())) {
-						if (!message.contains("resourceTemplate")) {
-							responseMessage = Utilities.getReturnMessage(8);
-						} else {
-							Fetch fetch = new Fetch(messageObject.resourceTemplate);
-							FetchResponse fetchsponse = fetch.proceFetch();
-							try {
-								if (!messageObject.resourceTemplate.uri.isEmpty() && fetchsponse != null) {
-									String resMess = fetchsponse.getResponseMessage();
-									streamOut.writeUTF(resMess);
-									Resource resp = fetchsponse.getResource();
-									if (resp != null) {
-										FileTransfer file = new FileTransfer(streamIn, streamOut,
-												messageObject.resourceTemplate.uri);
-										resp.resourceSize = file.getFileSize();
-										streamOut.writeUTF(resp.toFetchResultJson());
-										file.send();
-									}
-									responseMessage = fetchsponse.adsize.toJson();
-								} else {
-									responseMessage = Utilities.getReturnMessage(7);
-								}
-							} catch (Exception e) {
-								Logger.error(e);
-								responseMessage = Utilities.getReturnMessage(7);
-							}
-							streamOut.writeUTF(responseMessage);
-							break;
-						}
-					} else if (messageObject.command.equals(Constant.QUERY.toUpperCase())) {
-						Query query = new Query(messageObject.resourceTemplate, messageObject.relay);
-						ArrayList<Resource> resourceList = query.getResourceList();
-						String successResponse = new Responses().toJson();
-						streamOut.writeUTF(successResponse);
-						if (resourceList.size() > 0) {
-							for (Resource res : resourceList) {
-								streamOut.writeUTF(res.toJson());
-							}
-						}
-						streamOut.writeUTF("{\"resultSize\":" + resourceList.size() + "}");
+					if (messageObject.command.equals(Constant.FETCH.toUpperCase())
+							&& !message.contains("resourceTemplate")) {
+						streamOut.writeUTF(Utilities.getReturnMessage(8));
 						break;
 					} else {
-						responseMessage = handler.processMessage();
-						streamOut.writeUTF(responseMessage);
+						CommandHandler handler = new CommandHandler(messageObject, streamOut, Storage.secret);
+						handler.processMessage();
 						break;
 					}
 				}

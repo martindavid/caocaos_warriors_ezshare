@@ -58,8 +58,8 @@ public class TCPClient {
 							// Only fetch the file the response is not an error
 							if (!serverResponse.response.equals(Constant.ERROR)) {
 								// Receiving the file
-								fileTransfer = new FileTransfer(streamIn, streamOut, message.resourceTemplate.uri);
-								fileTransfer.receiveFile();
+								fileTransfer = new FileTransfer(streamIn);
+								fileTransfer.download();
 							}
 							exitLoop = true;
 						}
