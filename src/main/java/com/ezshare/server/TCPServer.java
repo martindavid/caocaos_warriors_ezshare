@@ -227,7 +227,7 @@ public class TCPServer implements Runnable {
            
         };
         Timer timer = new Timer();
-        timer.schedule(task, 1000*5,1000*5);
+        timer.schedule(task, 1000*5,1000*X*60);
     }
 	
 }
