@@ -34,7 +34,7 @@ public class Share {
 		}
 		if (!this.secret.equals(this.machineSecret)) {
 			Logger.debug("SHARE: secret is not match");
-			return Utilities.getReturnMessage(Constant.CANNOT_SHARE_RESOURCE);
+			return Utilities.getReturnMessage(Constant.INCORRECT_SECRET);
 		}
 
 		// Validate URI
