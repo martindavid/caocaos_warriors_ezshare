@@ -190,9 +190,10 @@ public class TCPServer implements Runnable {
 			private void RandomChoose() {
 				if(Storage.serverList.size()>0)
 				{
-					int index = (int)Math.random()*Storage.serverList.size();
+					int index = (int)(Math.random()*Storage.serverList.size());
+					Logger.info(index);
 					try {
-						this.ServerExchange(Storage.serverList.get(index));
+						this.ServerExchange(Storage.serverList.get(index),index);
 					} catch (IOException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
@@ -201,17 +202,24 @@ public class TCPServer implements Runnable {
 				
 			}
 
-			private void ServerExchange(ServerList server) throws UnknownHostException, IOException {
+			private void ServerExchange(ServerList server,int index) throws UnknownHostException, IOException {
 				ExchangeMessage message = new ExchangeMessage();
 				String mes="";
 				message.command = "EXCHANGE";
 				message.serverList = Storage.serverList;
 				mes = message.toJson();
 				
-				Socket echoSocket = new Socket(server.hostname, server.port);
-				DataOutputStream streamOut = new DataOutputStream(echoSocket.getOutputStream());
+				try(Socket echoSocket = new Socket(server.hostname, server.port);
+				DataOutputStream streamOut = new DataOutputStream(echoSocket.getOutputStream());){
 				streamOut.writeUTF(mes);
-				Logger.info(mes);
+				Logger.info(mes);}
+				catch(UnknownHostException e)
+				{
+					Storage.serverList.remove(index);
+				}
+				catch (IOException e) {
+					Storage.serverList.remove(index);
+				}
 			}
 			
 			
@@ -219,7 +227,7 @@ public class TCPServer implements Runnable {
            
         };
         Timer timer = new Timer();
-        timer.schedule(task, 1000*5,1000*X*60);
+        timer.schedule(task, 1000*5,1000*5);
     }
 	
 }
