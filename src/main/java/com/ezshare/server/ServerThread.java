@@ -38,9 +38,7 @@ public class ServerThread extends Thread {
 			while (true) {
 				if (streamIn.available() > 0) {
 					message = streamIn.readUTF();
-
 					Logger.debug(message);
-
 					Message messageObject = Utilities.convertJsonToObject(message, Message.class);
 
 					if (messageObject.command.equals(Constant.FETCH.toUpperCase())

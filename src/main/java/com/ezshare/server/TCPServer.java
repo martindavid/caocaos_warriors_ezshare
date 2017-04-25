@@ -2,6 +2,8 @@ package com.ezshare.server;
 
 import org.pmw.tinylog.Logger;
 
+
+
 import com.ezshare.Constant;
 import com.ezshare.Resource;
 import com.ezshare.client.Exchange;
@@ -17,6 +19,8 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -25,6 +29,8 @@ import java.util.concurrent.Executors;
  */
 public class TCPServer implements Runnable {
 	public Resource[] resources;
+	
+
 
 	private int portNumber;
 	private String hostName;
@@ -32,9 +38,10 @@ public class TCPServer implements Runnable {
 	private Thread thread;
 	private String secret;
 	private ServerSocket server = null;
-	private int exchangeInterval;
+	private static int exchangeInterval=10;
 	private int connIntervalLimit;
 	private ExecutorService es;
+	
 
 	public TCPServer(String hostName, int portNumber, String secret, int exchangeInterval, int connIntervalLimit) {
 		this.portNumber = portNumber;
@@ -44,6 +51,8 @@ public class TCPServer implements Runnable {
 		this.connIntervalLimit = connIntervalLimit;
 		this.es = Executors.newCachedThreadPool();
 
+		
+		
 		try {
 			this.server = new ServerSocket(this.portNumber);
 		} catch (IOException ioe) {
@@ -117,11 +126,14 @@ public class TCPServer implements Runnable {
 		Logger.info("Waiting for a client.....");
 		
 		Logger.debug("Setting debug on");
-		
+		this.startTimer();
 		// Update global variable
 		Storage.hostName = this.hostName;
 		Storage.port = this.portNumber;
 		Storage.secret = this.secret;
+		
+
+
 		
 		while (thread != null) {
 			try {
@@ -161,4 +173,64 @@ public class TCPServer implements Runnable {
 		}
 		
 	}
+
+    public static void startTimer(){
+        TimerTask task = new TimerTask() {
+
+			@Override
+			public void run() {
+				this.runServerInteraction();
+				
+			}
+
+			private void runServerInteraction() {
+				if(Storage.serverList.size()>0)
+				{
+					int index = (int)(Math.random()*Storage.serverList.size());
+					Logger.info(index);
+					try {
+						this.ServerExchange(Storage.serverList.get(index),index);
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}
+				
+			}
+
+			private void ServerExchange(ServerList server,int index) throws UnknownHostException, IOException {
+				ExchangeMessage message = new ExchangeMessage();
+				String mes="";
+				message.command = "EXCHANGE";
+				message.serverList = Storage.serverList;
+				mes = message.toJson();
+				
+				try(Socket echoSocket = new Socket(server.hostname, server.port);
+				DataOutputStream streamOut = new DataOutputStream(echoSocket.getOutputStream());){
+				streamOut.writeUTF(mes);
+				Logger.debug(mes);}
+				catch(UnknownHostException e)
+				{
+					Storage.serverList.remove(index);
+					Logger.error("Don't know about host " + server.hostname);
+					Logger.error(e);
+				}
+				catch (IOException e) {
+					Logger.error("Couldn't get I/O for the connection to " + server.hostname);
+					Logger.error(e);
+					Storage.serverList.remove(index);
+				}
+			}
+			
+			
+			
+           
+        };
+        Timer timer = new Timer();
+        timer.schedule(task, 1000*5,1000*exchangeInterval*60);
+    }
+	
 }
+
+
+
