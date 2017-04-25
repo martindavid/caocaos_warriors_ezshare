@@ -31,14 +31,14 @@ public class TCPServer implements Runnable {
 	public Resource[] resources;
 	
 
-	public static int X = 10;
+
 	private int portNumber;
 	private String hostName;
 	private ServerThread client;
 	private Thread thread;
 	private String secret;
 	private ServerSocket server = null;
-	private int exchangeInterval;
+	private static int exchangeInterval=10;
 	private int connIntervalLimit;
 	private ExecutorService es;
 	
@@ -174,20 +174,16 @@ public class TCPServer implements Runnable {
 		
 	}
 
-
-	
-
-	
     public static void startTimer(){
         TimerTask task = new TimerTask() {
 
 			@Override
 			public void run() {
-				this.RandomChoose();
+				this.runServerInteraction();
 				
 			}
 
-			private void RandomChoose() {
+			private void runServerInteraction() {
 				if(Storage.serverList.size()>0)
 				{
 					int index = (int)(Math.random()*Storage.serverList.size());
@@ -212,12 +208,16 @@ public class TCPServer implements Runnable {
 				try(Socket echoSocket = new Socket(server.hostname, server.port);
 				DataOutputStream streamOut = new DataOutputStream(echoSocket.getOutputStream());){
 				streamOut.writeUTF(mes);
-				Logger.info(mes);}
+				Logger.debug(mes);}
 				catch(UnknownHostException e)
 				{
 					Storage.serverList.remove(index);
+					Logger.error("Don't know about host " + server.hostname);
+					Logger.error(e);
 				}
 				catch (IOException e) {
+					Logger.error("Couldn't get I/O for the connection to " + server.hostname);
+					Logger.error(e);
 					Storage.serverList.remove(index);
 				}
 			}
@@ -227,7 +227,7 @@ public class TCPServer implements Runnable {
            
         };
         Timer timer = new Timer();
-        timer.schedule(task, 1000*5,1000*X*60);
+        timer.schedule(task, 1000*5,1000*exchangeInterval*60);
     }
 	
 }

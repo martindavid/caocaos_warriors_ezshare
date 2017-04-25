@@ -7,8 +7,5 @@ public class ServerList {
 	public String hostname="";
 	public int port;
 	
-	public String toJson() throws JsonProcessingException {
-		ObjectMapper mapper = new ObjectMapper();
-		return mapper.writeValueAsString(this);
-	}
+
 }

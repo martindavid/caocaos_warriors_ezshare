@@ -16,8 +16,5 @@ public class Message {
 	public ArrayList<ServerList> serverList= new ArrayList<ServerList>();
 	
 	
-	public String toJson() throws JsonProcessingException {
-		ObjectMapper mapper = new ObjectMapper();
-		return mapper.writeValueAsString(this);
-	}
+
 }
