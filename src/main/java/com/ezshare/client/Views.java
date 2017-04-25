@@ -16,7 +16,7 @@ public class Views {
 	public static class Share extends Common {
 	};
 
-	public static class Exchange extends Common {
+	public static class Exchange extends Command {
 	};
 
 	public static class FileReceive extends Common {
