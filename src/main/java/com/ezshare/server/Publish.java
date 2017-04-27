@@ -31,7 +31,9 @@ public class Publish {
 		if (!isValid) {
 			return Utilities.getReturnMessage(Constant.CANNOT_PUBLISH_RESOURCE);
 		}
-
+		
+		// Update ezserver value before add to list
+		res.ezserver = String.format("%s:%d", Storage.hostName, Storage.port);
 		for (Resource localRes : Storage.resourceList) {
 			// Check for same primary key and overwrite
 			if (localRes.owner.equals(res.owner) && localRes.channel.equals(res.channel)
@@ -49,8 +51,7 @@ public class Publish {
 			}
 		}
 
-		// Update ezserver value before add to list
-		res.ezserver = String.format("%s:%d", Storage.hostName, Storage.port);
+		
 		Storage.resourceList.add(res);
 		return Utilities.getReturnMessage(Constant.SUCCESS);
 	}

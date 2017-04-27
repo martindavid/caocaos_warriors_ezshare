@@ -26,7 +26,9 @@ public class Share {
 		if (res == null) {
 			return Utilities.getReturnMessage(Constant.MISSING_RESOURCE);
 		}
-
+		// Update ezserver value before add to list
+		res.ezserver = String.format("%s:%d", Storage.hostName, Storage.port);
+		
 		// Validate Secret
 		if (this.secret.isEmpty()) {
 			Logger.debug("SHARE: secret is empty");
@@ -61,8 +63,6 @@ public class Share {
 				}
 			}
 			Logger.debug("SHARE: insert new resource");
-			// Update ezserver value before add to list
-			res.ezserver = String.format("%s:%d", Storage.hostName, Storage.port);
 			
 			Storage.resourceList.add(res);
 			return Utilities.getReturnMessage(Constant.SUCCESS);
