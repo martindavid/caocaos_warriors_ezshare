@@ -32,21 +32,27 @@ public class ServerThread extends Thread {
 	@Override
 	public void run() {
 		Logger.debug("Server thread " + ID + " running");
-		String message = "";
+		String jsonString = "";
 		try (DataInputStream streamIn = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
 				DataOutputStream streamOut = new DataOutputStream(socket.getOutputStream());) {
 			while (true) {
 				if (streamIn.available() > 0) {
-					message = streamIn.readUTF();
-					Logger.debug(message);
-					Message messageObject = Utilities.convertJsonToObject(message, Message.class);
+					jsonString = streamIn.readUTF();
+					Logger.debug(jsonString);
+					Message message = Utilities.convertJsonToObject(jsonString, Message.class);
 
-					if (messageObject.command.equals(Constant.FETCH.toUpperCase())
-							&& !message.contains("resourceTemplate")) {
+					if ((message.command.equals(Constant.FETCH.toUpperCase())
+							|| message.command.equals(Constant.QUERY.toUpperCase()))
+							&& !jsonString.contains("resourceTemplate")) {
 						streamOut.writeUTF(Utilities.getReturnMessage(Constant.MISSING_RESOURCE_TEMPLATE));
 						break;
+					} else if ((message.command.equals(Constant.PUBLISH.toUpperCase())
+							|| message.command.equals(Constant.REMOVE.toUpperCase())
+							|| message.command.equals(Constant.SHARE.toUpperCase()))
+							&& !jsonString.contains("resource")) {
+						streamOut.writeUTF(Utilities.getReturnMessage(Constant.MISSING_RESOURCE));
 					} else {
-						CommandHandler handler = new CommandHandler(messageObject, streamOut, Storage.secret);
+						CommandHandler handler = new CommandHandler(message, streamOut, Storage.secret);
 						handler.processMessage();
 						break;
 					}

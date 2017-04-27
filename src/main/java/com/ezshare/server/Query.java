@@ -33,30 +33,30 @@ public class Query {
 		}
 
 		if (relay) { // Fetch resource from other server
-			try {
-				// Construct client message to be passed to relay server
-				Message clientMessage = new Message();
-				clientMessage.command = Constant.QUERY.toUpperCase();
-				clientMessage.resourceTemplate = new ResourceTemplate(this.resource);
-				clientMessage.relay = false;
-				Logger.debug("QUERY: Client message for relay server");
-				Logger.debug(String.format("QUERY: Channel: %s, Owner: %s, Uri: %s, Name: %s, Description: %s",
-						clientMessage.resourceTemplate.channel, clientMessage.resourceTemplate.owner,
-						clientMessage.resourceTemplate.uri, clientMessage.resourceTemplate.name,
-						clientMessage.resourceTemplate.description));
-				for (ServerList server : Storage.serverList) {
-					Logger.debug(String.format("QUERY: Fetch resource from %s:%d", server.hostname, server.port));
-					ArrayList<Resource> relayRes = new QueryRelay(server.hostname, server.port, clientMessage)
-							.fetchResourceList();
-					Logger.debug(String.format("QUERY: Fetched %d resource from %s:%d", relayRes.size(),
-							server.hostname, server.port));
-					if (relayRes.size() > 0) {
-						result.addAll(relayRes);
-					}
-				}
-			} catch (Exception e) {
-				Logger.error(e);
-			}
+//			try {
+//				// Construct client message to be passed to relay server
+//				Message clientMessage = new Message();
+//				clientMessage.command = Constant.QUERY.toUpperCase();
+//				clientMessage.resourceTemplate = new ResourceTemplate(this.resource);
+//				clientMessage.relay = false;
+//				Logger.debug("QUERY: Client message for relay server");
+//				Logger.debug(String.format("QUERY: Channel: %s, Owner: %s, Uri: %s, Name: %s, Description: %s",
+//						clientMessage.resourceTemplate.channel, clientMessage.resourceTemplate.owner,
+//						clientMessage.resourceTemplate.uri, clientMessage.resourceTemplate.name,
+//						clientMessage.resourceTemplate.description));
+//				for (ServerList server : Storage.serverList) {
+//					Logger.debug(String.format("QUERY: Fetch resource from %s:%d", server.hostname, server.port));
+//					ArrayList<Resource> relayRes = new QueryRelay(server.hostname, server.port, clientMessage)
+//							.fetchResourceList();
+//					Logger.debug(String.format("QUERY: Fetched %d resource from %s:%d", relayRes.size(),
+//							server.hostname, server.port));
+//					if (relayRes.size() > 0) {
+//						result.addAll(relayRes);
+//					}
+//				}
+//			} catch (Exception e) {
+//				Logger.error(e);
+//			}
 		}
 
 		return result;

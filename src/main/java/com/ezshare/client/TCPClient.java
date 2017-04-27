@@ -76,6 +76,9 @@ public class TCPClient {
 									|| response.contains(Constant.RESULT_SIZE)) {
 								break;
 							}
+							if (response.contains("error")){
+								break;
+							}
 						}
 					}
 				}
