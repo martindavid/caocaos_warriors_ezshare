@@ -22,8 +22,8 @@ public class Message {
 	@JsonView(Views.Common.class)
 	public Resource resource;
 
-//	@JsonView(Views.Fetch.class)
-//	public ResourceTemplate resourceTemplate;
+	@JsonView(Views.Fetch.class)
+	public ResourceTemplate resourceTemplate;
 
 	@JsonView(Views.Exchange.class)
 	public ArrayList<Exchange> serverList = new ArrayList<Exchange>();
@@ -37,10 +37,10 @@ public class Message {
 		try {
 			switch (this.command.toLowerCase()) {
 				case Constant.FETCH:
-					//this.resourceTemplate = new ResourceTemplate(this.resource);
+					this.resourceTemplate = new ResourceTemplate(this.resource);
 					return mapper.writerWithView(Views.Fetch.class).writeValueAsString(this);
 				case Constant.QUERY:
-					//this.resourceTemplate = new ResourceTemplate(this.resource);
+					this.resourceTemplate = new ResourceTemplate(this.resource);
 					return mapper.writerWithView(Views.Query.class).writeValueAsString(this);
 				case Constant.SHARE:
 					return mapper.writerWithView(Views.Share.class).writeValueAsString(this);
