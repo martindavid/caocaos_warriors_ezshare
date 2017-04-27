@@ -6,9 +6,14 @@ import com.ezshare.Resource;
 import com.ezshare.server.Exchange;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
@@ -64,7 +69,16 @@ public class TCPServer implements Runnable {
 
 		while (thread != null) {
 			try {
-				addThread(server.accept());
+				Socket socket = server.accept();
+				String ipAddress = ((InetSocketAddress) socket.getRemoteSocketAddress()).getAddress().toString().replace("/","");;
+				Logger.debug(String.format("SERVER: validate %s", ipAddress));
+				if (isIpAllowed(ipAddress)) {
+					addThread(socket, ipAddress);
+					Logger.debug(String.format("SERVER: add %s to ip list", ipAddress));
+					Storage.ipList.add(new ConnectionTracking(ipAddress));
+					Logger.debug(String.format("SERVER: ip list size: %d", Storage.ipList.size()));
+				}
+				
 			} catch (IOException e) {
 				Logger.error(e);
 			}
@@ -83,17 +97,42 @@ public class TCPServer implements Runnable {
 			thread = null;
 		}
 	}
+	
+	/**
+	 * Validate whether incoming IP address allowed to make a connection or not
+	 * We validate against IP list array that system maintains
+	 * @param ipAddress
+	 * @return
+	 */
+	private boolean isIpAllowed(String ipAddress) {
+		ConnectionTracking tracking = (ConnectionTracking) Storage.ipList.stream().filter(x -> x.ipAddress.equals(ipAddress))
+										.findAny()
+										.orElse(null);
+		if (tracking != null) {
+			DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+			Date now = new Date();
+			try {
+				Date lastConnected = dateFormat.parse(tracking.timeStamp);
+				if ((now.getTime() - lastConnected.getTime())/ 1000 % 60 <= this.connIntervalLimit) {
+					return false;
+				}
+			} catch (ParseException e) {
+				Logger.error(e);
+			}
+		}
+		
+		return true;
+	}
 
 	/**
 	 * Create a new thread every time the client connected
 	 * 
 	 * @param socket
 	 */
-	public void addThread(Socket socket) {
-		Logger.debug("Client connected: " + socket);
-		Logger.debug("Client with IP: " + socket.getInetAddress() + " connected");
+	private void addThread(Socket socket, String ipAddress) {
+		Logger.debug("Client with IP: " + ipAddress + " connected");
 		try {
-			client = new ServerThread(socket, this.connIntervalLimit);
+			client = new ServerThread(socket, ipAddress);
 			this.es.execute(client);
 		} catch (SocketException e) {
 			Logger.error(e);

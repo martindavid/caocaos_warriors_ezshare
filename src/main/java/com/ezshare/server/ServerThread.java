@@ -21,11 +21,13 @@ import com.ezshare.Constant;
  */
 public class ServerThread extends Thread {
 	private Socket socket = null;
+	private String ipAddress;
 	private int ID = -1;
+	
 
-	public ServerThread(Socket socket, int connIntervalLimit) throws SocketException {
+	public ServerThread(Socket socket, String ipAddress) throws SocketException {
 		this.socket = socket;
-		this.socket.setSoTimeout(connIntervalLimit * 1000);
+		this.ipAddress = ipAddress;
 		this.ID = socket.getPort();
 	}
 
@@ -58,6 +60,9 @@ public class ServerThread extends Thread {
 					}
 				}
 			}
+			Logger.debug(String.format("SERVER: removing %s from ip list", this.ipAddress));
+			removeIp(this.ipAddress);
+			Logger.debug(String.format("SERVER: ip list size: %d", Storage.ipList.size()));
 		} catch (IOException ioe) {
 			Logger.error(ioe);
 		} finally { // Close the conection
@@ -70,6 +75,14 @@ public class ServerThread extends Thread {
 			} catch (IOException e) {
 				Logger.error(e);
 			}
+		}
+	}
+
+	private void removeIp(String ipAddress) {
+		ConnectionTracking tracking = (ConnectionTracking) Storage.ipList.stream()
+				.filter(x -> x.ipAddress.equals(ipAddress)).findAny().orElse(null);
+		if (tracking != null) {
+			Storage.ipList.remove(tracking);
 		}
 	}
 }
