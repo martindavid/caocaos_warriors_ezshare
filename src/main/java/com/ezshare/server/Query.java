@@ -28,9 +28,12 @@ public class Query {
 				if (!newRes.owner.isEmpty()) {
 					newRes.owner = "*";
 				}
+				Logger.debug(String.format("QUERY: Resource Match - Channel: %s, Owner: %s, Uri: %s, Name: %s, Description: %s", res.channel,
+						res.owner, res.uri, res.name, res.description));
 				result.add(newRes);
 			}
 		}
+		Logger.debug(String.format("QUERY: Fetched %d resource from local server", result.size()));
 
 		if (relay) { // Fetch resource from other server
 			try {

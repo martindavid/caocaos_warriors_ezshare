@@ -28,7 +28,7 @@ public class Share {
 		}
 		// Update ezserver value before add to list
 		res.ezserver = String.format("%s:%d", Storage.hostName, Storage.port);
-		
+
 		// Validate Secret
 		if (this.secret.isEmpty()) {
 			Logger.debug("SHARE: secret is empty");
@@ -63,7 +63,7 @@ public class Share {
 				}
 			}
 			Logger.debug("SHARE: insert new resource");
-			
+
 			Storage.resourceList.add(res);
 			return Utilities.getReturnMessage(Constant.SUCCESS);
 		}
@@ -71,17 +71,22 @@ public class Share {
 
 	private boolean isValidFileUri(String stringUri) {
 		Logger.debug(String.format("SHARE: validate uri - %s", stringUri));
-		if (stringUri.isEmpty()) return false;
+		if (stringUri.isEmpty())
+			return false;
 		try {
 			URI uri = new URI(stringUri);
-			Logger.debug(String.format("SHARE: uri path: %s", uri.getPath()));
-			if (uri != null && uri.isAbsolute() && uri.getScheme().equals(Constant.FILE_SCHEME)){
+			if (uri.getPath().equals("")) {
+				return false;
+			}
+			if (uri.isAbsolute() && uri.getScheme().equals(Constant.FILE_SCHEME)) {
 				File f = new File(uri.getPath());
 				if (!f.isFile()) {
 					Logger.debug("SHARE: uri is not a file");
 					return false;
 				}
 			}
+			Logger.debug(String.format("SHARE: uri path: %s", uri.getPath()));
+
 		} catch (URISyntaxException e) {
 			Logger.error(e);
 			return false;

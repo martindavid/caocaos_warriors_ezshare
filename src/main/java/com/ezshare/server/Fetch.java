@@ -51,7 +51,7 @@ public class Fetch {
 				// It's ok to hardcode this message, because we have 
 				// make sure that we can only have 1 resource fetch at a time
 				Logger.debug("FETCH: send resultSize message");
-				streamOut.writeUTF("{\"resultSize\":1}"); 
+				streamOut.writeUTF("{\"resultSize\":1}");
 			} catch (Exception e) {
 				Logger.error(e);
 				streamOut.writeUTF(Utilities.getReturnMessage(Constant.INVALID_RESOURCE_TEMPLATE));
