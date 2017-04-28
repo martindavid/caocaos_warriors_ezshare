@@ -23,7 +23,6 @@ public class ServerThread extends Thread {
 	private Socket socket = null;
 	private String ipAddress;
 	private int ID = -1;
-	
 
 	public ServerThread(Socket socket, String ipAddress) throws SocketException {
 		this.socket = socket;

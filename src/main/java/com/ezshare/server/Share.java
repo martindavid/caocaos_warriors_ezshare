@@ -63,7 +63,6 @@ public class Share {
 				}
 			}
 			Logger.debug("SHARE: insert new resource");
-
 			Storage.resourceList.add(res);
 			return Utilities.getReturnMessage(Constant.SUCCESS);
 		}
@@ -75,18 +74,17 @@ public class Share {
 			return false;
 		try {
 			URI uri = new URI(stringUri);
-			if (uri.getPath().equals("")) {
-				return false;
-			}
-			if (uri.isAbsolute() && uri.getScheme().equals(Constant.FILE_SCHEME)) {
+
+			if (!uri.getPath().equals("") && uri.isAbsolute() && uri.getScheme().equals(Constant.FILE_SCHEME)) {
 				File f = new File(uri.getPath());
 				if (!f.isFile()) {
 					Logger.debug("SHARE: uri is not a file");
 					return false;
 				}
+			} else {
+				return false;
 			}
 			Logger.debug(String.format("SHARE: uri path: %s", uri.getPath()));
-
 		} catch (URISyntaxException e) {
 			Logger.error(e);
 			return false;

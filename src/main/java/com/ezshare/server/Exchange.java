@@ -50,12 +50,14 @@ public class Exchange {
 			streamOut.writeUTF(message);
 
 		} catch (UnknownHostException e) {
-			Storage.serverList.remove(index);
 			Logger.error("Don't know about host " + server.hostname);
+			Logger.debug(String.format("EXCHANGE: removing %s from server list", server.hostname));
+			Storage.serverList.remove(index);
 			Logger.error(e);
 		} catch (IOException e) {
-			Storage.serverList.remove(index);
 			Logger.error("Couldn't get I/O for the connection to " + server.hostname);
+			Logger.debug(String.format("EXCHANGE: removing %s from server list", server.hostname));
+			Storage.serverList.remove(index);
 			Logger.error(e);
 		}
 	}
