@@ -38,7 +38,6 @@ public class Cli {
 			}
 			
 		} catch(ParseException e) {
-			Logger.error(e);
 			help(options);
 		}
 		

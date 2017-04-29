@@ -44,17 +44,54 @@ Using command line run this command in the root folder
 mvn package
 ```
 
+After you run this command, the jar file will be available in `target/` folder.
+
 **1. Run the application**
 
 You need to run the client and server in the separate command line/terminal
+
+Available command line arguments for Server
+
+```
+ -advertisedhostname <arg>        advertised hostname
+ -connectionintervallimit <arg>   connection interval limit in seconds
+ -debug                           Print debug information
+ -exchangeinterval <arg>          exchange interval in seconds
+ -port <arg>                      Server port, an integer
+ -secret <arg>                    Secret
+```
+
 #### Server
 ```bash
-java -cp target/ezshare-1.0-jar-with-dependencies.jar com.ezshare.Server
+java -cp target/ezshare-1.0-jar-with-dependencies.jar EZShare.Server <command line arguments>
 ```
+
+Available command line arguments for Client
+
+```
+ -channel <arg>       channel
+ -debug               print debug information
+ -description <arg>   resource description
+ -exchange            exchange server list with server
+ -fetch               fetch resources from server
+ -host <arg>          server host, a domain name or IP Address
+ -name <arg>          resource name
+ -owner <arg>         owner
+ -port <arg>          server port, an integer
+ -publish             publish resource on server
+ -query               query for resources from server
+ -remove              remove resource from server
+ -secret <arg>        secret
+ -servers <arg>       server list
+ -share               share resource on server
+ -tags <arg>          resource tag
+ -uri <arg>           resource uri
+```
+
 
 ### Client
 ```bash
-java -cp target/ezshare-1.0-jar-with-dependencies.jar com.ezshare.Client
+java -cp target/ezshare-1.0-jar-with-dependencies.jar EZShare.Client <command line arguments>
 ```
 
 Code Structure
