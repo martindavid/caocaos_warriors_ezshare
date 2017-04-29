@@ -6,10 +6,11 @@ import java.net.UnknownHostException;
 
 import org.pmw.tinylog.Logger;
 
-import com.ezshare.Constant;
-import com.ezshare.Message;
 import com.ezshare.server.Responses;
 import com.ezshare.server.Utilities;
+
+import EZShare.Constant;
+import EZShare.Message;
 
 /**
  * Created by mvalentino on 20/3/17.

@@ -1,8 +1,9 @@
 package com.ezshare.server;
 
-import com.ezshare.Constant;
-import com.ezshare.Resource;
 import com.fasterxml.jackson.core.JsonProcessingException;
+
+import EZShare.Constant;
+import EZShare.Resource;
 
 import java.io.File;
 import java.net.URI;

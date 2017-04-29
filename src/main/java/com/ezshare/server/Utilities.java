@@ -3,11 +3,12 @@ package com.ezshare.server;
 import java.io.IOException;
 import java.security.SecureRandom;
 
-import com.ezshare.Constant;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import EZShare.Constant;
 
 public class Utilities {
 

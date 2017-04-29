@@ -2,8 +2,9 @@ package com.ezshare.server;
 
 import org.pmw.tinylog.Logger;
 
-import com.ezshare.Resource;
 import com.ezshare.server.Exchange;
+
+import EZShare.Resource;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;

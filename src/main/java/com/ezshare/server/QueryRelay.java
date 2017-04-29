@@ -11,9 +11,9 @@ import java.util.ArrayList;
 
 import org.pmw.tinylog.Logger;
 
-import com.ezshare.Constant;
-import com.ezshare.Message;
-import com.ezshare.Resource;
+import EZShare.Constant;
+import EZShare.Message;
+import EZShare.Resource;
 
 public class QueryRelay {
 

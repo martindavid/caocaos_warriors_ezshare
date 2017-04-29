@@ -10,7 +10,7 @@ import java.net.SocketException;
 
 import org.pmw.tinylog.Logger;
 
-import com.ezshare.Constant;
+import EZShare.Constant;
 
 /**
  * @author mvalentino

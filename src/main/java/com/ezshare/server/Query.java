@@ -3,10 +3,11 @@ package com.ezshare.server;
 import java.util.ArrayList;
 import java.util.Arrays;
 import org.pmw.tinylog.Logger;
-import com.ezshare.Resource;
-import com.ezshare.ResourceTemplate;
-import com.ezshare.Constant;
-import com.ezshare.Message;
+
+import EZShare.Constant;
+import EZShare.Message;
+import EZShare.Resource;
+import EZShare.ResourceTemplate;
 
 public class Query {
 	private Resource resource;

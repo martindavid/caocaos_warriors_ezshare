@@ -1,4 +1,4 @@
-package com.ezshare;
+package EZShare;
 
 import com.ezshare.client.Views;
 import com.fasterxml.jackson.annotation.JsonView;

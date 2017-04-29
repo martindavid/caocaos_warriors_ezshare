@@ -1,10 +1,11 @@
 package com.ezshare.server;
 
-import com.ezshare.Constant;
 import com.ezshare.client.Views;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import EZShare.Constant;
 
 public class Responses {
 	

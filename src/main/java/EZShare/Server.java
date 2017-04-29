@@ -1,4 +1,4 @@
-package com.ezshare;
+package EZShare;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;

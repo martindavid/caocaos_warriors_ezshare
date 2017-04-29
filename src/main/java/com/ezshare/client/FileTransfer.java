@@ -7,9 +7,10 @@ import java.util.Arrays;
 
 import org.pmw.tinylog.Logger;
 
-import com.ezshare.Constant;
-import com.ezshare.Resource;
 import com.ezshare.server.Utilities;
+
+import EZShare.Constant;
+import EZShare.Resource;
 
 /**
  * A class that handle transferring files

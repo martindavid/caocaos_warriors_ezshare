@@ -1,4 +1,4 @@
-package com.ezshare;
+package EZShare;
 
 import java.util.ArrayList;
 import org.pmw.tinylog.Logger;

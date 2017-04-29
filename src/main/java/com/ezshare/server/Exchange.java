@@ -8,8 +8,9 @@ import java.util.ArrayList;
 
 import org.pmw.tinylog.Logger;
 
-import com.ezshare.Constant;
 import com.fasterxml.jackson.core.JsonProcessingException;
+
+import EZShare.Constant;
 
 public class Exchange {
 	private ArrayList<ServerList> serverList;

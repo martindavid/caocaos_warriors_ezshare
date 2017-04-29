@@ -1,4 +1,4 @@
-package com.ezshare;
+package EZShare;
 
 public class Constant {
 	public static final String ADVERTISED_HOSTNAME = "advertisedhostname";

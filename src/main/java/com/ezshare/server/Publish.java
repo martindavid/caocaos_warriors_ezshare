@@ -3,9 +3,10 @@ package com.ezshare.server;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import com.ezshare.Constant;
-import com.ezshare.Resource;
 import com.fasterxml.jackson.core.JsonProcessingException;
+
+import EZShare.Constant;
+import EZShare.Resource;
 
 public class Publish {
 	private Resource resource;

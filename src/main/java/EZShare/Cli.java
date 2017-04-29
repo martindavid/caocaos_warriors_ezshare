@@ -1,4 +1,4 @@
-package com.ezshare;
+package EZShare;
 
 import org.pmw.tinylog.Logger;
 

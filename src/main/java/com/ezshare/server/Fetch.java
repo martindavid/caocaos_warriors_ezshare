@@ -9,9 +9,10 @@ import java.util.Arrays;
 
 import org.pmw.tinylog.Logger;
 
-import com.ezshare.Constant;
-import com.ezshare.Resource;
 import com.fasterxml.jackson.core.JsonProcessingException;
+
+import EZShare.Constant;
+import EZShare.Resource;
 
 public class Fetch {
 	private Message message;
