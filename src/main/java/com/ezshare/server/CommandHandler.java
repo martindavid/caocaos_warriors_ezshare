@@ -9,6 +9,10 @@ import org.pmw.tinylog.Logger;
 import EZShare.Constant;
 import EZShare.Resource;
 
+/**
+ * Class to distribute command processing task
+ *
+ */
 public class CommandHandler {
 
 	Message message;

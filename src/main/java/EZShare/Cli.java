@@ -69,7 +69,7 @@ public class Cli {
 	
 	/**
 	 * A command line arguments options for server program
-	 * @return
+	 * @return command line options for server
 	 */
 	private Options constructServerOptions() {
 		Options options = new Options();
@@ -87,7 +87,7 @@ public class Cli {
 	
 	/**
 	 * A command line arguments options for client program
-	 * @return
+	 * @return command line options for Client
 	 */
 	private Options constructClientOptions() {
 		Options options = new Options();

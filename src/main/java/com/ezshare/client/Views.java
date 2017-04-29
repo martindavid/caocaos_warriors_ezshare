@@ -1,5 +1,9 @@
 package com.ezshare.client;
 
+/**
+ * Decorator class used by JSON parser to dynamically convert object to json string
+ *
+ */
 public class Views {
 	public static class Command {
 	};

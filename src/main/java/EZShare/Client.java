@@ -10,6 +10,10 @@ import org.pmw.tinylog.Level;
 import com.ezshare.client.Exchange;
 import com.ezshare.client.TCPClient;
 
+/**
+ * An entry point for Client application
+ *
+ */
 public class Client {
 	
 	public static void main(String[] args) throws IOException {

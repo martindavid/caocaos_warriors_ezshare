@@ -10,6 +10,11 @@ import org.pmw.tinylog.Level;
 import com.ezshare.server.TCPServer;
 import com.ezshare.server.Utilities;
 
+
+/**
+ * An entry point class for Server application
+ *
+ */
 public class Server {
 
 	public static void main(String[] args) {

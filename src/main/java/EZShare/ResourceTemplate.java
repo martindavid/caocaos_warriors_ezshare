@@ -1,8 +1,5 @@
 package EZShare;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 public class ResourceTemplate {
 	public String name;
 	public String description;
@@ -20,10 +17,5 @@ public class ResourceTemplate {
 		this.owner = res.owner;
 		this.ezserver = res.ezserver;
 		this.tags = res.tags;
-	}
-
-	public String toJson() throws JsonProcessingException {
-		ObjectMapper mapper = new ObjectMapper();
-		return mapper.writeValueAsString(this);
 	}
 }
