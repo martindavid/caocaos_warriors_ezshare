@@ -7,6 +7,7 @@ import org.apache.commons.cli.CommandLine;
 import org.pmw.tinylog.Configurator;
 import org.pmw.tinylog.Level;
 
+import com.ezshare.server.SSLServer;
 import com.ezshare.server.TCPServer;
 import com.ezshare.server.Utilities;
 
@@ -25,6 +26,7 @@ public class Server {
 		String secret = Utilities.generateRandomString(40);
 		int exchangeInterval = 600;
 		int connectionIntervalLimit = 1;
+		int sport = 3781;
 
 		try {
 			hostName = InetAddress.getLocalHost().getHostName();
@@ -55,7 +57,14 @@ public class Server {
 		if (cmd.hasOption(Constant.DEBUG)) {
 			Configurator.currentConfig().level(Level.DEBUG).activate();
 		}
-
+		
+		if (cmd.hasOption(Constant.SPORT)) {
+			sport = Integer.parseInt(cmd.getOptionValue(Constant.SPORT));
+		}
+		
+		SSLServer server_secure = new SSLServer(hostName, sport, secret, exchangeInterval, connectionIntervalLimit);
+		server_secure.start();
+		
 		TCPServer server = new TCPServer(hostName, port, secret, exchangeInterval, connectionIntervalLimit);
 		server.start();
 	}

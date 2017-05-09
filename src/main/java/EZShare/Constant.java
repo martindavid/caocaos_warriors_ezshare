@@ -7,6 +7,8 @@ public class Constant {
 	public static final String PORT = "port";
 	public static final String SECRET = "secret";
 	public static final String DEBUG = "debug";
+	public static final String SECURE = "secure";
+	public static final String SPORT = "secureportnumber";
 	
 	public static final String CHANNEL = "channel";
 	public static final String DESCRIPTION = "description";

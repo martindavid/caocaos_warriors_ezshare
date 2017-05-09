@@ -80,6 +80,7 @@ public class Cli {
 		options.addOption(Constant.PORT, true, "Server port, an integer");
 		options.addOption(Constant.SECRET, true, "Secret");
 		options.addOption(Constant.DEBUG, false, "Print debug information");
+		options.addOption(Constant.SPORT, true, "Secure port, an integer");
 		
 		return options;
 	}
@@ -109,6 +110,7 @@ public class Cli {
 		options.addOption(Constant.SHARE, false, "share resource on server");
 		options.addOption(Constant.TAGS, true, "resource tag");
 		options.addOption(Constant.URI, true, "resource uri");
+		options.addOption(Constant.SECURE, false, "secure socket");
 		
 		return options;
 	}
