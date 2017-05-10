@@ -52,8 +52,19 @@ public class ServerThread extends Thread {
 							|| message.command.equals(Constant.SHARE.toUpperCase()))
 							&& !jsonString.contains("resource")) {
 						streamOut.writeUTF(Utilities.getReturnMessage(Constant.MISSING_RESOURCE));
-					} else {
-						CommandHandler handler = new CommandHandler(message, streamOut, Storage.secret, false);
+					} 
+					else if (message.command.equals(Constant.SUBSCRIBE.toUpperCase())
+							&& !jsonString.contains("resourceTemplate")) {
+						streamOut.writeUTF(Utilities.getReturnMessage(Constant.MISSING_RESOURCE_TEMPLATE));
+					}
+					
+					else if (message.command.equals(Constant.SUBSCRIBE.toUpperCase())) {
+						CommandHandler handler = new CommandHandler(message, streamOut, Storage.secret);
+						handler.processMessage();
+						if (message.command.equals(Constant.UNSUBSCRIBE.toUpperCase())) break;
+					}
+					else {
+						CommandHandler handler = new CommandHandler(message, streamOut, Storage.secret);
 						handler.processMessage();
 						break;
 					}
@@ -66,7 +77,7 @@ public class ServerThread extends Thread {
 			Logger.error(ioe);
 		} finally { // Close the conection
 			try {
-				if (socket != null) {
+				if ((socket != null)) {
 					socket.close();
 					Logger.debug("Socket on thread " + ID + " closed");
 				}

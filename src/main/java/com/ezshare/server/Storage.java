@@ -9,7 +9,9 @@ public class Storage {
 	public static ArrayList<ServerList> serverList = new ArrayList<ServerList>();
 	public static ArrayList<ServerList> secure_serverList = new ArrayList<ServerList>();
 	public static ArrayList<ConnectionTracking> ipList = new ArrayList<ConnectionTracking>();
+	public static ArrayList<Resource> subscribeResultList = new ArrayList<Resource>();
 	public static String hostName = "";
 	public static int port = 0;
 	public static String secret = "";
+	public static String id = "";
 }

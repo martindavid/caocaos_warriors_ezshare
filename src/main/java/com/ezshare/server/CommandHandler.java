@@ -29,6 +29,25 @@ public class CommandHandler {
 
 	public void processMessage() throws IOException {
 		String responseMessage = "";
+		if(this.message.command.toLowerCase().equals(Constant.SUBSCRIBE))
+		{
+			Subscribe subscribe = new Subscribe(message.resourceTemplate, message.relay,message.id);
+			ArrayList<Resource> resourceList = subscribe.getResourceList();
+			Storage.id=message.id;
+			String successResponse = new Response().toJson();
+			streamOut.writeUTF(successResponse);
+			
+			if (resourceList.size() > 0) {
+				for (Resource res : resourceList) {
+					streamOut.writeUTF(res.toJson());
+					Storage.subscribeResultList.add(res);
+				}
+			}
+			
+		}
+		
+		
+		else{
 		switch (this.message.command.toLowerCase()) {
 		case Constant.PUBLISH:
 			responseMessage = new Publish(this.message.resource).processResourceMessage();
@@ -67,6 +86,12 @@ public class CommandHandler {
 			}
 			streamOut.writeUTF("{\"resultSize\":" + resourceList.size() + "}");
 			break;
+			
+			
+		case Constant.UNSUBSCRIBE:
+			streamOut.writeUTF("{\"resultSize\":" + Storage.subscribeResultList.size() + "}");
+			break;
+		
 		case Constant.FETCH:
 			Fetch fetch = new Fetch(this.message, streamOut);
 			fetch.processFetch();
@@ -86,5 +111,7 @@ public class CommandHandler {
 			streamOut.writeUTF(responseMessage);
 			break;
 		}
+	}
+		
 	}
 }

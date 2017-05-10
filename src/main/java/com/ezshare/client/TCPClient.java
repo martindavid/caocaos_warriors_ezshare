@@ -11,6 +11,7 @@ import com.ezshare.server.Utilities;
 
 import EZShare.Constant;
 import EZShare.Message;
+import EZShare.UnsubscribeMessage;
 
 /**
  * Created by mvalentino on 20/3/17.
@@ -23,6 +24,7 @@ public class TCPClient {
 	private int portNumber;
 	private String hostName;
 	private FileTransfer fileTransfer;
+	
 
 	public TCPClient(int portNumber, String hostName, Message message) {
 		this.portNumber = portNumber;
@@ -31,6 +33,7 @@ public class TCPClient {
 	}
 
 	public void Execute() throws IOException {
+
 		try (Socket echoSocket = new Socket(hostName, portNumber);
 				DataOutputStream streamOut = new DataOutputStream(echoSocket.getOutputStream());) {
 			// Print all of the information
@@ -69,18 +72,49 @@ public class TCPClient {
 						}
 					}
 				} else {
-					while (true) {
+					
+					while (System.in.available()==0) {
+						
 						if (streamIn.available() > 0) {
 							response = streamIn.readUTF();
 							Logger.info(response);
-							if (!message.command.equals(Constant.QUERY.toUpperCase())
-									|| response.contains(Constant.RESULT_SIZE)) {
+							if ((!message.command.equals(Constant.QUERY.toUpperCase())&&!message.command.equals(Constant.SUBSCRIBE.toUpperCase()))
+									|| response.contains(Constant.RESULT_SIZE)
+									) {
 								break;
 							}
 							if (response.contains("error")) {
 								break;
 							}
+					}
+						
 						}
+//					UnsubscribeMessage unmessage= new UnsubscribeMessage(message.id);
+//					streamOut.writeUTF(unmessage.toJson());
+//				if(message.command.equals(Constant.SUBSCRIBE.toUpperCase()))	
+//				{
+//					UnsubscribeMessage unmessage= new UnsubscribeMessage(message.id);
+//					streamOut.writeUTF(unmessage.toJson());
+//					if (streamIn.available() > 0) {
+//						response = streamIn.readUTF();
+//						Logger.info(response);}
+//				}
+			
+					
+				}
+				while(true)
+				{
+					UnsubscribeMessage unmessage= new UnsubscribeMessage(message.id);
+					streamOut.writeUTF(unmessage.toJson());
+					
+					if (streamIn.available() > 0) {
+						response = streamIn.readUTF();
+						Logger.info(response);}
+					if ((!message.command.equals(Constant.QUERY.toUpperCase())&&!message.command.equals(Constant.SUBSCRIBE.toUpperCase()))
+							|| response.contains(Constant.RESULT_SIZE)
+							|| response.contains("this")
+							) {
+						break;
 					}
 				}
 			} catch (IOException ioe) {

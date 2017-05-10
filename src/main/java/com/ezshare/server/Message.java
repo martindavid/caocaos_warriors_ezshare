@@ -11,4 +11,5 @@ public class Message {
 	public boolean relay;
 	public Resource resourceTemplate = new Resource();
 	public ArrayList<ServerList> serverList = new ArrayList<ServerList>();
+	public String id;
 }

@@ -5,6 +5,8 @@ import org.pmw.tinylog.Logger;
 
 import com.ezshare.client.Exchange;
 import com.ezshare.client.Views;
+
+import com.ezshare.server.Utilities;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -15,16 +17,19 @@ public class Message {
 
 	@JsonView(Views.Query.class)
 	public boolean relay = true;
-
+	
+	@JsonView(Views.Subscribe.class)
+	public String id = Utilities.generateRandomString(5);
+	
 	@JsonView(Views.Share.class)
 	public String secret = "";
-
+	
 	@JsonView(Views.Common.class)
 	public Resource resource;
 
 	@JsonView(Views.Fetch.class)
 	public ResourceTemplate resourceTemplate;
-
+	
 	@JsonView(Views.Exchange.class)
 	public ArrayList<Exchange> serverList = new ArrayList<Exchange>();
 
@@ -42,6 +47,9 @@ public class Message {
 				case Constant.QUERY:
 					this.resourceTemplate = new ResourceTemplate(this.resource);
 					return mapper.writerWithView(Views.Query.class).writeValueAsString(this);
+				case Constant.SUBSCRIBE:
+					this.resourceTemplate = new ResourceTemplate(this.resource);
+					return mapper.writerWithView(Views.Subscribe.class).writeValueAsString(this);
 				case Constant.SHARE:
 					return mapper.writerWithView(Views.Share.class).writeValueAsString(this);
 				case Constant.EXCHANGE:

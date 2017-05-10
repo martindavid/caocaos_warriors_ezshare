@@ -17,6 +17,9 @@ public class Views {
 	public static class Query extends Fetch {
 	};
 
+	public static class Subscribe extends Query {
+	};
+	
 	public static class Share extends Common {
 	};
 
@@ -24,11 +27,12 @@ public class Views {
 	};
 
 	public static class FileReceive extends Common {
-	};
+	}
 
 	public static class Response {
 	};
 
+	
 	public static class ErrorMessage extends Response {
 	};
 
