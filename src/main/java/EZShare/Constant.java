@@ -1,6 +1,7 @@
 package EZShare;
 
 public class Constant {
+
 	public static final String ADVERTISED_HOSTNAME = "advertisedhostname";
 	public static final String CONNECTION_INTERVAL_LIMIT = "connectionintervallimit";
 	public static final String EXCHANGE_INTERVAL = "exchangeinterval";
@@ -24,6 +25,8 @@ public class Constant {
 	public static final String SHARE = "share";
 	public static final String TAGS = "tags";
 	public static final String URI = "uri";
+	public static final String SUBSCRIBE = "subscribe";
+	public static final String UNSUBSCRIBE = "unsubscribe";
 	
 	public static final String RESULT_SIZE = "resultSize";
 	public static final String FILE_SCHEME = "file";
@@ -42,4 +45,5 @@ public class Constant {
 	public static final String INCORRECT_SECRET = "incorrect secret";
 	public static final String MISSING_RESOURCE_OR_SECRET = "missing resource and or secret";
 	public static final String CANNOT_SHARE_RESOURCE = "cannot share resource";
+	
 }
