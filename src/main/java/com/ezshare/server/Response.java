@@ -11,9 +11,9 @@ public class Response {
 	
 	
 	
-	public Response() {
+	public Response(int index) {
 		this.response = Constant.SUCCESS;
-		this.id=Storage.id;
+		this.id=Storage.id.get(index);
 	}
 	
 	public Response(String errorMessage) {

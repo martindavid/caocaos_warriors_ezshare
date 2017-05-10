@@ -71,7 +71,8 @@ public class TCPClient {
 							break;
 						}
 					}
-				} else {
+				} 
+				else {
 					
 					while (System.in.available()==0) {
 						
@@ -102,7 +103,9 @@ public class TCPClient {
 			
 					
 				}
-				while(true)
+				if (message.command.equals(Constant.SUBSCRIBE.toUpperCase()))
+				{
+					while(true)
 				{
 					UnsubscribeMessage unmessage= new UnsubscribeMessage(message.id);
 					streamOut.writeUTF(unmessage.toJson());
@@ -117,6 +120,8 @@ public class TCPClient {
 						break;
 					}
 				}
+				
+			}
 			} catch (IOException ioe) {
 				Logger.error(ioe);
 			}

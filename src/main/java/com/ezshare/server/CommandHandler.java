@@ -32,15 +32,22 @@ public class CommandHandler {
 		if(this.message.command.toLowerCase().equals(Constant.SUBSCRIBE))
 		{
 			Subscribe subscribe = new Subscribe(message.resourceTemplate, message.relay,message.id);
+			
+
+			
+			
 			ArrayList<Resource> resourceList = subscribe.getResourceList();
-			Storage.id=message.id;
-			String successResponse = new Response().toJson();
+			String successResponse = new Response(Storage.id.indexOf(message.id)).toJson();
 			streamOut.writeUTF(successResponse);
 			
 			if (resourceList.size() > 0) {
 				for (Resource res : resourceList) {
 					streamOut.writeUTF(res.toJson());
-					Storage.subscribeResultList.add(res);
+					int index = Storage.id.indexOf(message.id);
+					if(index != -1)
+					{
+						Storage.Resultsize.set(index, Storage.Resultsize.get(index)+1);
+					}
 				}
 			}
 			
@@ -89,7 +96,18 @@ public class CommandHandler {
 			
 			
 		case Constant.UNSUBSCRIBE:
-			streamOut.writeUTF("{\"resultSize\":" + Storage.subscribeResultList.size() + "}");
+			
+
+			int index = Storage.id.indexOf(message.id);
+			streamOut.writeUTF("{\"resultSize\":" +Storage.Resultsize.get(index) + "}");
+			if(index != -1)
+			{
+				Storage.id.remove(index);
+				Storage.Resultsize.remove(index);
+				Storage.subscribesocket.remove(index);
+				Storage.Subscribetemplate.remove(index);
+			}
+
 			break;
 		
 		case Constant.FETCH:

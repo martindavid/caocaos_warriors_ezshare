@@ -43,8 +43,10 @@ public class ServerThread extends Thread {
 					Message message = Utilities.convertJsonToObject(jsonString, Message.class);
 
 					if ((message.command.equals(Constant.FETCH.toUpperCase())
-							|| message.command.equals(Constant.QUERY.toUpperCase()))
-							&& !jsonString.contains("resourceTemplate")) {
+							|| message.command.equals(Constant.QUERY.toUpperCase())
+							|| message.command.equals(Constant.SUBSCRIBE.toUpperCase()))
+							&& (!jsonString.contains("resourceTemplate"))) {
+						Logger.debug(message.command);
 						streamOut.writeUTF(Utilities.getReturnMessage(Constant.MISSING_RESOURCE_TEMPLATE));
 						break;
 					} else if ((message.command.equals(Constant.PUBLISH.toUpperCase())
@@ -53,14 +55,17 @@ public class ServerThread extends Thread {
 							&& !jsonString.contains("resource")) {
 						streamOut.writeUTF(Utilities.getReturnMessage(Constant.MISSING_RESOURCE));
 					} 
-					else if (message.command.equals(Constant.SUBSCRIBE.toUpperCase())
-							&& !jsonString.contains("resourceTemplate")) {
-						streamOut.writeUTF(Utilities.getReturnMessage(Constant.MISSING_RESOURCE_TEMPLATE));
-					}
 					
 					else if (message.command.equals(Constant.SUBSCRIBE.toUpperCase())) {
+						// store the information for this subscribe
+						Storage.subscribesocket.add(this.socket);
+						Storage.id.add(message.id);
+						Storage.Subscribetemplate.add(message.resourceTemplate);
+						Storage.Resultsize.add(0);
+						
 						CommandHandler handler = new CommandHandler(message, streamOut, Storage.secret);
 						handler.processMessage();
+						// Storage id will change to String list latter. the connection will close when list=null;
 						if (message.command.equals(Constant.UNSUBSCRIBE.toUpperCase())) break;
 					}
 					else {
