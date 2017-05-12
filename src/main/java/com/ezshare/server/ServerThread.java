@@ -53,7 +53,7 @@ public class ServerThread extends Thread {
 							&& !jsonString.contains("resource")) {
 						streamOut.writeUTF(Utilities.getReturnMessage(Constant.MISSING_RESOURCE));
 					} else {
-						CommandHandler handler = new CommandHandler(message, streamOut, Storage.secret);
+						CommandHandler handler = new CommandHandler(message, streamOut, Storage.secret, false);
 						handler.processMessage();
 						break;
 					}

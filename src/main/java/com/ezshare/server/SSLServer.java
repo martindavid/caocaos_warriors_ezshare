@@ -1,10 +1,7 @@
 package com.ezshare.server;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.InetSocketAddress;
-import java.net.Socket;
 import java.net.SocketException;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -23,7 +20,6 @@ import org.pmw.tinylog.Logger;
 
 import com.ezshare.server.ConnectionTracking;
 import com.ezshare.server.Exchange;
-import com.ezshare.server.ServerThread;
 import com.ezshare.server.ServerThreadSecure;
 import com.ezshare.server.Storage;
 

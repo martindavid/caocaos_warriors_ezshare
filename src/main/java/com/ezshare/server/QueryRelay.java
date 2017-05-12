@@ -35,10 +35,11 @@ public class QueryRelay {
 			streamOut.writeUTF(message.toJson());
 
 			String response = "";
+			String string = "";
 			try (DataInputStream streamIn = new DataInputStream(new BufferedInputStream(echoSocket.getInputStream()))) {
 				while (true) {
-					if (streamIn.available() > 0) {
-						response = streamIn.readUTF();
+					if ((string = streamIn.readUTF()) != null) {
+						response = string;
 						if (response.contains(Constant.RESULT_SIZE)) {
 							break;
 						}
