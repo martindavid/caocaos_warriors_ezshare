@@ -13,6 +13,8 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.net.UnknownHostException;
+import java.nio.Buffer;
+import java.nio.ByteBuffer;
 
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
@@ -32,7 +34,6 @@ public class SSLClient {
 	private String hostName;
 	private FileTransfer fileTransfer;
 	SSLSocket echoSocket;
-	SSLSocket receive_socket;
 	SSLSocketFactory sslsocketfactory;
 
 	public SSLClient(int portNumber, String hostName, Message message) {
@@ -76,88 +77,67 @@ public class SSLClient {
 	
 	public void message_transfer() throws IOException{
 		
-		//Create buffered writer to send data to the server
-		OutputStream outputstream = echoSocket.getOutputStream();
-		OutputStreamWriter outputstreamwriter = new OutputStreamWriter(outputstream);
-		BufferedWriter bufferedwriter = new BufferedWriter(outputstreamwriter);
+		DataOutputStream streamOut = new DataOutputStream(echoSocket.getOutputStream());
 		
 		//Send data to the server
-		bufferedwriter.write(message.toJson());
-		bufferedwriter.flush();
-		echoSocket.close();
-		
+		streamOut.writeUTF(message.toJson());
+		streamOut.flush();
 	}
 	
 	public void message_receive() throws IOException {
-		//Create buffered reader to read input from the server
-		receive_socket = (SSLSocket) sslsocketfactory.createSocket(hostName, portNumber);
-		System.out.println("1");
-		InputStream inputstream = receive_socket.getInputStream();
-		System.out.println("2");
-		InputStreamReader inputstreamreader = new InputStreamReader(inputstream);
-		System.out.println("3");
-		BufferedReader bufferedreader = new BufferedReader(inputstreamreader);
-		System.out.println("4");
-
+		
 		String response = "";
-		try {
-			String string = null;
-			String jsonString = "";
-			System.out.println("5");
-			//Read input from the server and print it to the screen
-			try {
-				System.out.println("6");
-				while((string = bufferedreader.readLine()) != ""){
-					jsonString = string;
-					System.out.println("7");
-				}
-				System.out.println(jsonString);
-				
+		String string ="";
+		
+		try (DataInputStream streamIn = new DataInputStream(new BufferedInputStream(echoSocket.getInputStream()))) {
+			
 			boolean exitLoop = false;
+			
 			if (message.command.equals(Constant.FETCH.toUpperCase())) {
+				
 				while (true) {
-					if ((string = bufferedreader.readLine()) != null) {
-						// Receive response from server (success or error)
-						
-						response = string;
-						
-						Logger.info(response);
-						Responses serverResponse = Utilities.convertJsonToObject(response, Responses.class);
-
-						// Only fetch the file the response is not an error
-						if (!serverResponse.response.equals(Constant.ERROR)) {
-							DataInputStream streamIn = new DataInputStream(new BufferedInputStream(receive_socket.getInputStream()));
-							// Receiving the file
-							fileTransfer = new FileTransfer(streamIn);
-							fileTransfer.download();
-						}
-						exitLoop = true;
+					if ((string = DataInputStream.readUTF(streamIn)) != null){
+					
+							response = string;
+					
 					}
+				System.out.println(response);
+					
+				Responses serverResponse = Utilities.convertJsonToObject(response, Responses.class);
+
+				// Only fetch the file the response is not an error
+				if (!serverResponse.response.equals(Constant.ERROR)) {
+				// Receiving the file
+					fileTransfer = new FileTransfer(streamIn);
+					fileTransfer.download();
+				}
+					exitLoop = true;
+					
 					if (exitLoop) {
-						
+						break;
 					}
 				}
 			} else {
 				while (true) {
-					while ((string = bufferedreader.readLine()) != null) {
+					if ((string = DataInputStream.readUTF(streamIn)) != null){
+						
 						response = string;
-						Logger.info(response);
-						if (!message.command.equals(Constant.QUERY.toUpperCase())
-								|| response.contains(Constant.RESULT_SIZE)) {
-							
-						}
-						if (response.contains("error")) {
-							
-						}
+				
+					}
+					System.out.println(response);
+					
+					if (!message.command.equals(Constant.QUERY.toUpperCase())
+							|| response.contains(Constant.RESULT_SIZE)) {
+						break;
+					}
+					if (response.contains("error")) {
+						break;
 					}
 				}
 			}
 		} catch (IOException ioe) {
 			Logger.error(ioe);
 		}
-	} catch (Exception e) {
-		Logger.error(e);
-	}
-	}
-
 }
+}
+
