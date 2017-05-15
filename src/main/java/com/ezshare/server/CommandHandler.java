@@ -31,7 +31,7 @@ public class CommandHandler {
 		String responseMessage = "";
 		if(this.message.command.toLowerCase().equals(Constant.SUBSCRIBE))
 		{
-			Subscribe subscribe = new Subscribe(message.resourceTemplate, message.relay,message.id);
+			Query subscribe = new Query(message.resourceTemplate, message.relay);
 			
 
 			

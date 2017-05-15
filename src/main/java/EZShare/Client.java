@@ -32,103 +32,55 @@ public class Client {
 			hostName = cmd.getOptionValue(Constant.HOST);
 		}
 
-		TCPClient clientall = new TCPClient(portNumber, hostName, message);
-
-		if ((!cmd.hasOption(Constant.SUBSCRIBE)) && (!cmd.hasOption(Constant.UNSUBSCRIBE))) {
-			if (cmd.hasOption(Constant.PUBLISH)) {
-				message.command = Constant.PUBLISH.toUpperCase();
-			} else if (cmd.hasOption(Constant.REMOVE)) {
-				message.command = Constant.REMOVE.toUpperCase();
-			} else if (cmd.hasOption(Constant.SHARE)) {
-				message.command = Constant.SHARE.toUpperCase();
-			} else if (cmd.hasOption(Constant.QUERY)) {
-				message.command = Constant.QUERY.toUpperCase();
-			} else if (cmd.hasOption(Constant.FETCH)) {
-				message.command = Constant.FETCH.toUpperCase();
-			} else if (cmd.hasOption(Constant.EXCHANGE)) {
-				message.command = Constant.EXCHANGE.toUpperCase();
-			}
-
-			if (cmd.hasOption(Constant.SECRET)) {
-				message.secret = cmd.getOptionValue(Constant.SECRET);
-			}
-
-			if (cmd.hasOption(Constant.NAME)) {
-				message.resource.name = cmd.getOptionValue(Constant.NAME);
-			}
-
-			if (cmd.hasOption(Constant.DESCRIPTION)) {
-				message.resource.description = cmd.getOptionValue(Constant.DESCRIPTION);
-			}
-
-			if (cmd.hasOption(Constant.TAGS)) {
-				message.resource.tags = cmd.getOptionValue(Constant.TAGS).split("\\,");
-			}
-
-			if (cmd.hasOption(Constant.URI)) {
-				message.resource.uri = cmd.getOptionValue(Constant.URI);
-			}
-
-			if (cmd.hasOption(Constant.CHANNEL)) {
-				message.resource.channel = cmd.getOptionValue(Constant.CHANNEL);
-			}
-
-			if (cmd.hasOption(Constant.OWNER)) {
-				message.resource.owner = cmd.getOptionValue(Constant.OWNER);
-			}
-
-			if (cmd.hasOption(Constant.SERVERS)) {
-				String server = cmd.getOptionValue(Constant.SERVERS);
-				message.serverList = parseServerList(server);
-			}
-
-			if (cmd.hasOption(Constant.DEBUG)) {
-				Configurator.currentConfig().level(Level.DEBUG).activate();
-			}
-
-			TCPClient client = new TCPClient(portNumber, hostName, message);
-			client.Execute();
-		} else {
-			
-				message.command = Constant.SUBSCRIBE.toUpperCase();
-				clientall.Execute();
-				
-			
+		if (cmd.hasOption(Constant.PUBLISH)) {
+			message.command = Constant.PUBLISH.toUpperCase();
+		} else if (cmd.hasOption(Constant.REMOVE)) {
+			message.command = Constant.REMOVE.toUpperCase();
+		} else if (cmd.hasOption(Constant.SHARE)) {
+			message.command = Constant.SHARE.toUpperCase();
+		} else if (cmd.hasOption(Constant.QUERY)) {
+			message.command = Constant.QUERY.toUpperCase();
+		} else if (cmd.hasOption(Constant.FETCH)) {
+			message.command = Constant.FETCH.toUpperCase();
+		} else if (cmd.hasOption(Constant.EXCHANGE)) {
+			message.command = Constant.EXCHANGE.toUpperCase();
+		} else if (cmd.hasOption(Constant.SUBSCRIBE)) {
+			message.command = Constant.SUBSCRIBE.toUpperCase();
 		}
-		
+
+		if (cmd.hasOption(Constant.SECRET)) {
+			message.secret = cmd.getOptionValue(Constant.SECRET);
+		}
+
 		if (cmd.hasOption(Constant.NAME)) {
 			message.resource.name = cmd.getOptionValue(Constant.NAME);
 		}
-		
-		if (cmd.hasOption(Constant.DESCRIPTION)){
+
+		if (cmd.hasOption(Constant.DESCRIPTION)) {
 			message.resource.description = cmd.getOptionValue(Constant.DESCRIPTION);
 		}
-		
+
 		if (cmd.hasOption(Constant.TAGS)) {
 			message.resource.tags = cmd.getOptionValue(Constant.TAGS).split("\\,");
 		}
-		
+
 		if (cmd.hasOption(Constant.URI)) {
 			message.resource.uri = cmd.getOptionValue(Constant.URI);
 		}
-		
+
 		if (cmd.hasOption(Constant.CHANNEL)) {
 			message.resource.channel = cmd.getOptionValue(Constant.CHANNEL);
 		}
-		
+
 		if (cmd.hasOption(Constant.OWNER)) {
 			message.resource.owner = cmd.getOptionValue(Constant.OWNER);
 		}
-		
-		if (cmd.hasOption(Constant.PORT)) {
-			portNumber = Integer.parseInt(cmd.getOptionValue(Constant.PORT));
-		}
-		
+
 		if (cmd.hasOption(Constant.SERVERS)) {
 			String server = cmd.getOptionValue(Constant.SERVERS);
 			message.serverList = parseServerList(server);
 		}
-		
+
 		if (cmd.hasOption(Constant.DEBUG)) {
 			Configurator.currentConfig().level(Level.DEBUG).activate();
 		}
