@@ -58,9 +58,8 @@ public class SSLClient {
 	}
 
 	public void transferMessage() throws IOException {
-		try (DataOutputStream streamOut = new DataOutputStream(echoSocket.getOutputStream())) {
-			streamOut.writeUTF(message.toJson());
-		}
+		DataOutputStream streamOut = new DataOutputStream(echoSocket.getOutputStream());
+		streamOut.writeUTF(message.toJson());
 	}
 
 	public void receiveMessage() throws IOException {
