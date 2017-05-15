@@ -2,6 +2,8 @@ package EZShare;
 
 import org.pmw.tinylog.Logger;
 
+
+
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -110,6 +112,8 @@ public class Cli {
 		options.addOption(Constant.SHARE, false, "share resource on server");
 		options.addOption(Constant.TAGS, true, "resource tag");
 		options.addOption(Constant.URI, true, "resource uri");
+		options.addOption(Constant.SUBSCRIBE, false, "keep connect");
+		options.addOption(Constant.UNSUBSCRIBE, false, "disconnect");
 		options.addOption(Constant.SECURE, false, "secure socket");
 		
 		return options;

@@ -65,11 +65,11 @@ public class Query {
 
 		return result;
 	}
-
-	private Boolean isMatch(Resource res, Resource template) {
+	
+	public static Boolean isMatch(Resource res, Resource template) {
 		Boolean result = false;
-		Logger.debug("QUERY: validate resource");
-		Logger.debug(String.format("QUERY: Channel: %s, Owner: %s, Uri: %s, Name: %s, Description: %s", res.channel,
+		Logger.debug("QUERY or SUBSCRIBE: validate resource");
+		Logger.debug(String.format("QUERY or SUBSCRIBE: Channel: %s, Owner: %s, Uri: %s, Name: %s, Description: %s", res.channel,
 				res.owner, res.uri, res.name, res.description));
 
 		if ((res.channel.equals(template.channel)) && (res.name.contains(template.name) || (template.name.isEmpty()))
@@ -85,4 +85,7 @@ public class Query {
 
 		return result;
 	}
+	
+
+
 }

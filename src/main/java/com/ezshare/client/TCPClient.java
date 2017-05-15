@@ -11,6 +11,7 @@ import com.ezshare.server.Utilities;
 
 import EZShare.Constant;
 import EZShare.Message;
+import EZShare.UnsubscribeMessage;
 
 /**
  * Created by mvalentino on 20/3/17.
@@ -31,6 +32,7 @@ public class TCPClient {
 	}
 
 	public void Execute() throws IOException {
+
 		try (Socket echoSocket = new Socket(hostName, portNumber);
 				DataOutputStream streamOut = new DataOutputStream(echoSocket.getOutputStream());) {
 			// Print all of the information
@@ -69,11 +71,14 @@ public class TCPClient {
 						}
 					}
 				} else {
-					while (true) {
+
+					while (System.in.available() == 0) {
+
 						if (streamIn.available() > 0) {
 							response = streamIn.readUTF();
 							Logger.info(response);
-							if (!message.command.equals(Constant.QUERY.toUpperCase())
+							if ((!message.command.equals(Constant.QUERY.toUpperCase())
+									&& !message.command.equals(Constant.SUBSCRIBE.toUpperCase()))
 									|| response.contains(Constant.RESULT_SIZE)) {
 								break;
 							}
@@ -81,7 +86,38 @@ public class TCPClient {
 								break;
 							}
 						}
+
 					}
+					// UnsubscribeMessage unmessage= new
+					// UnsubscribeMessage(message.id);
+					// streamOut.writeUTF(unmessage.toJson());
+					// if(message.command.equals(Constant.SUBSCRIBE.toUpperCase()))
+					// {
+					// UnsubscribeMessage unmessage= new
+					// UnsubscribeMessage(message.id);
+					// streamOut.writeUTF(unmessage.toJson());
+					// if (streamIn.available() > 0) {
+					// response = streamIn.readUTF();
+					// Logger.info(response);}
+					// }
+
+				}
+				if (message.command.equals(Constant.SUBSCRIBE.toUpperCase())) {
+					while (true) {
+						UnsubscribeMessage unmessage = new UnsubscribeMessage(message.id);
+						streamOut.writeUTF(unmessage.toJson());
+
+						if (streamIn.available() > 0) {
+							response = streamIn.readUTF();
+							Logger.info(response);
+						}
+						if ((!message.command.equals(Constant.QUERY.toUpperCase())
+								&& !message.command.equals(Constant.SUBSCRIBE.toUpperCase()))
+								|| response.contains(Constant.RESULT_SIZE) || response.contains("this")) {
+							break;
+						}
+					}
+
 				}
 			} catch (IOException ioe) {
 				Logger.error(ioe);

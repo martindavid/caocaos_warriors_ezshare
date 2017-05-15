@@ -5,7 +5,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import EZShare.Constant;
 import EZShare.Resource;
 
+import java.io.DataOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -22,7 +24,7 @@ public class Share {
 		this.machineSecret = machineSecret;
 	}
 
-	public String processResourceMessage() throws JsonProcessingException {
+	public String processResourceMessage() throws IOException {
 		Resource res = this.resource;
 		if (res == null) {
 			return Utilities.getReturnMessage(Constant.MISSING_RESOURCE);
@@ -65,6 +67,26 @@ public class Share {
 			}
 			Logger.debug("SHARE: insert new resource");
 			Storage.resourceList.add(res);
+			if(Storage.id!=null)
+			{
+				for(Resource template :Storage.Subscribetemplate)
+				{
+					if(Utilities.isMatch(res, template))
+					{
+						int index = Storage.Subscribetemplate.indexOf(template);
+						Resource newres = res;
+						if(!res.owner.isEmpty())
+						{
+							newres.owner="*";
+						}
+						DataOutputStream streamOut = new DataOutputStream(Storage.subscribesocket.get(index).getOutputStream());
+						streamOut.writeUTF(newres.toJson());
+						Storage.Resultsize.set(index, Storage.Resultsize.get(index)+1);
+						
+					}
+				}
+				
+			}
 			return Utilities.getReturnMessage(Constant.SUCCESS);
 		}
 	}
