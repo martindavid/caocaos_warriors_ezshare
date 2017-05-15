@@ -19,7 +19,7 @@ public class Exchange {
 		this.serverList = serverList;
 	}
 
-	public String processCommand() throws JsonProcessingException {
+	public String processCommand(boolean isSecure) throws JsonProcessingException {
 		if (this.serverList.size() <= 0) {
 			return Utilities.getReturnMessage(Constant.MISSING_OR_INVALID_SERVER_LIST);
 		}
@@ -28,7 +28,11 @@ public class Exchange {
 					.filter(x -> x.hostname.equals(server.hostname) && x.port == server.port).findAny().orElse(null);
 
 			if (existingServer == null) {
-				Storage.serverList.add(server);
+				if (isSecure) {
+					Storage.secureServerList.add(server);
+				} else {
+					Storage.serverList.add(server);
+				}
 			}
 		}
 		return Utilities.getReturnMessage(Constant.SUCCESS);

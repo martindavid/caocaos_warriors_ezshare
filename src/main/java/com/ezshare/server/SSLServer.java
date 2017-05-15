@@ -20,7 +20,7 @@ import org.pmw.tinylog.Logger;
 
 import com.ezshare.server.ConnectionTracking;
 import com.ezshare.server.Exchange;
-import com.ezshare.server.ServerThreadSecure;
+import com.ezshare.server.SecureServerThread;
 import com.ezshare.server.Storage;
 
 import EZShare.Resource;
@@ -30,7 +30,7 @@ public class SSLServer implements Runnable {
 
 	private int portNumber;
 	private String hostName;
-	private ServerThreadSecure client;
+	private SecureServerThread client;
 	private Thread thread;
 	private String secret;
 	private int exchangeInterval;
@@ -61,8 +61,7 @@ public class SSLServer implements Runnable {
 		// the keystore file contains an application's own certificate and private key
 		System.setProperty("javax.net.ssl.keyStore", "serverKeystore/serverKeystore.jks");
 		//Password to access the private key from the keystore file
-		System.setProperty("javax.net.ssl.keyStorePassword", "comp90015");
-										
+		System.setProperty("javax.net.ssl.keyStorePassword", "comp90015");					
 		//Enable debugging to view the handshake and communication which happens between the server and client
 		System.setProperty("javax.net.debug", "all");
 				
@@ -71,8 +70,7 @@ public class SSLServer implements Runnable {
 		try {
 			sslserversocket = (SSLServerSocket) sslserversocketfactory.createServerSocket(portNumber);
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			Logger.error(e1);
 		}
 		
 		// Separate task for server interaction
@@ -84,14 +82,12 @@ public class SSLServer implements Runnable {
 		Storage.secret = this.secret;
 		
 
-
 		while (thread != null) {
 			//Accept client connection
 			try {
 				socket = (SSLSocket) sslserversocket.accept();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				Logger.error(e);
 			}
 			String ipAddress = ((InetSocketAddress) socket.getRemoteSocketAddress()).getAddress().toString().replace("/","");;
 			Logger.debug(String.format("SERVER: validate %s", ipAddress));
@@ -151,7 +147,7 @@ public class SSLServer implements Runnable {
 	private void addThread(SSLSocket socket, String ipAddress) {
 		Logger.debug("Client with IP: " + ipAddress + " connected");
 		try {
-			client = new ServerThreadSecure(socket, ipAddress);
+			client = new SecureServerThread(socket, ipAddress);
 			this.es.execute(client);
 		} catch (SocketException e) {
 			Logger.error(e);
@@ -161,7 +157,6 @@ public class SSLServer implements Runnable {
 
 	private void runExchangeInterval() {
 		TimerTask task = new TimerTask() {
-
 			@Override
 			public void run() {
 				Logger.debug("START - server interaction");

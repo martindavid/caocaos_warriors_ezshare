@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-
 import EZShare.Constant;
 import EZShare.Resource;
 
@@ -22,7 +20,7 @@ public class Publish {
 	 * 
 	 * @param resJson
 	 * @return
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	public String processResourceMessage() throws IOException {
 		Resource res = this.resource;
@@ -34,7 +32,7 @@ public class Publish {
 		if (!isValid) {
 			return Utilities.getReturnMessage(Constant.CANNOT_PUBLISH_RESOURCE);
 		}
-		
+
 		// Update ezserver value before add to list
 		res.ezserver = String.format("%s:%d", Storage.hostName, Storage.port);
 		for (Resource localRes : Storage.resourceList) {
@@ -54,32 +52,28 @@ public class Publish {
 			}
 		}
 
-		
 		Storage.resourceList.add(res);
-		
-		
-		//if it match the template in subscribe, use the old socket to transfer it
-		if(Storage.id!=null)
-		{
-			for(Resource template :Storage.Subscribetemplate)
-			{
-				if(Utilities.isMatch(res, template))
-				{
+
+		// if it match the template in subscribe, use the old socket to transfer
+		// it
+		if (Storage.id != null) {
+			for (Resource template : Storage.Subscribetemplate) {
+				if (Utilities.isMatch(res, template)) {
 					int index = Storage.Subscribetemplate.indexOf(template);
 					Resource newres = res;
-					if(!res.owner.isEmpty())
-					{
-						newres.owner="*";
+					if (!res.owner.isEmpty()) {
+						newres.owner = "*";
 					}
-					DataOutputStream streamOut = new DataOutputStream(Storage.subscribesocket.get(index).getOutputStream());
+					DataOutputStream streamOut = new DataOutputStream(
+							Storage.subscribesocket.get(index).getOutputStream());
 					streamOut.writeUTF(newres.toJson());
-					Storage.Resultsize.set(index, Storage.Resultsize.get(index)+1);
-					
+					Storage.Resultsize.set(index, Storage.Resultsize.get(index) + 1);
+
 				}
 			}
-			
+
 		}
-		
+
 		return Utilities.getReturnMessage(Constant.SUCCESS);
 	}
 

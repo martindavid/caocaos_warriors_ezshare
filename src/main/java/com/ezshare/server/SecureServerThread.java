@@ -20,13 +20,13 @@ import EZShare.Constant;
  * This class also handle the main logic processing
  *
  */
-public class ServerThreadSecure extends Thread {
+public class SecureServerThread extends Thread {
 
 	private String ipAddress;
 	private int ID = -1;
 	private SSLSocket socket_secure = null;
 
-	public ServerThreadSecure(SSLSocket socket, String ipAddress) throws SocketException {
+	public SecureServerThread(SSLSocket socket, String ipAddress) throws SocketException {
 		this.socket_secure = socket;
 		this.ipAddress = ipAddress;
 		this.ID = socket.getPort();

@@ -11,7 +11,6 @@ import com.ezshare.server.SSLServer;
 import com.ezshare.server.TCPServer;
 import com.ezshare.server.Utilities;
 
-
 /**
  * An entry point class for Server application
  *
@@ -21,12 +20,12 @@ public class Server {
 	public static void main(String[] args) {
 		CommandLine cmd = new Cli(args).parseServer();
 
-		int port = 3030;
 		String hostName;
 		String secret = Utilities.generateRandomString(40);
 		int exchangeInterval = 600;
 		int connectionIntervalLimit = 1;
-		int sport = 3781;
+		int secure_port = 3781;
+		int port = 3030;
 
 		try {
 			hostName = InetAddress.getLocalHost().getHostName();
@@ -49,7 +48,7 @@ public class Server {
 		if (cmd.hasOption(Constant.EXCHANGE_INTERVAL)) {
 			exchangeInterval = Integer.parseInt(cmd.getOptionValue(Constant.EXCHANGE_INTERVAL));
 		}
-		
+
 		if (cmd.hasOption(Constant.CONNECTION_INTERVAL_LIMIT)) {
 			connectionIntervalLimit = Integer.parseInt(cmd.getOptionValue(Constant.CONNECTION_INTERVAL_LIMIT));
 		}
@@ -57,14 +56,15 @@ public class Server {
 		if (cmd.hasOption(Constant.DEBUG)) {
 			Configurator.currentConfig().level(Level.DEBUG).activate();
 		}
-		
+
 		if (cmd.hasOption(Constant.SPORT)) {
-			sport = Integer.parseInt(cmd.getOptionValue(Constant.SPORT));
+			secure_port = Integer.parseInt(cmd.getOptionValue(Constant.SPORT));
 		}
-		
-		SSLServer server_secure = new SSLServer(hostName, sport, secret, exchangeInterval, connectionIntervalLimit);
+
+		SSLServer server_secure = new SSLServer(hostName, secure_port, secret, exchangeInterval,
+				connectionIntervalLimit);
 		server_secure.start();
-		
+
 		TCPServer server = new TCPServer(hostName, port, secret, exchangeInterval, connectionIntervalLimit);
 		server.start();
 	}

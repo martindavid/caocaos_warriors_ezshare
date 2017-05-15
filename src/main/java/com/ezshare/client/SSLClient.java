@@ -35,7 +35,6 @@ public class SSLClient {
 		// Location of the Java keystore file containing the collection of
 		// certificates trusted by this application(trust store).
 		System.setProperty("javax.net.ssl.trustStore", "clientKeyStore/clientKeystore.jks");
-
 		System.setProperty("javax.net.debug", "all");
 
 		// Create SSL socket and connect it to the remote server
@@ -52,22 +51,19 @@ public class SSLClient {
 		Logger.debug("Setting Debug On");
 		Logger.debug("[SENT]:" + message.toJson());
 
-		message_transfer();
+		transferMessage();
 
-		message_receive();
+		receiveMessage();
 
 	}
 
-	public void message_transfer() throws IOException {
-
-		DataOutputStream streamOut = new DataOutputStream(echoSocket.getOutputStream());
-
-		// Send data to the server
-		streamOut.writeUTF(message.toJson());
-		streamOut.flush();
+	public void transferMessage() throws IOException {
+		try (DataOutputStream streamOut = new DataOutputStream(echoSocket.getOutputStream())) {
+			streamOut.writeUTF(message.toJson());
+		}
 	}
 
-	public void message_receive() throws IOException {
+	public void receiveMessage() throws IOException {
 
 		String response = "";
 		String string = "";
@@ -80,12 +76,10 @@ public class SSLClient {
 
 				while (true) {
 					if ((string = DataInputStream.readUTF(streamIn)) != null) {
-
 						response = string;
-
 					}
-					System.out.println(response);
 
+					Logger.debug(response);
 					Responses serverResponse = Utilities.convertJsonToObject(response, Responses.class);
 
 					// Only fetch the file the response is not an error
@@ -103,11 +97,9 @@ public class SSLClient {
 			} else {
 				while (true) {
 					if ((string = DataInputStream.readUTF(streamIn)) != null) {
-
 						response = string;
-
 					}
-					System.out.println(response);
+					Logger.debug(response);
 
 					if (!message.command.equals(Constant.QUERY.toUpperCase())
 							|| response.contains(Constant.RESULT_SIZE)) {

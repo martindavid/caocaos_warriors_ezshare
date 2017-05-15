@@ -11,7 +11,6 @@ import com.ezshare.server.Utilities;
 
 import EZShare.Constant;
 import EZShare.Message;
-import EZShare.UnsubscribeMessage;
 
 /**
  * Created by mvalentino on 20/3/17.
@@ -86,21 +85,7 @@ public class TCPClient {
 								break;
 							}
 						}
-
 					}
-					// UnsubscribeMessage unmessage= new
-					// UnsubscribeMessage(message.id);
-					// streamOut.writeUTF(unmessage.toJson());
-					// if(message.command.equals(Constant.SUBSCRIBE.toUpperCase()))
-					// {
-					// UnsubscribeMessage unmessage= new
-					// UnsubscribeMessage(message.id);
-					// streamOut.writeUTF(unmessage.toJson());
-					// if (streamIn.available() > 0) {
-					// response = streamIn.readUTF();
-					// Logger.info(response);}
-					// }
-
 				}
 				if (message.command.equals(Constant.SUBSCRIBE.toUpperCase())) {
 					while (true) {

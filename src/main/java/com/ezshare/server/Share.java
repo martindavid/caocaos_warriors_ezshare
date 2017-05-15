@@ -1,7 +1,5 @@
 package com.ezshare.server;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-
 import EZShare.Constant;
 import EZShare.Resource;
 
@@ -67,25 +65,22 @@ public class Share {
 			}
 			Logger.debug("SHARE: insert new resource");
 			Storage.resourceList.add(res);
-			if(Storage.id!=null)
-			{
-				for(Resource template :Storage.Subscribetemplate)
-				{
-					if(Utilities.isMatch(res, template))
-					{
+			if (Storage.id != null) {
+				for (Resource template : Storage.Subscribetemplate) {
+					if (Utilities.isMatch(res, template)) {
 						int index = Storage.Subscribetemplate.indexOf(template);
 						Resource newres = res;
-						if(!res.owner.isEmpty())
-						{
-							newres.owner="*";
+						if (!res.owner.isEmpty()) {
+							newres.owner = "*";
 						}
-						DataOutputStream streamOut = new DataOutputStream(Storage.subscribesocket.get(index).getOutputStream());
+						DataOutputStream streamOut = new DataOutputStream(
+								Storage.subscribesocket.get(index).getOutputStream());
 						streamOut.writeUTF(newres.toJson());
-						Storage.Resultsize.set(index, Storage.Resultsize.get(index)+1);
-						
+						Storage.Resultsize.set(index, Storage.Resultsize.get(index) + 1);
+
 					}
 				}
-				
+
 			}
 			return Utilities.getReturnMessage(Constant.SUCCESS);
 		}

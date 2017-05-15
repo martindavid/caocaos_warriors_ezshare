@@ -7,7 +7,6 @@ import org.apache.commons.cli.CommandLine;
 import org.pmw.tinylog.Configurator;
 import org.pmw.tinylog.Level;
 
-import com.ezshare.client.ClientStorage;
 import com.ezshare.client.Exchange;
 import com.ezshare.client.SSLClient;
 import com.ezshare.client.TCPClient;
