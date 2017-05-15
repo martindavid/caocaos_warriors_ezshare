@@ -33,6 +33,7 @@ public class CommandHandler {
 			Query subscribe = new Query(message.resourceTemplate, message.relay,
 					isSecure ? Storage.secureServerList : Storage.serverList);
 			ArrayList<Resource> resourceList = subscribe.getResourceList();
+			//Subscriber subscriber = Storage.subscriber.stream().filter(x -> x.id.equals(message.id)).findAny().orElse(null);
 			String successResponse = new Response(Storage.id.indexOf(message.id)).toJson();
 			streamOut.writeUTF(successResponse);
 

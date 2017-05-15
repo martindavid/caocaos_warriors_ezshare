@@ -55,14 +55,9 @@ public class ServerThread extends Thread {
 							&& !jsonString.contains("resource")) {
 						streamOut.writeUTF(Utilities.getReturnMessage(Constant.MISSING_RESOURCE));
 					} 
-					
 					else if (message.command.equals(Constant.SUBSCRIBE.toUpperCase())) {
-						// store the information for this subscribe
-						Storage.subscribesocket.add(this.socket);
-						Storage.id.add(message.id);
-						Storage.Subscribetemplate.add(message.resourceTemplate);
-						Storage.Resultsize.add(0);
-						
+						// store the information for this subscriber
+						Storage.subscriber.add(new Subscriber(message.id, 0, message.resourceTemplate, this.socket));
 						CommandHandler handler = new CommandHandler(message, streamOut, Storage.secret, false);
 						handler.processMessage();
 						// Storage id will change to String list latter. the connection will close when list=null;

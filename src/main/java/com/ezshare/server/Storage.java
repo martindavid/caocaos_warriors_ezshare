@@ -15,6 +15,7 @@ public class Storage {
 	public static String secret = "";
 
 	// this are for subscribe
+	public static ArrayList<Subscriber> subscriber = new ArrayList<Subscriber>();
 	public static ArrayList<Integer> Resultsize = new ArrayList<Integer>();
 	public static ArrayList<Resource> Subscribetemplate = new ArrayList<Resource>();
 	public static ArrayList<String> id = new ArrayList<String>();
