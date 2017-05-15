@@ -8,6 +8,7 @@ import org.pmw.tinylog.Configurator;
 import org.pmw.tinylog.Level;
 
 import com.ezshare.client.Exchange;
+import com.ezshare.client.SSLClient;
 import com.ezshare.client.TCPClient;
 
 /**
@@ -82,8 +83,14 @@ public class Client {
 			Configurator.currentConfig().level(Level.DEBUG).activate();
 		}
 		
-		TCPClient client = new TCPClient(portNumber, hostName, message);
-		client.Execute();
+		if (cmd.hasOption(Constant.SECURE)){
+			SSLClient client = new SSLClient(portNumber, hostName, message);
+			client.Execute();
+		}else{
+			TCPClient client = new TCPClient(portNumber, hostName, message);
+			client.Execute();
+		}
+	
 	}
 	
 	private static ArrayList<Exchange> parseServerList(String serverList) {

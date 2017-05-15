@@ -18,29 +18,28 @@ import EZShare.Resource;
  */
 public class FileTransfer {
 	DataInputStream streamIn;
-	
+
 	public FileTransfer(DataInputStream streamIn) {
 		this.streamIn = streamIn;
 	}
 
 	public void download() throws IOException {
 		String message = "";
-		try
-		{
+		try {
 			// Read resource or result size response
 			message = streamIn.readUTF();
 			Logger.info(message);
-				
-			//file receive
-			if(!message.contains(Constant.RESULT_SIZE)){
+
+			// file receive
+			if (!message.contains(Constant.RESULT_SIZE)) {
 				Resource resource = Utilities.convertJsonToObject(message, Resource.class);
 				String fileName = resource.uri.substring(resource.uri.lastIndexOf("/") + 1);
-					
+
 				long fileSizeRemaining = resource.resourceSize;
 				int chunkSize = setChunkSize(fileSizeRemaining);
 				byte[] buffer = new byte[chunkSize];
 				int num;
-					
+
 				try (RandomAccessFile downloadingFile = new RandomAccessFile(fileName, "rw")) {
 					Logger.info("Downloading file");
 					while ((num = streamIn.read(buffer)) > 0) {
@@ -53,11 +52,10 @@ public class FileTransfer {
 						}
 					}
 					Logger.info("File received!");
-				}
-				catch(Exception e) {
+				} catch (Exception e) {
 					Logger.error(e);
 				}
-					
+
 				// Read result size response
 				message = streamIn.readUTF();
 				Logger.info(message);

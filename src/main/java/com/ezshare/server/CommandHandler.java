@@ -18,11 +18,13 @@ public class CommandHandler {
 	Message message;
 	String serverSecret;
 	DataOutputStream streamOut;
+	Boolean secure;
 
-	public CommandHandler(Message message, DataOutputStream streamOut, String serverSecret) {
+	public CommandHandler(Message message, DataOutputStream streamOut, String serverSecret, Boolean secure) {
 		this.message = message;
 		this.streamOut = streamOut;
 		this.serverSecret = serverSecret;
+		this.secure = secure;
 	}
 
 	public void processMessage() throws IOException {
@@ -48,8 +50,14 @@ public class CommandHandler {
 			Logger.debug("SHARE: Resource Size: " + Storage.resourceList.size());
 			break;
 		case Constant.QUERY:
-			Query query = new Query(message.resourceTemplate, message.relay);
-			ArrayList<Resource> resourceList = query.getResourceList();
+			ArrayList<Resource> resourceList;
+			if (secure = true) {
+				Query query = new Query(message.resourceTemplate, message.relay);
+				resourceList = query.getResourceList();
+			} else {
+				SecureQuery query = new SecureQuery(message.resourceTemplate, message.relay);
+				resourceList = query.getResourceList();
+			}
 			String successResponse = new Responses().toJson();
 			streamOut.writeUTF(successResponse);
 			if (resourceList.size() > 0) {
@@ -64,7 +72,11 @@ public class CommandHandler {
 			fetch.processFetch();
 			break;
 		case Constant.EXCHANGE:
-			responseMessage = new Exchange(this.message.serverList).processCommand();
+			if (secure = true) {
+				responseMessage = new Exchange(this.message.serverList).processCommand();
+			} else {
+				responseMessage = new SecureExchange(this.message.serverList).processCommand();
+			}
 			streamOut.writeUTF(responseMessage);
 			Logger.debug("EXCHANGE: response message: " + responseMessage);
 			Logger.debug("EXCHANGE: Server List Size: " + Storage.serverList.size());
