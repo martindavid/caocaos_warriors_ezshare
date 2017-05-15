@@ -87,6 +87,7 @@ public class SecureServerThread extends Thread {
 				Logger.debug(String.format("SERVER: removing %s from ip list", this.ipAddress));
 				removeIp(this.ipAddress);
 				Logger.debug(String.format("SERVER: ip list size: %d", Storage.ipList.size()));
+				break;
 			}
 
 		} catch (IOException e) {
