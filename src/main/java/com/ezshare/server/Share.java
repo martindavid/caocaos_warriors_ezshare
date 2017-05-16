@@ -3,7 +3,6 @@ package com.ezshare.server;
 import EZShare.Constant;
 import EZShare.Resource;
 
-import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -65,23 +64,13 @@ public class Share {
 			}
 			Logger.debug("SHARE: insert new resource");
 			Storage.resourceList.add(res);
-			if (Storage.id != null) {
-				for (Resource template : Storage.Subscribetemplate) {
-					if (Utilities.isMatch(res, template)) {
-						int index = Storage.Subscribetemplate.indexOf(template);
-						Resource newres = res;
-						if (!res.owner.isEmpty()) {
-							newres.owner = "*";
-						}
-						DataOutputStream streamOut = new DataOutputStream(
-								Storage.subscribesocket.get(index).getOutputStream());
-						streamOut.writeUTF(newres.toJson());
-						Storage.Resultsize.set(index, Storage.Resultsize.get(index) + 1);
-
-					}
-				}
-
+			
+			// If there is any subscriber notify them with this new resource
+			if (Storage.subscriber.size() > 0) {
+				Subscription subscription = new Subscription();
+				subscription.notifySubscriber(res);
 			}
+			
 			return Utilities.getReturnMessage(Constant.SUCCESS);
 		}
 	}

@@ -1,6 +1,5 @@
 package com.ezshare.server;
 
-import java.net.Socket;
 import java.util.ArrayList;
 import EZShare.Resource;
 
@@ -14,10 +13,5 @@ public class Storage {
 	public static int port = 0;
 	public static String secret = "";
 
-	// this are for subscribe
 	public static ArrayList<Subscriber> subscriber = new ArrayList<Subscriber>();
-	public static ArrayList<Integer> Resultsize = new ArrayList<Integer>();
-	public static ArrayList<Resource> Subscribetemplate = new ArrayList<Resource>();
-	public static ArrayList<String> id = new ArrayList<String>();
-	public static ArrayList<Socket> subscribesocket = new ArrayList<Socket>();
 }

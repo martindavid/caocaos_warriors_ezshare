@@ -35,12 +35,8 @@ public class TCPClient {
 		try (Socket echoSocket = new Socket(hostName, portNumber);
 				DataOutputStream streamOut = new DataOutputStream(echoSocket.getOutputStream());) {
 			// Print all of the information
-			Logger.info("Starting the EZShare Server");
-			Logger.info("using secret: ");
-			Logger.info("using advertised hostname: " + hostName);
-			Logger.info("bound to port " + portNumber);
-			Logger.info("started");
-
+			Logger.info("Starting the EZShare Client");
+			Logger.info("Connect to host - " + hostName + " on port: " + portNumber);
 			Logger.debug("Setting Debug On");
 			Logger.debug("[SENT]:" + message.toJson());
 
