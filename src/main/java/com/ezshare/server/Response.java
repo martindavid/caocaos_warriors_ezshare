@@ -8,19 +8,21 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import EZShare.Constant;
 
 public class Response {
-	
-	
-	
-	public Response(int index) {
+
+	public Response() {
 		this.response = Constant.SUCCESS;
-		this.id=Storage.id.get(index);
 	}
 	
+	public Response(String response, String subscriberId) {
+		this.id = subscriberId;
+		this.response = response;
+	}
+
 	public Response(String errorMessage) {
 		this.response = Constant.ERROR;
 		this.errorMessage = errorMessage;
 	}
-	
+
 	@JsonView(Views.Response.class)
 	public String response;
 	public String id = "";

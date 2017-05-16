@@ -31,23 +31,7 @@ public class Utilities {
 		return sb.toString();
 	}
 
-	/**
-	 * Generic method to convert from jsonString to T object where T is class
-	 * 
-	 * @param jsonString
-	 * @param target
-	 * @return T instance
-	 * @throws JsonParseException
-	 * @throws JsonMappingException
-	 * @throws IOException
-	 */
-	
-	
-
-	
-	
-	
-	public static Boolean isMatch(Resource res, Resource template) {
+	public static Boolean isResourceMath(Resource res, Resource template) {
 		Boolean result = false;
 		Logger.debug("QUERY or SUBSCRIBE: validate resource");
 		Logger.debug(String.format("QUERY or SUBSCRIBE: Channel: %s, Owner: %s, Uri: %s, Name: %s, Description: %s", res.channel,
@@ -67,6 +51,16 @@ public class Utilities {
 		return result;
 	}
 	
+	/**
+	 * Generic method to convert from jsonString to T object where T is class
+	 * 
+	 * @param jsonString
+	 * @param target
+	 * @return T instance
+	 * @throws JsonParseException
+	 * @throws JsonMappingException
+	 * @throws IOException
+	 */
 	public static <T> T convertJsonToObject(String jsonString, Class<T> target)
 			throws JsonParseException, JsonMappingException, IOException {
 		ObjectMapper mapper = new ObjectMapper();

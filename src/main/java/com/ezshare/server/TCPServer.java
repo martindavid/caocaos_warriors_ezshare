@@ -57,7 +57,6 @@ public class TCPServer implements Runnable {
 		Logger.info("using advertised hostname: " + hostName);
 		Logger.info("bound to port: " + portNumber);
 		Logger.info("Waiting for a client.....");
-
 		Logger.debug("Setting debug on");
 		
 		// Separate task for server interaction
