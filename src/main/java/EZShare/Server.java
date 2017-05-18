@@ -7,6 +7,7 @@ import org.apache.commons.cli.CommandLine;
 import org.pmw.tinylog.Configurator;
 import org.pmw.tinylog.Level;
 
+import com.ezshare.server.NIOServer;
 import com.ezshare.server.SSLServer;
 import com.ezshare.server.TCPServer;
 import com.ezshare.server.Utilities;
@@ -62,11 +63,13 @@ public class Server {
 		}
 
 
-		TCPServer server = new TCPServer(hostName, port, secret, exchangeInterval, connectionIntervalLimit);
+//		TCPServer server = new TCPServer(hostName, port, secret, exchangeInterval, connectionIntervalLimit);
+//		server.start();
+//		
+//		SSLServer server_secure = new SSLServer(hostName, secure_port, secret, exchangeInterval,
+//				connectionIntervalLimit);
+//		server_secure.start();
+		NIOServer server = new NIOServer(hostName, port, secret, exchangeInterval, connectionIntervalLimit);
 		server.start();
-		
-		SSLServer server_secure = new SSLServer(hostName, secure_port, secret, exchangeInterval,
-				connectionIntervalLimit);
-		server_secure.start();
 	}
 }
