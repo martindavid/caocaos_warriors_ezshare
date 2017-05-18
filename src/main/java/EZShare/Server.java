@@ -61,11 +61,12 @@ public class Server {
 			secure_port = Integer.parseInt(cmd.getOptionValue(Constant.SPORT));
 		}
 
-		SSLServer server_secure = new SSLServer(hostName, secure_port, secret, exchangeInterval,
-				connectionIntervalLimit);
-		server_secure.start();
 
 		TCPServer server = new TCPServer(hostName, port, secret, exchangeInterval, connectionIntervalLimit);
 		server.start();
+		
+		SSLServer server_secure = new SSLServer(hostName, secure_port, secret, exchangeInterval,
+				connectionIntervalLimit);
+		server_secure.start();
 	}
 }

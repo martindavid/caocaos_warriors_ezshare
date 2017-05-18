@@ -35,62 +35,48 @@ public class SecureServerThread extends Thread {
 	@Override
 	public void run() {
 		Logger.debug("Server thread " + ID + " running");
-
-		// Create DataInputStream to read input from the client
-		DataInputStream streamIn = null;
-		try {
-			streamIn = new DataInputStream(new BufferedInputStream(socket_secure.getInputStream()));
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-
-		String string = null;
-		String jsonString = "unsuccess";
+		String jsonString = "";
 		// Read input from the client and print it to the screen
-		try {
+		try (DataInputStream streamIn = new DataInputStream(new BufferedInputStream(socket_secure.getInputStream()));) {
 			while (true) {
-				if ((string = streamIn.readUTF()) != null) {
 
-					jsonString = string;
-
+				try {
+					jsonString = streamIn.readUTF();
+					Logger.debug(jsonString);
+				} catch (Exception e) {
+					// No need to log, because this is a hackyway to read value
+					// from DataInputStream with SSLSocket
+					jsonString = "";
 				}
-				System.out.println(jsonString);
 
-				Message message = Utilities.convertJsonToObject(jsonString, Message.class);
+				if (!jsonString.isEmpty()) {
+					DataOutputStream streamOut = new DataOutputStream(socket_secure.getOutputStream());
+					Message message = Utilities.convertJsonToObject(jsonString, Message.class);
+					if ((message.command.equals(Constant.FETCH.toUpperCase())
+							|| message.command.equals(Constant.QUERY.toUpperCase()))
+							&& !jsonString.contains("resourceTemplate")) {
 
-				// Create buffered writer to send data to the client
-				DataOutputStream streamOut = new DataOutputStream(socket_secure.getOutputStream());
+						streamOut.writeUTF(Utilities.getReturnMessage(Constant.MISSING_RESOURCE_TEMPLATE));
+						break;
 
-				if ((message.command.equals(Constant.FETCH.toUpperCase())
-						|| message.command.equals(Constant.QUERY.toUpperCase()))
-						&& !jsonString.contains("resourceTemplate")) {
+					} else if ((message.command.equals(Constant.PUBLISH.toUpperCase())
+							|| message.command.equals(Constant.REMOVE.toUpperCase())
+							|| message.command.equals(Constant.SHARE.toUpperCase()))
+							&& !jsonString.contains("resource")) {
 
-					streamOut.writeUTF(Utilities.getReturnMessage(Constant.MISSING_RESOURCE_TEMPLATE));
-					streamOut.flush();
-					break;
-
-				} else if ((message.command.equals(Constant.PUBLISH.toUpperCase())
-						|| message.command.equals(Constant.REMOVE.toUpperCase())
-						|| message.command.equals(Constant.SHARE.toUpperCase())) && !jsonString.contains("resource")) {
-
-					streamOut.writeUTF(Utilities.getReturnMessage(Constant.MISSING_RESOURCE));
-					streamOut.flush();
-					break;
-
-				} else {
-
-					CommandHandler handler = new CommandHandler(message, streamOut, Storage.secret, true);
-					handler.processMessage();
-
+						streamOut.writeUTF(Utilities.getReturnMessage(Constant.MISSING_RESOURCE));
+						break;
+					} else {
+						CommandHandler handler = new CommandHandler(message, streamOut, Storage.secret, true);
+						handler.processMessage();
+						break;
+					}
 				}
-				Logger.debug(String.format("SERVER: removing %s from ip list", this.ipAddress));
-				removeIp(this.ipAddress);
-				Logger.debug(String.format("SERVER: ip list size: %d", Storage.ipList.size()));
 			}
-
+			Logger.debug(String.format("SERVER: removing %s from ip list", this.ipAddress));
+			removeIp(this.ipAddress);
+			Logger.debug(String.format("SERVER: ip list size: %d", Storage.ipList.size()));
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			Logger.error(e);
 		}
 	}
