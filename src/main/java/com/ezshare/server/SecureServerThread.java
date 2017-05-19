@@ -14,8 +14,7 @@ import org.pmw.tinylog.Logger;
 import EZShare.Constant;
 
 /**
- * 
- * 
+ *
  * A class to handle thread creation when a new client connected to the server
  * This class also handle the main logic processing
  *
@@ -24,10 +23,10 @@ public class SecureServerThread extends Thread {
 
 	private String ipAddress;
 	private int ID = -1;
-	private SSLSocket socket_secure = null;
+	private SSLSocket secureSocket = null;
 
 	public SecureServerThread(SSLSocket socket, String ipAddress) throws SocketException {
-		this.socket_secure = socket;
+		this.secureSocket = socket;
 		this.ipAddress = ipAddress;
 		this.ID = socket.getPort();
 	}
@@ -37,9 +36,8 @@ public class SecureServerThread extends Thread {
 		Logger.debug("Server thread " + ID + " running");
 		String jsonString = "";
 		// Read input from the client and print it to the screen
-		try (DataInputStream streamIn = new DataInputStream(new BufferedInputStream(socket_secure.getInputStream()));) {
+		try (DataInputStream streamIn = new DataInputStream(new BufferedInputStream(secureSocket.getInputStream()));) {
 			while (true) {
-
 				try {
 					jsonString = streamIn.readUTF();
 					Logger.debug(jsonString);
@@ -50,7 +48,7 @@ public class SecureServerThread extends Thread {
 				}
 
 				if (!jsonString.isEmpty()) {
-					DataOutputStream streamOut = new DataOutputStream(socket_secure.getOutputStream());
+					DataOutputStream streamOut = new DataOutputStream(secureSocket.getOutputStream());
 					Message message = Utilities.convertJsonToObject(jsonString, Message.class);
 					if ((message.command.equals(Constant.FETCH.toUpperCase())
 							|| message.command.equals(Constant.QUERY.toUpperCase()))
@@ -66,6 +64,13 @@ public class SecureServerThread extends Thread {
 
 						streamOut.writeUTF(Utilities.getReturnMessage(Constant.MISSING_RESOURCE));
 						break;
+					} else if (message.command.equals(Constant.SUBSCRIBE.toUpperCase())) {
+						// store the information for this subscriber
+						secureSocket.setKeepAlive(true);
+						Storage.secureSubscriber.add(new SecureSubscriber(message.id, 0, message.resourceTemplate, this.secureSocket));
+						Subscription subscription = new Subscription(streamOut, message, true);
+						subscription.subscribe();
+						//break;
 					} else {
 						CommandHandler handler = new CommandHandler(message, streamOut, Storage.secret, true);
 						handler.processMessage();

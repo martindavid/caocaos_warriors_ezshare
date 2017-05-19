@@ -28,11 +28,10 @@ public class CommandHandler {
 	}
 
 	public void processMessage() throws IOException {
-		Subscription subscription;
 		String responseMessage = "";
 		switch (this.message.command.toLowerCase()) {
 		case Constant.PUBLISH:
-			responseMessage = new Publish(this.message.resource).processResourceMessage();
+			responseMessage = new Publish(this.message.resource, this.isSecure).processResourceMessage();
 			streamOut.writeUTF(responseMessage);
 			Logger.debug("PUBLISH: response message: " + responseMessage);
 			Logger.debug("PUBLISH: Resource Size: " + Storage.resourceList.size());
@@ -44,7 +43,7 @@ public class CommandHandler {
 			Logger.debug("REMOVE: Resource Size: " + Storage.resourceList.size());
 			break;
 		case Constant.SHARE:
-			responseMessage = new Share(this.message.resource, this.message.secret, this.serverSecret)
+			responseMessage = new Share(this.message.resource, this.message.secret, this.serverSecret, this.isSecure)
 					.processResourceMessage();
 			streamOut.writeUTF(responseMessage);
 			Logger.debug("SHARE: response message: " + responseMessage);
@@ -63,8 +62,7 @@ public class CommandHandler {
 			streamOut.writeUTF("{\"resultSize\":" + resourceList.size() + "}");
 			break;
 		case Constant.UNSUBSCRIBE:
-			subscription = new Subscription(streamOut, message, isSecure);
-			subscription.unsubscribe();
+			new Subscription(streamOut, message, isSecure).unsubscribe();
 			break;
 		case Constant.FETCH:
 			Fetch fetch = new Fetch(this.message, streamOut);

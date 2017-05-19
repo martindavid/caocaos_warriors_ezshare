@@ -14,4 +14,5 @@ public class Storage {
 	public static String secret = "";
 
 	public static ArrayList<Subscriber> subscriber = new ArrayList<Subscriber>();
+	public static ArrayList<SecureSubscriber> secureSubscriber = new ArrayList<SecureSubscriber>();
 }
