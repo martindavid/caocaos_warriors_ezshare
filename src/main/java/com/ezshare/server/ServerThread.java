@@ -23,6 +23,7 @@ public class ServerThread extends Thread {
 	private Socket socket = null;
 	private String ipAddress;
 	private int ID = -1;
+	Message message;
 
 	public ServerThread(Socket socket, String ipAddress) throws SocketException {
 		this.socket = socket;
@@ -34,13 +35,14 @@ public class ServerThread extends Thread {
 	public void run() {
 		Logger.debug("Server thread " + ID + " running");
 		String jsonString = "";
-		try (DataInputStream streamIn = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
-				DataOutputStream streamOut = new DataOutputStream(socket.getOutputStream());) {
+		try {
+			DataInputStream streamIn = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
+			DataOutputStream streamOut = new DataOutputStream(socket.getOutputStream());
 			while (true) {
 				if (streamIn.available() > 0) {
 					jsonString = streamIn.readUTF();
 					Logger.debug(jsonString);
-					Message message = Utilities.convertJsonToObject(jsonString, Message.class);
+					message = Utilities.convertJsonToObject(jsonString, Message.class);
 
 					if ((message.command.equals(Constant.FETCH.toUpperCase())
 							|| message.command.equals(Constant.QUERY.toUpperCase())
@@ -56,13 +58,11 @@ public class ServerThread extends Thread {
 						streamOut.writeUTF(Utilities.getReturnMessage(Constant.MISSING_RESOURCE));
 					} else if (message.command.equals(Constant.SUBSCRIBE.toUpperCase())) {
 						// store the information for this subscriber
+						socket.setKeepAlive(true);
 						Storage.subscriber.add(new Subscriber(message.id, 0, message.resourceTemplate, this.socket));
 						Subscription subscription = new Subscription(streamOut, message, false);
 						subscription.subscribe();
-						// Storage id will change to String list latter. the
-						// connection will close when list=null;
-						if (message.command.equals(Constant.UNSUBSCRIBE.toUpperCase()))
-							break;
+						//break;
 					} else {
 						CommandHandler handler = new CommandHandler(message, streamOut, Storage.secret, false);
 						handler.processMessage();
@@ -70,21 +70,25 @@ public class ServerThread extends Thread {
 					}
 				}
 			}
-			Logger.debug(String.format("SERVER: removing %s from ip list", this.ipAddress));
-			removeIp(this.ipAddress);
-			Logger.debug(String.format("SERVER: ip list size: %d", Storage.ipList.size()));
+
+			if (!message.command.equals(Constant.SUBSCRIBE.toUpperCase())) {
+				Logger.debug(String.format("SERVER: removing %s from ip list", this.ipAddress));
+				removeIp(this.ipAddress);
+				Logger.debug(String.format("SERVER: ip list size: %d", Storage.ipList.size()));
+				try {
+					if (streamIn != null) streamIn.close();
+					if (streamOut != null) streamOut.close();
+					if (socket != null) {
+						socket.close();
+						Logger.debug("Socket on thread " + ID + " closed");
+					}
+					Logger.debug("Server thread " + ID + " closed");
+				} catch (IOException e) {
+					Logger.error(e);
+				}
+			}
 		} catch (IOException ioe) {
 			Logger.error(ioe);
-		} finally { // Close the conection
-			try {
-				if ((socket != null)) {
-					socket.close();
-					Logger.debug("Socket on thread " + ID + " closed");
-				}
-				Logger.debug("Server thread " + ID + " closed");
-			} catch (IOException e) {
-				Logger.error(e);
-			}
 		}
 	}
 

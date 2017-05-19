@@ -83,15 +83,15 @@ public class Client {
 		if (cmd.hasOption(Constant.DEBUG)) {
 			Configurator.currentConfig().level(Level.DEBUG).activate();
 		}
-		
-		if (cmd.hasOption(Constant.SECURE)){
+
+		if (cmd.hasOption(Constant.SECURE)) {
 			SSLClient client = new SSLClient(portNumber, hostName, message);
 			client.Execute();
-		}else{
+		} else {
 			TCPClient client = new TCPClient(portNumber, hostName, message);
 			client.Execute();
 		}
-	
+
 	}
 
 	private static ArrayList<Exchange> parseServerList(String serverList) {

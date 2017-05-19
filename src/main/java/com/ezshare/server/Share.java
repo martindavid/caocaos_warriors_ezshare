@@ -14,11 +14,13 @@ public class Share {
 	private Resource resource;
 	private String secret;
 	private String machineSecret;
+	private boolean isSecure;
 
-	public Share(Resource resource, String secret, String machineSecret) {
+	public Share(Resource resource, String secret, String machineSecret, boolean isSecure) {
 		this.secret = secret;
 		this.resource = resource;
 		this.machineSecret = machineSecret;
+		this.isSecure = isSecure;
 	}
 
 	public String processResourceMessage() throws IOException {
@@ -64,13 +66,12 @@ public class Share {
 			}
 			Logger.debug("SHARE: insert new resource");
 			Storage.resourceList.add(res);
-			
+
 			// If there is any subscriber notify them with this new resource
 			if (Storage.subscriber.size() > 0) {
-				Subscription subscription = new Subscription();
-				subscription.notifySubscriber(res);
+				new Subscription(isSecure).notifySubscriber(res);
 			}
-			
+
 			return Utilities.getReturnMessage(Constant.SUCCESS);
 		}
 	}

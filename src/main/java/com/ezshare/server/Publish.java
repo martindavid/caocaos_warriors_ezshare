@@ -9,9 +9,11 @@ import EZShare.Resource;
 
 public class Publish {
 	private Resource resource;
+	private boolean isSecure;
 
-	public Publish(Resource resource) {
+	public Publish(Resource resource, boolean isSecure) {
 		this.resource = resource;
+		this.isSecure = isSecure;
 	}
 
 	/***
@@ -53,12 +55,9 @@ public class Publish {
 
 		Storage.resourceList.add(res);
 
-		
 		if (Storage.subscriber.size() > 0) {
-			Subscription subscription = new Subscription();
-			subscription.notifySubscriber(res);
+			new Subscription(this.isSecure).notifySubscriber(res);
 		}
-
 		return Utilities.getReturnMessage(Constant.SUCCESS);
 	}
 

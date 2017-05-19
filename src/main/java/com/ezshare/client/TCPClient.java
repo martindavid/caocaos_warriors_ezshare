@@ -32,9 +32,9 @@ public class TCPClient {
 
 	public void Execute() throws IOException {
 
-		try (Socket echoSocket = new Socket(hostName, portNumber);
-				DataOutputStream streamOut = new DataOutputStream(echoSocket.getOutputStream());) {
-			// Print all of the information
+		try (Socket echoSocket = new Socket(hostName, portNumber)) {
+			DataOutputStream streamOut = new DataOutputStream(echoSocket.getOutputStream());
+
 			Logger.info("Starting the EZShare Client");
 			Logger.info("Connect to host - " + hostName + " on port: " + portNumber);
 			Logger.debug("Setting Debug On");
@@ -61,33 +61,25 @@ public class TCPClient {
 							}
 							exitLoop = true;
 						}
-						if (exitLoop) {
+						if (exitLoop)
 							break;
-						}
 					}
-				} else {
-
+				} else if (message.command.equals(Constant.SUBSCRIBE.toUpperCase())) {
+					// always listen to server until client explicitly press
+					// ENTER
 					while (System.in.available() == 0) {
-
 						if (streamIn.available() > 0) {
 							response = streamIn.readUTF();
 							Logger.info(response);
-							if ((!message.command.equals(Constant.QUERY.toUpperCase())
-									&& !message.command.equals(Constant.SUBSCRIBE.toUpperCase()))
-									|| response.contains(Constant.RESULT_SIZE)) {
-								break;
-							}
 							if (response.contains("error")) {
 								break;
 							}
 						}
 					}
-				}
-				if (message.command.equals(Constant.SUBSCRIBE.toUpperCase())) {
-					while (true) {
-						UnsubscribeMessage unmessage = new UnsubscribeMessage(message.id);
-						streamOut.writeUTF(unmessage.toJson());
 
+					UnsubscribeMessage unmessage = new UnsubscribeMessage(message.id);
+					streamOut.writeUTF(unmessage.toJson());
+					while (true) {
 						if (streamIn.available() > 0) {
 							response = streamIn.readUTF();
 							Logger.info(response);
@@ -98,7 +90,20 @@ public class TCPClient {
 							break;
 						}
 					}
-
+				} else {
+					while (true) {
+						if (streamIn.available() > 0) {
+							response = streamIn.readUTF();
+							Logger.info(response);
+							if (!message.command.equals(Constant.QUERY.toUpperCase())
+									|| response.contains(Constant.RESULT_SIZE)) {
+								break;
+							}
+							if (response.contains("error")) {
+								break;
+							}
+						}
+					}
 				}
 			} catch (IOException ioe) {
 				Logger.error(ioe);
@@ -114,6 +119,5 @@ public class TCPClient {
 		} catch (Exception e) {
 			Logger.error(e);
 		}
-
 	}
 }
