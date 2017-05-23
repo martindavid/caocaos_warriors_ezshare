@@ -10,6 +10,6 @@ public class Message {
 	public String secret;
 	public boolean relay;
 	public Resource resourceTemplate = new Resource();
-	public ArrayList<ServerList> serverList = new ArrayList<ServerList>();
+	public ArrayList<Server> serverList = new ArrayList<Server>();
 	public String id;
 }

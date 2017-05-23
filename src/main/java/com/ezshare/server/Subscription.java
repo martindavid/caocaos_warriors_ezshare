@@ -25,7 +25,9 @@ public class Subscription {
 
 	public void subscribe() {
 		try {
-			Query subscribe = new Query(message.resourceTemplate, message.relay,
+			// For QUERY, only fetch resource from local server, fetch from remote server will be done from
+			// SubscriptionServerThread class
+			Query subscribe = new Query(message.resourceTemplate, false,
 					isSecure ? Storage.secureServerList : Storage.serverList);
 			ArrayList<Resource> resourceList = subscribe.getResourceList();
 
@@ -55,6 +57,11 @@ public class Subscription {
 							streamOut.writeUTF(res.toJson());
 							subscriber.resultSize += 1;
 						}
+					}
+					
+					if (message.relay) {
+						SubscriptionRelay relay = new SubscriptionRelay(subscriber);
+						relay.relaySubscription();
 					}
 				}
 			}
@@ -96,12 +103,14 @@ public class Subscription {
 
 	/**
 	 * Notify any subscriber for new resources that has been published/shared
-	 * @param resource new resource that come from publish/share command
+	 * 
+	 * @param resource
+	 *            new resource that come from publish/share command
 	 */
 	public void notifySubscriber(Resource resource) {
 		if (isSecure) {
 			for (SecureSubscriber subscriber : Storage.secureSubscriber) {
-				if (Utilities.isResourceMath(resource, subscriber.subscribeTemplate)) {
+				if (Utilities.isResourceMatch(resource, subscriber.subscribeTemplate)) {
 					Resource newres = new Resource(resource);
 					if (!resource.owner.isEmpty()) {
 						newres.owner = "*";
@@ -118,7 +127,7 @@ public class Subscription {
 			}
 		} else {
 			for (Subscriber subscriber : Storage.subscriber) {
-				if (Utilities.isResourceMath(resource, subscriber.subscribeTemplate)) {
+				if (Utilities.isResourceMatch(resource, subscriber.subscribeTemplate)) {
 					Resource newres = new Resource(resource);
 					if (!resource.owner.isEmpty()) {
 						newres.owner = "*";

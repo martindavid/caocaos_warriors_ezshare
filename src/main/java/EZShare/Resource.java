@@ -1,5 +1,8 @@
 package EZShare;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+
 import com.ezshare.client.Views;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -58,5 +61,34 @@ public class Resource {
 	public String toJson() throws JsonProcessingException {
 		ObjectMapper mapper = new ObjectMapper();
 		return mapper.writerWithView(Views.Common.class).writeValueAsString(this);
+	}
+
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder(17, 31) // two randomly chosen prime numbers
+				.append(name)
+				.append(description)
+				.append(uri)
+				.append(channel)
+				.append(owner)
+				.append(tags)
+				.toHashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof Resource))
+            return false;
+        if (obj == this)
+            return true;
+        Resource other = (Resource) obj;
+        return new EqualsBuilder()
+        		.append(name, other.name)
+        		.append(description, other.description)
+        		.append(uri, other.uri)
+        		.append(channel, other.channel)
+        		.append(owner, other.owner)
+        		.append(tags, other.tags)
+        		.isEquals();
 	}
 }
