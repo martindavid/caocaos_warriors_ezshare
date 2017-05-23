@@ -57,6 +57,9 @@ public class SSLServer implements Runnable {
 		System.setProperty("javax.net.ssl.keyStore", "serverKeystore/serverKeystore.jks");
 		//Password to access the private key from the keystore file
 		System.setProperty("javax.net.ssl.keyStorePassword", "comp90015");
+		
+		// certificates trusted by this application(trust store).
+		System.setProperty("javax.net.ssl.trustStore", "serverKeystore/servertrust.jks");
 				
 		//Create SSL server socket
 		SSLServerSocketFactory sslserversocketfactory = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
