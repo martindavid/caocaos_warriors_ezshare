@@ -23,6 +23,7 @@ import com.ezshare.server.Exchange;
 import com.ezshare.server.SecureServerThread;
 import com.ezshare.server.Storage;
 
+import EZShare.Constant;
 import EZShare.Resource;
 
 public class SSLServer implements Runnable {
@@ -51,41 +52,43 @@ public class SSLServer implements Runnable {
 	public void run() {
 		Logger.info("Starting the EZShare Secure Server");
 		Logger.info("bound to port: " + portNumber);
-		
-		// Specify the keystore details (this can be specified as VM arguments as well)
-		// the keystore file contains an application's own certificate and private key
-		System.setProperty("javax.net.ssl.keyStore", "serverKeystore/serverKeystore.jks");
-		//Password to access the private key from the keystore file
-		System.setProperty("javax.net.ssl.keyStorePassword", "comp90015");
-		
+
+		// Specify the keystore details (this can be specified as VM arguments
+		// as well)
+		// the keystore file contains an application's own certificate and
+		// private key
+		System.setProperty(Constant.JAVANET_KEYSTORE_PROP, Constant.SERVER_KEYSTORE_KEY);
+		// Password to access the private key from the keystore file
+		System.setProperty(Constant.JAVANET_KEYSTOREPASS_PROP, Constant.KEYSTORE_PASSWORD);
 		// certificates trusted by this application(trust store).
-		System.setProperty("javax.net.ssl.trustStore", "serverKeystore/servertrust.jks");
-				
-		//Create SSL server socket
+		System.setProperty(Constant.JAVANET_TRUSTSTORE_PROP, Constant.SERVER_TRUSTSTORE_KEY);
+
+		// Create SSL server socket
 		SSLServerSocketFactory sslserversocketfactory = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
 		try {
 			sslserversocket = (SSLServerSocket) sslserversocketfactory.createServerSocket(portNumber);
 		} catch (IOException e1) {
 			Logger.error(e1);
 		}
-		
+
 		// Separate task for server interaction
 		this.runExchangeInterval();
-		
+
 		// Update global variable
 		Storage.hostName = this.hostName;
 		Storage.port = this.portNumber;
 		Storage.secret = this.secret;
-		
 
 		while (thread != null) {
-			//Accept client connection
+			// Accept client connection
 			try {
 				socket = (SSLSocket) sslserversocket.accept();
 			} catch (IOException e) {
 				Logger.error(e);
 			}
-			String ipAddress = ((InetSocketAddress) socket.getRemoteSocketAddress()).getAddress().toString().replace("/","");;
+			String ipAddress = ((InetSocketAddress) socket.getRemoteSocketAddress()).getAddress().toString()
+					.replace("/", "");
+			;
 			Logger.debug(String.format("SERVER: validate %s", ipAddress));
 			if (isIpAllowed(ipAddress)) {
 				addThread(socket, ipAddress);
@@ -108,30 +111,30 @@ public class SSLServer implements Runnable {
 			thread = null;
 		}
 	}
-	
+
 	/**
 	 * Validate whether incoming IP address allowed to make a connection or not
 	 * We validate against IP list array that system maintains
+	 * 
 	 * @param ipAddress
 	 * @return
 	 */
 	private boolean isIpAllowed(String ipAddress) {
-		ConnectionTracking tracking = (ConnectionTracking) Storage.ipList.stream().filter(x -> x.ipAddress.equals(ipAddress))
-										.findAny()
-										.orElse(null);
+		ConnectionTracking tracking = (ConnectionTracking) Storage.ipList.stream()
+				.filter(x -> x.ipAddress.equals(ipAddress)).findAny().orElse(null);
 		if (tracking != null) {
 			DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 			Date now = new Date();
 			try {
 				Date lastConnected = dateFormat.parse(tracking.timeStamp);
-				if ((now.getTime() - lastConnected.getTime())/ 1000 % 60 <= this.connIntervalLimit) {
+				if ((now.getTime() - lastConnected.getTime()) / 1000 % 60 <= this.connIntervalLimit) {
 					return false;
 				}
 			} catch (ParseException e) {
 				Logger.error(e);
 			}
 		}
-		
+
 		return true;
 	}
 
@@ -163,7 +166,7 @@ public class SSLServer implements Runnable {
 				Logger.debug("END - secure server interaction");
 			}
 		};
-		
+
 		Timer timer = new Timer();
 		timer.schedule(task, 1000 * 5, 1000 * exchangeInterval);
 	}

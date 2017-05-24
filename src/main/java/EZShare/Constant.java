@@ -46,4 +46,14 @@ public class Constant {
 	public static final String MISSING_RESOURCE_OR_SECRET = "missing resource and or secret";
 	public static final String CANNOT_SHARE_RESOURCE = "cannot share resource";
 	
+	public static final String SERVER_KEYSTORE_KEY = "serverKeystore/serverKeystore.jks";
+	public static final String SERVER_TRUSTSTORE_KEY = "serverKeystore/servertrust.jks";
+	public static final String CLIENT_TRUSTSTORE_KEY = "clientKeyStore/clienttrust.jks";
+	public static final String CLIENT_KEYSTORE_KEY = "clientKeyStore/clientKeystore.jks";
+	public static final String KEYSTORE_PASSWORD = "comp90015";
+	public static final String JAVANET_KEYSTORE_PROP = "javax.net.ssl.keyStore";
+	public static final String JAVANET_TRUSTSTORE_PROP = "javax.net.ssl.trustStore";
+	public static final String JAVANET_KEYSTOREPASS_PROP = "javax.net.ssl.keyStorePassword";
+	
+	
 }
