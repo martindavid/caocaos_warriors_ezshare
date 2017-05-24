@@ -31,10 +31,13 @@ public class SSLClient {
 	public void Execute() throws IOException {
 
 		// Location of the Java keystore file containing the collection of
-		// certificates trusted by this application(trust store).
-		System.setProperty("javax.net.ssl.trustStore", "clientKeyStore/clientKeystore.jks");
+		// the keystore file contains an application's own certificate and private key
+		System.setProperty("javax.net.ssl.keyStore", "clientKeyStore/clientKeystore.jks");
 		
 		System.setProperty("javax.net.ssl.keyStorePassword", "comp90015");
+		
+		// certificates trusted by this application(trust store).
+		System.setProperty("javax.net.ssl.trustStore", "clientKeyStore/clienttrust.jks");
 
 		// Create SSL socket and connect it to the remote server
 		SSLSocketFactory sslsocketfactory = (SSLSocketFactory) SSLSocketFactory.getDefault();
