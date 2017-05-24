@@ -3,8 +3,10 @@ package com.ezshare.server;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.net.Socket;
 import java.net.UnknownHostException;
+
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
 
 import org.pmw.tinylog.Logger;
 
@@ -15,19 +17,22 @@ import EZShare.Constant;
 import EZShare.Resource;
 import EZShare.ResourceTemplate;
 
-public class SubscriptionServerThread implements Runnable {
+public class SubscriptionSecureServerThread implements Runnable {
 
 	public Resource resourceTemplate;
 	public Server server;
-	private Socket socket;
+	private SSLSocket socket;
 	private DataInputStream streamIn;
 	private DataOutputStream streamOut;
-
-	public SubscriptionServerThread(Server server, Subscriber subscriber) {
+	
+	public SubscriptionSecureServerThread(Server server, SecureSubscriber subscriber) {
+		System.setProperty(Constant.JAVANET_TRUSTSTORE_PROP, Constant.CERTIFICATE_KEY);
+		System.setProperty(Constant.JAVANET_KEYSTOREPASS_PROP, Constant.CERTIFICATE_PASSWORD);
 		this.server = server;
 		this.resourceTemplate = subscriber.subscribeTemplate;
 		try {
-			socket = new Socket(server.hostname, server.port);
+			SSLSocketFactory sslsocketfactory = (SSLSocketFactory) SSLSocketFactory.getDefault();
+			socket = (SSLSocket) sslsocketfactory.createSocket(server.hostname, server.port);
 			streamIn = new DataInputStream(socket.getInputStream());
 			streamOut = new DataOutputStream(socket.getOutputStream());
 		} catch (UnknownHostException e) {
@@ -36,7 +41,7 @@ public class SubscriptionServerThread implements Runnable {
 			Logger.error(e);
 		}
 	}
-
+	
 	@Override
 	public void run() {
 		try {
@@ -52,21 +57,21 @@ public class SubscriptionServerThread implements Runnable {
 			Storage.subscriptionResources.add(new SubscriptionResources(this.resourceTemplate));
 
 			while (true) {
-				if (Storage.subscriber.size() == 0) {
-					UnsubscribeMessage unmessage = new UnsubscribeMessage(message.id);
-					streamOut.writeUTF(unmessage.toJson());
-					Storage.serverThread.remove(this);
+				if (Storage.secureSubscriber.size() == 0) {
+					UnsubscribeMessage unsubscribeMessage = new UnsubscribeMessage(message.id);
+					streamOut.writeUTF(unsubscribeMessage.toJson());
+					Storage.secureServerThread.remove(this);
 					break;
 				}
-				if (streamIn.available() > 0) {
-					response = streamIn.readUTF();
+				if ((response = DataInputStream.readUTF(streamIn)) != null) {
+					
 					Logger.info(response);
 					if (!response.contains(Constant.SUCCESS)) {
 						Resource res = Utilities.convertJsonToObject(response, Resource.class);
 
-						for (Subscriber subscriber : Storage.subscriber) {
+						for (SecureSubscriber subscriber : Storage.secureSubscriber) {
 							try {
-								SubscriptionResources subsResource = Storage.subscriptionResources.stream()
+								SubscriptionResources subsResource = Storage.secureSubscriptionResources.stream()
 										.filter(x -> x.resourceTemplate.equals(subscriber.subscribeTemplate)).findAny()
 										.orElse(null);
 								if (subsResource != null) {
@@ -102,8 +107,9 @@ public class SubscriptionServerThread implements Runnable {
 				Logger.error(e);
 			}
 		}
+		
 	}
-
+	
 	/***
 	 * Update this thread if there is any new subscriber Check if the existing
 	 * subscriber has same template so no need to send new request, otherwise
@@ -111,12 +117,12 @@ public class SubscriptionServerThread implements Runnable {
 	 * 
 	 * @param subscriber
 	 */
-	public void updateRequest(Subscriber subscriber) {
+	public void updateRequest(SecureSubscriber subscriber) {
 		try {
 			Logger.debug(String.format("Update new subscriber for subscription server thread %s:%d", server.hostname, server.port));
 			// Find from existing resource list
 			// If template exists then no need to send new request to other server just stream out the resources to client
-			SubscriptionResources existingTemplate = Storage.subscriptionResources.stream()
+			SubscriptionResources existingTemplate = Storage.secureSubscriptionResources.stream()
 					.filter(x -> x.resourceTemplate.equals(subscriber.subscribeTemplate)).findAny().orElse(null);
 			if (existingTemplate == null) {
 				Logger.debug(String.format("Send new subscribe template to server %s:%d", server.hostname, server.port));
@@ -142,4 +148,5 @@ public class SubscriptionServerThread implements Runnable {
 			Logger.error(e);
 		}
 	}
+
 }

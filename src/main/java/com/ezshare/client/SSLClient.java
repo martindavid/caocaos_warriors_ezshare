@@ -51,7 +51,7 @@ public class SSLClient {
 
 			transferMessage(streamOut);
 
-			receiveMessage(streamIn);
+			receiveMessage(streamIn, streamOut);
 		} catch (Exception e) {
 			Logger.error(e);
 		}
@@ -62,7 +62,7 @@ public class SSLClient {
 		streamOut.writeUTF(message.toJson());
 	}
 
-	public void receiveMessage(DataInputStream streamIn) throws IOException {
+	public void receiveMessage(DataInputStream streamIn, DataOutputStream streamOut) throws IOException {
 
 		String response = "";
 		String string = "";
@@ -88,6 +88,30 @@ public class SSLClient {
 				exitLoop = true;
 
 				if (exitLoop) {
+					break;
+				}
+			}
+		} else if (message.command.equals(Constant.SUBSCRIBE.toUpperCase())) {
+			// always listen to server until client explicitly press
+			// ENTER
+			while (System.in.available() == 0) {
+				if ((response = DataInputStream.readUTF(streamIn)) != null) {
+					Logger.info(response);
+					if (response.contains("error")) {
+						break;
+					}
+				}
+			}
+
+			UnsubscribeMessage unmessage = new UnsubscribeMessage(message.id);
+			streamOut.writeUTF(unmessage.toJson());
+			while (true) {
+				if ((response = DataInputStream.readUTF(streamIn)) != null) {
+					Logger.info(response);
+				}
+				if ((!message.command.equals(Constant.QUERY.toUpperCase())
+						&& !message.command.equals(Constant.SUBSCRIBE.toUpperCase()))
+						|| response.contains(Constant.RESULT_SIZE) || response.contains("this")) {
 					break;
 				}
 			}

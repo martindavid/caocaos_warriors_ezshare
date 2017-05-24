@@ -82,7 +82,7 @@ public class Resource {
         if (obj == this)
             return true;
         Resource other = (Resource) obj;
-        return new EqualsBuilder()
+        boolean isEqual = new EqualsBuilder()
         		.append(name, other.name)
         		.append(description, other.description)
         		.append(uri, other.uri)
@@ -90,5 +90,6 @@ public class Resource {
         		.append(owner, other.owner)
         		.append(tags, other.tags)
         		.isEquals();
+        return isEqual;
 	}
 }

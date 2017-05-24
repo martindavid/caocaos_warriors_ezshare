@@ -17,4 +17,7 @@ public class Storage {
 	public static ArrayList<SecureSubscriber> secureSubscriber = new ArrayList<SecureSubscriber>();
 	public static ArrayList<SubscriptionServerThread> serverThread = new ArrayList<SubscriptionServerThread>();
 	public static ArrayList<SubscriptionResources> subscriptionResources = new ArrayList<SubscriptionResources>();
+
+	public static ArrayList<SubscriptionSecureServerThread> secureServerThread = new ArrayList<SubscriptionSecureServerThread>();
+	public static ArrayList<SubscriptionResources> secureSubscriptionResources = new ArrayList<SubscriptionResources>();
 }

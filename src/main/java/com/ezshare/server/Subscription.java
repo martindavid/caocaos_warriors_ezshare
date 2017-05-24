@@ -25,7 +25,8 @@ public class Subscription {
 
 	public void subscribe() {
 		try {
-			// For QUERY, only fetch resource from local server, fetch from remote server will be done from
+			// For QUERY, only fetch resource from local server, fetch from
+			// remote server will be done from
 			// SubscriptionServerThread class
 			Query subscribe = new Query(message.resourceTemplate, false,
 					isSecure ? Storage.secureServerList : Storage.serverList);
@@ -58,7 +59,7 @@ public class Subscription {
 							subscriber.resultSize += 1;
 						}
 					}
-					
+
 					if (message.relay) {
 						SubscriptionRelay relay = new SubscriptionRelay(subscriber);
 						relay.relaySubscription();
@@ -74,30 +75,42 @@ public class Subscription {
 	 * Remove the subscriber from the list and close the socket connection
 	 */
 	public void unsubscribe() {
-		if (isSecure) {
-			SecureSubscriber subscriber = Storage.secureSubscriber.stream().filter(x -> x.id.equals(message.id))
-					.findAny().orElse(null);
-			try {
-				streamOut.writeUTF("{\"resultSize\":" + subscriber.resultSize + "}");
-				if (subscriber.subscriberSocket != null) {
-					subscriber.subscriberSocket.close();
+		try {
+			if (isSecure) {
+				SecureSubscriber subscriber = Storage.secureSubscriber.stream().filter(x -> x.id.equals(message.id))
+						.findAny().orElse(null);
+				try {
+					streamOut.writeUTF("{\"resultSize\":" + subscriber.resultSize + "}");
+					if (subscriber.subscriberSocket != null) {
+						subscriber.subscriberSocket.close();
+					}
+					Storage.subscriber.remove(subscriber);
+				} catch (Exception e) {
+					Logger.error(e);
 				}
-				Storage.subscriber.remove(subscriber);
-			} catch (Exception e) {
-				Logger.error(e);
-			}
-		} else {
-			Subscriber subscriber = Storage.subscriber.stream().filter(x -> x.id.equals(message.id)).findAny()
-					.orElse(null);
-			try {
-				streamOut.writeUTF("{\"resultSize\":" + subscriber.resultSize + "}");
-				if (subscriber.subscriberSocket != null) {
-					subscriber.subscriberSocket.close();
+			} else {
+				Subscriber subscriber = Storage.subscriber.stream().filter(x -> x.id.equals(message.id)).findAny()
+						.orElse(null);
+				Resource resTemplate = subscriber.subscribeTemplate;
+				try {
+					streamOut.writeUTF("{\"resultSize\":" + subscriber.resultSize + "}");
+					if (subscriber.subscriberSocket != null) {
+						subscriber.subscriberSocket.close();
+					}
+					Storage.subscriber.remove(subscriber);
+					// Find if there's still any subscriber with same template,
+					// if not any then remove subsriptionResources from Storage.subscriptionResources
+					Subscriber otherSubscriber = Storage.subscriber.stream()
+							.filter(x -> x.subscribeTemplate.equals(resTemplate)).findAny().orElse(null);
+					if (otherSubscriber == null) {
+						Storage.subscriptionResources.removeIf(x->x.resources.equals(resTemplate));
+					}
+				} catch (Exception e) {
+					Logger.error(e);
 				}
-				Storage.subscriber.remove(subscriber);
-			} catch (Exception e) {
-				Logger.error(e);
 			}
+		} catch (Exception e) {
+			Logger.error(e);
 		}
 	}
 
