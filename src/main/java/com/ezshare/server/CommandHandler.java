@@ -6,6 +6,9 @@ import java.util.ArrayList;
 
 import org.pmw.tinylog.Logger;
 
+import com.ezshare.server.model.Message;
+import com.ezshare.server.model.Responses;
+
 import EZShare.Constant;
 import EZShare.Resource;
 

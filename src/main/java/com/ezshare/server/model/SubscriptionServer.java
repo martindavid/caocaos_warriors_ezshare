@@ -1,4 +1,4 @@
-package com.ezshare.server;
+package com.ezshare.server.model;
 
 import java.io.IOException;
 import java.net.Socket;

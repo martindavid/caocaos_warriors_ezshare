@@ -1,4 +1,4 @@
-package com.ezshare.server;
+package com.ezshare.server.model;
 
 public class Server {
 	public String hostname = "";

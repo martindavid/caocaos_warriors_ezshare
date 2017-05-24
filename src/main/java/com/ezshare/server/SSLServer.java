@@ -18,10 +18,10 @@ import javax.net.ssl.SSLSocket;
 
 import org.pmw.tinylog.Logger;
 
-import com.ezshare.server.ConnectionTracking;
 import com.ezshare.server.Exchange;
 import com.ezshare.server.SecureServerThread;
 import com.ezshare.server.Storage;
+import com.ezshare.server.model.ConnectionTracking;
 
 import EZShare.Constant;
 import EZShare.Resource;
@@ -48,7 +48,8 @@ public class SSLServer implements Runnable {
 		this.connIntervalLimit = connIntervalLimit;
 		this.es = Executors.newCachedThreadPool();
 	}
-
+	
+	@Override
 	public void run() {
 		Logger.info("Starting the EZShare Secure Server");
 		Logger.info("bound to port: " + portNumber);
@@ -90,7 +91,7 @@ public class SSLServer implements Runnable {
 					.replace("/", "");
 			;
 			Logger.debug(String.format("SERVER: validate %s", ipAddress));
-			if (isIpAllowed(ipAddress)) {
+			if (Utilities.isIpAllowed(ipAddress, this.connIntervalLimit)) {
 				addThread(socket, ipAddress);
 				Logger.debug(String.format("SERVER: add %s to ip list", ipAddress));
 				Storage.ipList.add(new ConnectionTracking(ipAddress));
@@ -110,32 +111,6 @@ public class SSLServer implements Runnable {
 		if (thread != null) {
 			thread = null;
 		}
-	}
-
-	/**
-	 * Validate whether incoming IP address allowed to make a connection or not
-	 * We validate against IP list array that system maintains
-	 * 
-	 * @param ipAddress
-	 * @return
-	 */
-	private boolean isIpAllowed(String ipAddress) {
-		ConnectionTracking tracking = (ConnectionTracking) Storage.ipList.stream()
-				.filter(x -> x.ipAddress.equals(ipAddress)).findAny().orElse(null);
-		if (tracking != null) {
-			DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-			Date now = new Date();
-			try {
-				Date lastConnected = dateFormat.parse(tracking.timeStamp);
-				if ((now.getTime() - lastConnected.getTime()) / 1000 % 60 <= this.connIntervalLimit) {
-					return false;
-				}
-			} catch (ParseException e) {
-				Logger.error(e);
-			}
-		}
-
-		return true;
 	}
 
 	/**

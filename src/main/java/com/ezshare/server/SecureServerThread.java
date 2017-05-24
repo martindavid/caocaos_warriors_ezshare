@@ -11,6 +11,9 @@ import javax.net.ssl.SSLSocket;
 
 import org.pmw.tinylog.Logger;
 
+import com.ezshare.server.model.Message;
+import com.ezshare.server.model.SecureSubscriber;
+
 import EZShare.Constant;
 
 /**
@@ -79,18 +82,10 @@ public class SecureServerThread extends Thread {
 				}
 			}
 			Logger.debug(String.format("SERVER: removing %s from ip list", this.ipAddress));
-			removeIp(this.ipAddress);
+			Utilities.removeIp(this.ipAddress);
 			Logger.debug(String.format("SERVER: ip list size: %d", Storage.ipList.size()));
 		} catch (IOException e) {
 			Logger.error(e);
-		}
-	}
-
-	private void removeIp(String ipAddress) {
-		ConnectionTracking tracking = (ConnectionTracking) Storage.ipList.stream()
-				.filter(x -> x.ipAddress.equals(ipAddress)).findAny().orElse(null);
-		if (tracking != null) {
-			Storage.ipList.remove(tracking);
 		}
 	}
 }

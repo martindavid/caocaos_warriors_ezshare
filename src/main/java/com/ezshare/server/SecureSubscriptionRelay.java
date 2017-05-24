@@ -2,6 +2,9 @@ package com.ezshare.server;
 
 import org.pmw.tinylog.Logger;
 
+import com.ezshare.server.model.SecureSubscriber;
+import com.ezshare.server.model.Server;
+
 public class SecureSubscriptionRelay {
 	private SecureSubscriber subscriber;
 

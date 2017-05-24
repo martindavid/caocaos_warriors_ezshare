@@ -55,6 +55,7 @@ public class Publish {
 
 		Storage.resourceList.add(res);
 
+		// If there are subscribers notify this new published resource
 		if (Storage.subscriber.size() > 0) {
 			new Subscription(this.isSecure).notifySubscriber(res);
 		}

@@ -11,6 +11,8 @@ import javax.net.ssl.SSLSocketFactory;
 
 import org.pmw.tinylog.Logger;
 
+import com.ezshare.server.model.ExchangeMessage;
+import com.ezshare.server.model.Server;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import EZShare.Constant;

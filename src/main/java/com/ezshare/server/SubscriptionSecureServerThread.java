@@ -11,6 +11,9 @@ import javax.net.ssl.SSLSocketFactory;
 import org.pmw.tinylog.Logger;
 
 import com.ezshare.client.UnsubscribeMessage;
+import com.ezshare.server.model.SecureSubscriber;
+import com.ezshare.server.model.Server;
+import com.ezshare.server.model.SubscriptionResources;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import EZShare.Constant;

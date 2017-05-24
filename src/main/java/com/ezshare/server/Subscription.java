@@ -5,6 +5,11 @@ import java.util.ArrayList;
 
 import org.pmw.tinylog.Logger;
 
+import com.ezshare.server.model.Message;
+import com.ezshare.server.model.SecureSubscriber;
+import com.ezshare.server.model.Subscriber;
+import com.ezshare.server.model.SubscriptionResponse;
+
 import EZShare.Constant;
 import EZShare.Resource;
 
@@ -36,7 +41,7 @@ public class Subscription {
 				SecureSubscriber subscriber = Storage.secureSubscriber.stream().filter(x -> x.id.equals(message.id))
 						.findAny().orElse(null);
 				if (subscriber != null) {
-					String successResponse = new Response(Constant.SUCCESS, subscriber.id).toJson();
+					String successResponse = new SubscriptionResponse(Constant.SUCCESS, subscriber.id).toJson();
 					streamOut.writeUTF(successResponse);
 
 					if (resourceList.size() > 0) {
@@ -55,7 +60,7 @@ public class Subscription {
 				Subscriber subscriber = Storage.subscriber.stream().filter(x -> x.id.equals(message.id)).findAny()
 						.orElse(null);
 				if (subscriber != null) {
-					String successResponse = new Response(Constant.SUCCESS, subscriber.id).toJson();
+					String successResponse = new SubscriptionResponse(Constant.SUCCESS, subscriber.id).toJson();
 					streamOut.writeUTF(successResponse);
 
 					if (resourceList.size() > 0) {

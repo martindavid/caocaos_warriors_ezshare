@@ -1,27 +1,29 @@
-package com.ezshare.server;
+package com.ezshare.server.model;
 
 import java.io.DataOutputStream;
-import java.net.Socket;
+import java.io.IOException;
+
+import javax.net.ssl.SSLSocket;
 
 import org.pmw.tinylog.Logger;
 
 import EZShare.Resource;
 
-public class Subscriber {
+public class SecureSubscriber {
 	public String id;
 	public int resultSize;
 	public Resource subscribeTemplate;
-	public Socket subscriberSocket;
+	public SSLSocket subscriberSocket;
 	public DataOutputStream streamOut;
 
-	public Subscriber(String id, int resultSize, Resource subscribeTemplate, Socket subscriberSocket) {
+	public SecureSubscriber(String id, int resultSize, Resource subscribeTemplate, SSLSocket subscriberSocket) {
 		this.id = id;
 		this.resultSize = resultSize;
 		this.subscribeTemplate = subscribeTemplate;
 		this.subscriberSocket = subscriberSocket;
 		try {
 			this.streamOut = new DataOutputStream(subscriberSocket.getOutputStream());
-		} catch (Exception e) {
+		} catch (IOException e) {
 			Logger.error(e);
 		}
 	}

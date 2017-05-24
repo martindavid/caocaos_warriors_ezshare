@@ -9,6 +9,7 @@ import java.util.Arrays;
 
 import org.pmw.tinylog.Logger;
 
+import com.ezshare.server.model.Message;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import EZShare.Constant;

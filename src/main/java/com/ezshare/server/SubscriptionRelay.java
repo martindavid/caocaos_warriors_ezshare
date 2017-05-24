@@ -2,6 +2,9 @@ package com.ezshare.server;
 
 import org.pmw.tinylog.Logger;
 
+import com.ezshare.server.model.Server;
+import com.ezshare.server.model.Subscriber;
+
 public class SubscriptionRelay {
 	private Subscriber subscriber;
 

@@ -3,6 +3,7 @@ package com.ezshare.server;
 import org.pmw.tinylog.Logger;
 
 import com.ezshare.server.Exchange;
+import com.ezshare.server.model.ConnectionTracking;
 
 import EZShare.Resource;
 
@@ -11,10 +12,6 @@ import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
@@ -51,6 +48,7 @@ public class TCPServer implements Runnable {
 		}
 	}
 
+	@Override
 	public void run() {
 		Logger.info("Starting the EZShare Server");
 		Logger.info("Using secret: " + secret);
@@ -72,7 +70,7 @@ public class TCPServer implements Runnable {
 				Socket socket = server.accept();
 				String ipAddress = ((InetSocketAddress) socket.getRemoteSocketAddress()).getAddress().toString().replace("/","");;
 				Logger.debug(String.format("SERVER: validate %s", ipAddress));
-				if (isIpAllowed(ipAddress)) {
+				if (Utilities.isIpAllowed(ipAddress, this.connIntervalLimit)) {
 					addThread(socket, ipAddress);
 					Logger.debug(String.format("SERVER: add %s to ip list", ipAddress));
 					Storage.ipList.add(new ConnectionTracking(ipAddress));
@@ -96,32 +94,6 @@ public class TCPServer implements Runnable {
 		if (thread != null) {
 			thread = null;
 		}
-	}
-	
-	/**
-	 * Validate whether incoming IP address allowed to make a connection or not
-	 * We validate against IP list array that system maintains
-	 * @param ipAddress
-	 * @return
-	 */
-	private boolean isIpAllowed(String ipAddress) {
-		ConnectionTracking tracking = (ConnectionTracking) Storage.ipList.stream().filter(x -> x.ipAddress.equals(ipAddress))
-										.findAny()
-										.orElse(null);
-		if (tracking != null) {
-			DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-			Date now = new Date();
-			try {
-				Date lastConnected = dateFormat.parse(tracking.timeStamp);
-				if ((now.getTime() - lastConnected.getTime())/ 1000 % 60 <= this.connIntervalLimit) {
-					return false;
-				}
-			} catch (ParseException e) {
-				Logger.error(e);
-			}
-		}
-		
-		return true;
 	}
 
 	/**

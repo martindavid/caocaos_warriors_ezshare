@@ -2,10 +2,16 @@ package com.ezshare.server;
 
 import java.io.IOException;
 import java.security.SecureRandom;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 
 import org.pmw.tinylog.Logger;
 
+import com.ezshare.server.model.ConnectionTracking;
+import com.ezshare.server.model.Responses;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -49,6 +55,41 @@ public class Utilities {
 		}
 
 		return result;
+	}
+	
+	/**
+	 * Validate whether incoming IP address allowed to make a connection or not
+	 * We validate against IP list array that system maintains
+	 * @param ipAddress ip address need to validate
+	 * @param connIntervalLimit connection interval limit per ip address
+	 * @return
+	 */
+	public static boolean isIpAllowed(String ipAddress, int connIntervalLimit) {
+		ConnectionTracking tracking = (ConnectionTracking) Storage.ipList.stream().filter(x -> x.ipAddress.equals(ipAddress))
+										.findAny()
+										.orElse(null);
+		if (tracking != null) {
+			DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+			Date now = new Date();
+			try {
+				Date lastConnected = dateFormat.parse(tracking.timeStamp);
+				if ((now.getTime() - lastConnected.getTime())/ 1000 % 60 <= connIntervalLimit) {
+					return false;
+				}
+			} catch (ParseException e) {
+				Logger.error(e);
+			}
+		}
+		
+		return true;
+	}
+	
+	public static void removeIp(String ipAddress) {
+		ConnectionTracking tracking = (ConnectionTracking) Storage.ipList.stream()
+				.filter(x -> x.ipAddress.equals(ipAddress)).findAny().orElse(null);
+		if (tracking != null) {
+			Storage.ipList.remove(tracking);
+		}
 	}
 	
 	/**

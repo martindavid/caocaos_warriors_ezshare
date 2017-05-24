@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import org.pmw.tinylog.Logger;
 
+import com.ezshare.server.model.Server;
+
 import EZShare.Constant;
 import EZShare.Message;
 import EZShare.Resource;
@@ -31,8 +33,6 @@ public class Query {
 				if (!newRes.owner.isEmpty()) {
 					newRes.owner = "*";
 				}
-				Logger.debug(String.format("QUERY: Resource Match - Channel: %s, Owner: %s, Uri: %s, Name: %s, Description: %s", res.channel,
-						res.owner, res.uri, res.name, res.description));
 				result.add(newRes);
 			}
 		}
@@ -45,11 +45,6 @@ public class Query {
 				clientMessage.command = Constant.QUERY.toUpperCase();
 				clientMessage.resourceTemplate = new ResourceTemplate(this.resource);
 				clientMessage.relay = false;
-				Logger.debug("QUERY: Client message for relay server");
-				Logger.debug(String.format("QUERY: Channel: %s, Owner: %s, Uri: %s, Name: %s, Description: %s",
-						clientMessage.resourceTemplate.channel, clientMessage.resourceTemplate.owner,
-						clientMessage.resourceTemplate.uri, clientMessage.resourceTemplate.name,
-						clientMessage.resourceTemplate.description));
 				for (Server server : serverList) {
 					Logger.debug(String.format("QUERY: Fetch resource from %s:%d", server.hostname, server.port));
 					ArrayList<Resource> relayRes = new QueryRelay(server.hostname, server.port, clientMessage)
@@ -70,9 +65,6 @@ public class Query {
 	
 	public static Boolean isMatch(Resource res, Resource template) {
 		Boolean result = false;
-		Logger.debug("QUERY or SUBSCRIBE: validate resource");
-		Logger.debug(String.format("QUERY or SUBSCRIBE: Channel: %s, Owner: %s, Uri: %s, Name: %s, Description: %s", res.channel,
-				res.owner, res.uri, res.name, res.description));
 
 		if ((res.channel.equals(template.channel)) && (res.name.contains(template.name) || (template.name.isEmpty()))
 				&& (res.description.contains(template.description) || (template.description.isEmpty()))

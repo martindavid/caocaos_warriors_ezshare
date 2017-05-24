@@ -10,6 +10,9 @@ import java.net.SocketException;
 
 import org.pmw.tinylog.Logger;
 
+import com.ezshare.server.model.Message;
+import com.ezshare.server.model.Subscriber;
+
 import EZShare.Constant;
 
 /**
@@ -62,7 +65,7 @@ public class ServerThread extends Thread {
 						Storage.subscriber.add(new Subscriber(message.id, 0, message.resourceTemplate, this.socket));
 						Subscription subscription = new Subscription(streamOut, message, false);
 						subscription.subscribe();
-						//break;
+						// break;
 					} else {
 						CommandHandler handler = new CommandHandler(message, streamOut, Storage.secret, false);
 						handler.processMessage();
@@ -73,11 +76,13 @@ public class ServerThread extends Thread {
 
 			if (!message.command.equals(Constant.SUBSCRIBE.toUpperCase())) {
 				Logger.debug(String.format("SERVER: removing %s from ip list", this.ipAddress));
-				removeIp(this.ipAddress);
+				Utilities.removeIp(this.ipAddress);
 				Logger.debug(String.format("SERVER: ip list size: %d", Storage.ipList.size()));
 				try {
-					if (streamIn != null) streamIn.close();
-					if (streamOut != null) streamOut.close();
+					if (streamIn != null)
+						streamIn.close();
+					if (streamOut != null)
+						streamOut.close();
 					if (socket != null) {
 						socket.close();
 						Logger.debug("Socket on thread " + ID + " closed");
@@ -89,14 +94,6 @@ public class ServerThread extends Thread {
 			}
 		} catch (IOException ioe) {
 			Logger.error(ioe);
-		}
-	}
-
-	private void removeIp(String ipAddress) {
-		ConnectionTracking tracking = (ConnectionTracking) Storage.ipList.stream()
-				.filter(x -> x.ipAddress.equals(ipAddress)).findAny().orElse(null);
-		if (tracking != null) {
-			Storage.ipList.remove(tracking);
 		}
 	}
 }
