@@ -66,6 +66,26 @@ Available command line arguments for Server
 java -cp target/ezshare-1.0-jar-with-dependencies.jar EZShare.Server <command line arguments>
 ```
 
+Available command line arguments for Server
+
+```
+-advertisedhostname <arg>        advertised hostname
+-connectionintervallimit <arg>   connection interval limit in seconds
+-debug                           Print debug information
+-exchangeinterval <arg>          exchange interval in seconds
+-port <arg>                      Server port, an integer
+-secret <arg>                    Secret
+-secureportnumber <arg>          Secure port, an integer
+```
+
+
+
+
+### Client
+```bash
+java -cp target/ezshare-1.0-jar-with-dependencies.jar EZShare.Client <command line arguments>
+```
+
 Available command line arguments for Client
 
 ```
@@ -82,16 +102,13 @@ Available command line arguments for Client
  -query               query for resources from server
  -remove              remove resource from server
  -secret <arg>        secret
+ -secure              secure socket
  -servers <arg>       server list
  -share               share resource on server
+ -subscribe           keep connect
  -tags <arg>          resource tag
+ -unsubscribe         disconnect
  -uri <arg>           resource uri
-```
-
-
-### Client
-```bash
-java -cp target/ezshare-1.0-jar-with-dependencies.jar EZShare.Client <command line arguments>
 ```
 
 Code Structure
