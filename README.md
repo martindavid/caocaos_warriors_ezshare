@@ -3,10 +3,10 @@ COMP90015 EZShare Project
 A resource sharing network that consists of servers, which can communicate with each other, and clients which can communicate with the servers.
 
 #### Team:
-* Juan Daniel Daza
-* Haoran Sun
-* Martin Valentino
-* Sharon T
+* [Juan Daniel Daza](https://github.com/dazajuandaniel)
+* [Haoran Sun](https://github.com/haorans1994)
+* [Martin Valentino](https://github.com/martindavid)
+* [Sharon T](https://github.com/sharon-librae)
 
 Getting Started
 ---------------
