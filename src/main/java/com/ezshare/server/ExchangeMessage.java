@@ -8,9 +8,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class ExchangeMessage {
 
 	public String command;
-	public ArrayList<ServerList> serverList = new ArrayList<ServerList>();
+	public ArrayList<Server> serverList = new ArrayList<Server>();
 
-	public ExchangeMessage(String command, ArrayList<ServerList> serverList) {
+	public ExchangeMessage(String command, ArrayList<Server> serverList) {
 		this.command = command;
 		this.serverList = serverList;
 	}

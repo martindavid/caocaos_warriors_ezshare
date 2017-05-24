@@ -161,7 +161,7 @@ public class SSLServer implements Runnable {
 				Logger.debug("START - secure server interaction");
 				if (Storage.serverList.size() > 0) {
 					Exchange exchange = new Exchange(Storage.secureServerList);
-					exchange.runServerInteraction();
+					exchange.runSecureServerInteraction();
 				}
 				Logger.debug("END - secure server interaction");
 			}

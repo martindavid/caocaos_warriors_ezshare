@@ -31,7 +31,7 @@ public class Utilities {
 		return sb.toString();
 	}
 
-	public static Boolean isResourceMath(Resource res, Resource template) {
+	public static Boolean isResourceMatch(Resource res, Resource template) {
 		Boolean result = false;
 		Logger.debug("QUERY or SUBSCRIBE: validate resource");
 		Logger.debug(String.format("QUERY or SUBSCRIBE: Channel: %s, Owner: %s, Uri: %s, Name: %s, Description: %s", res.channel,

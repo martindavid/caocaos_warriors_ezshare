@@ -48,6 +48,22 @@
 			  </executions>
 	    </plugin>
   	</plugins>
+  	<resources>
+  		<resource>
+  			<directory>clientKeystore</directory>
+  			<includes>
+  				<include>**/*.*</include>
+  			</includes>
+  			<targetPath>clientKeystore</targetPath>
+  		</resource>
+  		<resource>
+  			<directory>serverKeystore</directory>
+  			<includes>
+  				<include>**/*.*</include>
+  			</includes>
+  			<targetPath>serverKeystore</targetPath>
+  		</resource>
+  	</resources>
   </build>
   
   <dependencies>
@@ -72,13 +88,15 @@
 		<artifactId>jackson-databind</artifactId>
 		<version>2.6.3</version>
 	</dependency>
-	<!-- https://mvnrepository.com/artifact/commons-validator/commons-validator -->
-<dependency>
-    <groupId>commons-validator</groupId>
-    <artifactId>commons-validator</artifactId>
-    <version>1.4.0</version>
-</dependency>
-	
+	<dependency>
+	    <groupId>commons-lang</groupId>
+	    <artifactId>commons-lang</artifactId>
+	    <version>2.6</version>
+	</dependency>
+	<dependency>
+	    <groupId>commons-validator</groupId>
+	    <artifactId>commons-validator</artifactId>
+	    <version>1.4.0</version>
+	</dependency>
   </dependencies>
-  
 </project>

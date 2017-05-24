@@ -12,9 +12,9 @@ import EZShare.ResourceTemplate;
 public class Query {
 	private Resource resource;
 	private boolean relay;
-	private ArrayList<ServerList> serverList;
+	private ArrayList<Server> serverList;
 
-	public Query(Resource resource, boolean relay, ArrayList<ServerList> serverList) {
+	public Query(Resource resource, boolean relay, ArrayList<Server> serverList) {
 		this.resource = resource;
 		this.relay = relay;
 		this.serverList = serverList;
@@ -50,7 +50,7 @@ public class Query {
 						clientMessage.resourceTemplate.channel, clientMessage.resourceTemplate.owner,
 						clientMessage.resourceTemplate.uri, clientMessage.resourceTemplate.name,
 						clientMessage.resourceTemplate.description));
-				for (ServerList server : serverList) {
+				for (Server server : serverList) {
 					Logger.debug(String.format("QUERY: Fetch resource from %s:%d", server.hostname, server.port));
 					ArrayList<Resource> relayRes = new QueryRelay(server.hostname, server.port, clientMessage)
 							.fetchResourceList();
