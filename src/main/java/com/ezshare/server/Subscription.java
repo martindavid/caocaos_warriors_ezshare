@@ -45,6 +45,11 @@ public class Subscription {
 							subscriber.resultSize += 1;
 						}
 					}
+					
+					if (message.relay) {
+						SecureSubscriptionRelay relay = new SecureSubscriptionRelay(subscriber);
+						relay.relaySubscription();
+					}
 				}
 			} else {
 				Subscriber subscriber = Storage.subscriber.stream().filter(x -> x.id.equals(message.id)).findAny()
@@ -79,12 +84,20 @@ public class Subscription {
 			if (isSecure) {
 				SecureSubscriber subscriber = Storage.secureSubscriber.stream().filter(x -> x.id.equals(message.id))
 						.findAny().orElse(null);
+				Resource resTemplate = subscriber.subscribeTemplate;
 				try {
 					streamOut.writeUTF("{\"resultSize\":" + subscriber.resultSize + "}");
 					if (subscriber.subscriberSocket != null) {
 						subscriber.subscriberSocket.close();
 					}
-					Storage.subscriber.remove(subscriber);
+					Storage.secureSubscriber.remove(subscriber);
+					// Find if there's still any subscriber with same template,
+					// if not any then remove subsriptionResources from Storage.subscriptionResources
+					SecureSubscriber otherSubscriber = Storage.secureSubscriber.stream()
+							.filter(x -> x.subscribeTemplate.equals(resTemplate)).findAny().orElse(null);
+					if (otherSubscriber == null) {
+						Storage.secureSubscriptionResources.removeIf(x->x.resources.equals(resTemplate));
+					}
 				} catch (Exception e) {
 					Logger.error(e);
 				}
