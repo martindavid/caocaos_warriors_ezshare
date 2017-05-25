@@ -12,6 +12,7 @@ import EZShare.Resource;
 
 public class Storage {
 	public static ArrayList<Resource> resourceList = new ArrayList<Resource>();
+	public static ArrayList<Resource> secureResourceList = new ArrayList<Resource>();
 	public static ArrayList<Server> serverList = new ArrayList<Server>();
 	public static ArrayList<Server> secureServerList = new ArrayList<Server>();
 	public static ArrayList<ConnectionTracking> ipList = new ArrayList<ConnectionTracking>();

@@ -48,8 +48,8 @@ public class Constant {
 	
 	public static final String SERVER_KEYSTORE_KEY = "serverKeystore/serverKeystore.jks";
 	public static final String SERVER_TRUSTSTORE_KEY = "serverKeystore/servertrust.jks";
-	public static final String CLIENT_TRUSTSTORE_KEY = "clientKeyStore/clienttrust.jks";
-	public static final String CLIENT_KEYSTORE_KEY = "clientKeyStore/clientKeystore.jks";
+	public static final String CLIENT_TRUSTSTORE_KEY = "clientKeystore/clienttrust.jks";
+	public static final String CLIENT_KEYSTORE_KEY = "clientKeystore/clientKeystore.jks";
 	public static final String KEYSTORE_PASSWORD = "comp90015";
 	public static final String JAVANET_KEYSTORE_PROP = "javax.net.ssl.keyStore";
 	public static final String JAVANET_TRUSTSTORE_PROP = "javax.net.ssl.trustStore";

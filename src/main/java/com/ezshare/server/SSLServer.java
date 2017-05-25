@@ -1,6 +1,7 @@
 package com.ezshare.server;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.util.Timer;
@@ -8,6 +9,7 @@ import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSocket;
@@ -35,6 +37,7 @@ public class SSLServer implements Runnable {
 	private ExecutorService es;
 	private SSLServerSocket sslserversocket;
 	private SSLSocket socket;
+	private SSLContext sslContext;
 
 	public SSLServer(String hostName, int portNumber, String secret, int exchangeInterval, int connIntervalLimit) {
 		this.portNumber = portNumber;
@@ -43,25 +46,23 @@ public class SSLServer implements Runnable {
 		this.exchangeInterval = exchangeInterval;
 		this.connIntervalLimit = connIntervalLimit;
 		this.es = Executors.newCachedThreadPool();
+		try (InputStream keyStoreInput = Thread.currentThread().getContextClassLoader()
+				.getResourceAsStream(Constant.SERVER_KEYSTORE_KEY);
+				InputStream trustStoreInput = Thread.currentThread().getContextClassLoader()
+						.getResourceAsStream(Constant.SERVER_TRUSTSTORE_KEY);) {
+			this.sslContext = Utilities.setSSLFactories(keyStoreInput, Constant.KEYSTORE_PASSWORD, trustStoreInput);
+		} catch (Exception e) {
+			Logger.error(e);
+		}
 	}
-	
+
 	@Override
 	public void run() {
 		Logger.info("Starting the EZShare Secure Server");
 		Logger.info("bound to port: " + portNumber);
 
-		// Specify the keystore details (this can be specified as VM arguments
-		// as well)
-		// the keystore file contains an application's own certificate and
-		// private key
-		System.setProperty(Constant.JAVANET_KEYSTORE_PROP, Constant.SERVER_KEYSTORE_KEY);
-		// Password to access the private key from the keystore file
-		System.setProperty(Constant.JAVANET_KEYSTOREPASS_PROP, Constant.KEYSTORE_PASSWORD);
-		// certificates trusted by this application(trust store).
-		System.setProperty(Constant.JAVANET_TRUSTSTORE_PROP, Constant.SERVER_TRUSTSTORE_KEY);
-
 		// Create SSL server socket
-		SSLServerSocketFactory sslserversocketfactory = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
+		SSLServerSocketFactory sslserversocketfactory = (SSLServerSocketFactory) this.sslContext.getServerSocketFactory();
 		try {
 			sslserversocket = (SSLServerSocket) sslserversocketfactory.createServerSocket(portNumber);
 		} catch (IOException e1) {

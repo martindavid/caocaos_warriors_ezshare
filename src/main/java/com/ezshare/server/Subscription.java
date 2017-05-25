@@ -33,8 +33,7 @@ public class Subscription {
 			// For QUERY, only fetch resource from local server, fetch from
 			// remote server will be done from
 			// SubscriptionServerThread class
-			Query subscribe = new Query(message.resourceTemplate, false,
-					isSecure ? Storage.secureServerList : Storage.serverList);
+			Query subscribe = new Query(message.resourceTemplate, false, isSecure);
 			ArrayList<Resource> resourceList = subscribe.getResourceList();
 
 			if (isSecure) {

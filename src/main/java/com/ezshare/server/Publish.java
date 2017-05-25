@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import org.pmw.tinylog.Logger;
+
 import EZShare.Constant;
 import EZShare.Resource;
 
@@ -36,7 +38,7 @@ public class Publish {
 
 		// Update ezserver value before add to list
 		res.ezserver = String.format("%s:%d", Storage.hostName, Storage.port);
-		for (Resource localRes : Storage.resourceList) {
+		for (Resource localRes : isSecure ? Storage.secureResourceList : Storage.resourceList) {
 			// Check for same primary key and overwrite
 			if (localRes.owner.equals(res.owner) && localRes.channel.equals(res.channel)
 					&& localRes.uri.equals(res.uri)) {
@@ -53,7 +55,13 @@ public class Publish {
 			}
 		}
 
-		Storage.resourceList.add(res);
+		if (isSecure) {
+			Logger.debug("[PUBLISH] store new resources to Secure storage");
+			Storage.secureResourceList.add(res);
+		} else {
+			Logger.debug("[PUBLISH] store new resources to Unsecure storage");
+			Storage.resourceList.add(res);
+		}
 
 		// If there are subscribers notify this new published resource
 		if (Storage.subscriber.size() > 0) {
