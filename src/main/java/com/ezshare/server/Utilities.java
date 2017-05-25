@@ -1,12 +1,21 @@
 package com.ezshare.server;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
+
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.KeyManagerFactory;
 
 import org.pmw.tinylog.Logger;
 
@@ -40,8 +49,8 @@ public class Utilities {
 	public static Boolean isResourceMatch(Resource res, Resource template) {
 		Boolean result = false;
 		Logger.debug("QUERY or SUBSCRIBE: validate resource");
-		Logger.debug(String.format("QUERY or SUBSCRIBE: Channel: %s, Owner: %s, Uri: %s, Name: %s, Description: %s", res.channel,
-				res.owner, res.uri, res.name, res.description));
+		Logger.debug(String.format("QUERY or SUBSCRIBE: Channel: %s, Owner: %s, Uri: %s, Name: %s, Description: %s",
+				res.channel, res.owner, res.uri, res.name, res.description));
 
 		if ((res.channel.equals(template.channel)) && (res.name.contains(template.name) || (template.name.isEmpty()))
 				&& (res.description.contains(template.description) || (template.description.isEmpty()))
@@ -56,34 +65,36 @@ public class Utilities {
 
 		return result;
 	}
-	
+
 	/**
 	 * Validate whether incoming IP address allowed to make a connection or not
 	 * We validate against IP list array that system maintains
-	 * @param ipAddress ip address need to validate
-	 * @param connIntervalLimit connection interval limit per ip address
+	 * 
+	 * @param ipAddress
+	 *            ip address need to validate
+	 * @param connIntervalLimit
+	 *            connection interval limit per ip address
 	 * @return
 	 */
 	public static boolean isIpAllowed(String ipAddress, int connIntervalLimit) {
-		ConnectionTracking tracking = (ConnectionTracking) Storage.ipList.stream().filter(x -> x.ipAddress.equals(ipAddress))
-										.findAny()
-										.orElse(null);
+		ConnectionTracking tracking = (ConnectionTracking) Storage.ipList.stream()
+				.filter(x -> x.ipAddress.equals(ipAddress)).findAny().orElse(null);
 		if (tracking != null) {
 			DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 			Date now = new Date();
 			try {
 				Date lastConnected = dateFormat.parse(tracking.timeStamp);
-				if ((now.getTime() - lastConnected.getTime())/ 1000 % 60 <= connIntervalLimit) {
+				if ((now.getTime() - lastConnected.getTime()) / 1000 % 60 <= connIntervalLimit) {
 					return false;
 				}
 			} catch (ParseException e) {
 				Logger.error(e);
 			}
 		}
-		
+
 		return true;
 	}
-	
+
 	public static void removeIp(String ipAddress) {
 		ConnectionTracking tracking = (ConnectionTracking) Storage.ipList.stream()
 				.filter(x -> x.ipAddress.equals(ipAddress)).findAny().orElse(null);
@@ -91,7 +102,7 @@ public class Utilities {
 			Storage.ipList.remove(tracking);
 		}
 	}
-	
+
 	/**
 	 * Generic method to convert from jsonString to T object where T is class
 	 * 
@@ -110,7 +121,22 @@ public class Utilities {
 
 	/*** Print assistant ***/
 	public static String getReturnMessage(String message) throws JsonProcessingException {
-		return message.equals(Constant.SUCCESS) ? 
-				new Responses().toJson() : new Responses(message).toJson();
+		return message.equals(Constant.SUCCESS) ? new Responses().toJson() : new Responses(message).toJson();
+	}
+
+	public static void setSSLFactories(InputStream keyStream, String keystorePassword, InputStream trustStoreStream)
+			throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException, UnrecoverableKeyException {
+		KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+		char[] keyPassword = keystorePassword.toCharArray();
+		keyStore.load(keyStream, keyPassword);
+		
+		// Initialize the trust manager factory with trusted store
+		KeyManagerFactory keyFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+		keyFactory.init(keyStore, keyPassword);
+		
+		KeyManager[] keyManagers = keyFactory.getKeyManagers();
+		
+		KeyStore trustedStore = KeyStore.getInstance(KeyStore.getDefaultType());
+
 	}
 }
