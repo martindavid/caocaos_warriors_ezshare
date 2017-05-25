@@ -4,6 +4,9 @@ import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+
+import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
@@ -21,25 +24,26 @@ public class SSLClient {
 	private int portNumber;
 	private String hostName;
 	private FileTransfer fileTransfer;
+	private SSLContext sslContext;
 
 	public SSLClient(int portNumber, String hostName, Message message) {
 		this.portNumber = portNumber;
 		this.hostName = hostName;
 		this.message = message;
+
+		try (InputStream keyStoreInput = Thread.currentThread().getContextClassLoader()
+				.getResourceAsStream(Constant.CLIENT_KEYSTORE_KEY);
+				InputStream trustStoreInput = Thread.currentThread().getContextClassLoader()
+						.getResourceAsStream(Constant.CLIENT_TRUSTSTORE_KEY);) {
+			this.sslContext = Utilities.setSSLFactories(keyStoreInput, Constant.KEYSTORE_PASSWORD, trustStoreInput);
+		} catch (Exception e) {
+			Logger.error(e);
+		}
 	}
 
 	public void Execute() throws IOException {
-
-		// Location of the Java keystore file containing the collection of
-		// the keystore file contains an application's own certificate and
-		// private key
-		System.setProperty(Constant.JAVANET_KEYSTORE_PROP, Constant.CLIENT_KEYSTORE_KEY);
-		System.setProperty(Constant.JAVANET_KEYSTOREPASS_PROP, Constant.KEYSTORE_PASSWORD);
-		// certificates trusted by this application(trust store).
-		System.setProperty(Constant.JAVANET_TRUSTSTORE_PROP, Constant.CLIENT_TRUSTSTORE_KEY);
-
 		// Create SSL socket and connect it to the remote server
-		SSLSocketFactory sslsocketfactory = (SSLSocketFactory) SSLSocketFactory.getDefault();
+		SSLSocketFactory sslsocketfactory = (SSLSocketFactory) this.sslContext.getSocketFactory();
 		try (SSLSocket socket = (SSLSocket) sslsocketfactory.createSocket(hostName, portNumber);
 				DataOutputStream streamOut = new DataOutputStream(socket.getOutputStream());
 				DataInputStream streamIn = new DataInputStream(new BufferedInputStream(socket.getInputStream()));) {
@@ -50,7 +54,6 @@ public class SSLClient {
 			Logger.debug("[SENT]:" + message.toJson());
 
 			transferMessage(streamOut);
-
 			receiveMessage(streamIn, streamOut);
 		} catch (Exception e) {
 			Logger.error(e);
@@ -94,7 +97,10 @@ public class SSLClient {
 		} else if (message.command.equals(Constant.SUBSCRIBE.toUpperCase())) {
 			// always listen to server until client explicitly press
 			// ENTER
-			while (System.in.available() == 0) {
+			while (true) {
+				if (System.in.available() > 0) {
+					break;
+				}
 				if ((response = DataInputStream.readUTF(streamIn)) != null) {
 					Logger.info(response);
 					if (response.contains("error")) {

@@ -18,12 +18,12 @@ import EZShare.Resource;
  */
 public class CommandHandler {
 
-	Message message;
-	String serverSecret;
-	DataOutputStream streamOut;
-	Boolean isSecure;
+	private Message message;
+	private String serverSecret;
+	private DataOutputStream streamOut;
+	private boolean isSecure;
 
-	public CommandHandler(Message message, DataOutputStream streamOut, String serverSecret, Boolean isSecure) {
+	public CommandHandler(Message message, DataOutputStream streamOut, String serverSecret, boolean isSecure) {
 		this.message = message;
 		this.streamOut = streamOut;
 		this.serverSecret = serverSecret;
@@ -37,7 +37,11 @@ public class CommandHandler {
 			responseMessage = new Publish(this.message.resource, this.isSecure).processResourceMessage();
 			streamOut.writeUTF(responseMessage);
 			Logger.debug("PUBLISH: response message: " + responseMessage);
-			Logger.debug("PUBLISH: Resource Size: " + Storage.resourceList.size());
+			if (this.isSecure) {
+				Logger.debug("PUBLISH: Secure Resource Size: " + Storage.secureResourceList.size());
+			} else {
+				Logger.debug("PUBLISH: Resource Size: " + Storage.resourceList.size());
+			}
 			break;
 		case Constant.REMOVE:
 			responseMessage = new Remove(this.message.resource).processResource();
@@ -50,11 +54,15 @@ public class CommandHandler {
 					.processResourceMessage();
 			streamOut.writeUTF(responseMessage);
 			Logger.debug("SHARE: response message: " + responseMessage);
-			Logger.debug("SHARE: Resource Size: " + Storage.resourceList.size());
+			if (this.isSecure) {
+				Logger.debug("SHARE: Secure Resource Size: " + Storage.secureResourceList.size());
+			} else {
+				Logger.debug("SHARE: Resource Size: " + Storage.resourceList.size());
+			}
 			break;
 		case Constant.QUERY:
-			ArrayList<Resource> resourceList = new Query(message.resourceTemplate, message.relay,
-					isSecure ? Storage.secureServerList : Storage.serverList).getResourceList();
+			ArrayList<Resource> resourceList = new Query(message.resourceTemplate, message.relay, this.isSecure)
+					.getResourceList();
 			String successResponse = new Responses().toJson();
 			streamOut.writeUTF(successResponse);
 			if (resourceList.size() > 0) {
@@ -72,7 +80,7 @@ public class CommandHandler {
 			fetch.processFetch();
 			break;
 		case Constant.EXCHANGE:
-			responseMessage = new Exchange(this.message.serverList).processCommand(isSecure);
+			responseMessage = new Exchange(this.message.serverList).processCommand(this.isSecure);
 			streamOut.writeUTF(responseMessage);
 			Logger.debug("EXCHANGE: response message: " + responseMessage);
 			Logger.debug("EXCHANGE: Server List Size: " + Storage.serverList.size());

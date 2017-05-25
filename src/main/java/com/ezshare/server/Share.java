@@ -47,7 +47,7 @@ public class Share {
 			return Utilities.getReturnMessage(Constant.CANNOT_SHARE_RESOURCE);
 		} else {
 
-			for (Resource localRes : Storage.resourceList) {
+			for (Resource localRes : isSecure ? Storage.secureResourceList : Storage.resourceList) {
 				// Check for same primary key and overwrite
 				if (localRes.owner.equals(res.owner) && localRes.channel.equals(res.channel)
 						&& localRes.uri.equals(res.uri)) {
@@ -64,8 +64,12 @@ public class Share {
 					return Utilities.getReturnMessage(Constant.CANNOT_PUBLISH_RESOURCE);
 				}
 			}
-			Logger.debug("SHARE: insert new resource");
-			Storage.resourceList.add(res);
+
+			if (isSecure) {
+				Storage.secureResourceList.add(res);
+			} else {
+				Storage.resourceList.add(res);
+			}
 
 			// If there is any subscriber notify them with this new resource
 			if (Storage.subscriber.size() > 0) {

@@ -2,6 +2,7 @@ package com.ezshare.server;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -16,6 +17,9 @@ import java.util.Date;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
 
 import org.pmw.tinylog.Logger;
 
@@ -124,19 +128,45 @@ public class Utilities {
 		return message.equals(Constant.SUCCESS) ? new Responses().toJson() : new Responses(message).toJson();
 	}
 
-	public static void setSSLFactories(InputStream keyStream, String keystorePassword, InputStream trustStoreStream)
-			throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException, UnrecoverableKeyException {
+	/**
+	 * A way to set SSL certificate system wide
+	 * Based on an answer here https://stackoverflow.com/a/17352927/4736604
+	 * @param keyStream
+	 * @param keystorePassword
+	 * @param trustStream
+	 * @throws KeyStoreException
+	 * @throws NoSuchAlgorithmException
+	 * @throws CertificateException
+	 * @throws IOException
+	 * @throws UnrecoverableKeyException
+	 * @throws KeyManagementException
+	 */
+	public static SSLContext setSSLFactories(InputStream keyStream, String keystorePassword, InputStream trustStream)
+			throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException,
+			UnrecoverableKeyException, KeyManagementException {
 		KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
 		char[] keyPassword = keystorePassword.toCharArray();
 		keyStore.load(keyStream, keyPassword);
 		
-		// Initialize the trust manager factory with trusted store
+		// Initialize the key manager factory with key store
 		KeyManagerFactory keyFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
 		keyFactory.init(keyStore, keyPassword);
 		
 		KeyManager[] keyManagers = keyFactory.getKeyManagers();
 		
-		KeyStore trustedStore = KeyStore.getInstance(KeyStore.getDefaultType());
-
+		KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+		
+		trustStore.load(trustStream, null);
+		
+		// Initialize trust manager factory with trus store
+		TrustManagerFactory trustFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+		trustFactory.init(trustStore);
+		
+		TrustManager[] trustManagers = trustFactory.getTrustManagers();
+		
+		// initialize an ssl context to use these managers and set as default
+		SSLContext sslContext = SSLContext.getInstance("SSL");
+		sslContext.init(keyManagers, trustManagers, null);
+		return sslContext;
 	}
 }

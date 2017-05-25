@@ -14,17 +14,19 @@ import EZShare.ResourceTemplate;
 public class Query {
 	private Resource resource;
 	private boolean relay;
-	private ArrayList<Server> serverList;
+	private boolean isSecure;
 
-	public Query(Resource resource, boolean relay, ArrayList<Server> serverList) {
+	public Query(Resource resource, boolean relay, boolean isSecure) {
 		this.resource = resource;
 		this.relay = relay;
-		this.serverList = serverList;
+		this.isSecure = isSecure;
 	}
 
 	public ArrayList<Resource> getResourceList() {
 		ArrayList<Resource> result = new ArrayList<Resource>();
-		for (Resource res : Storage.resourceList) {
+		// if it's secure request, fetch the resources from secureResourcesList,
+		// otherwise just from unsecure one
+		for (Resource res : isSecure ? Storage.secureResourceList : Storage.resourceList) {
 
 			// Copy res object because we need to change owner into * if it
 			// contains owner
@@ -36,7 +38,9 @@ public class Query {
 				result.add(newRes);
 			}
 		}
-		Logger.debug(String.format("QUERY: Fetched %d resource from local server", result.size()));
+
+		Logger.debug(String.format("QUERY: Fetched %d resource from %s storage from local server", result.size(),
+				this.isSecure ? "secure" : "unsecure"));
 
 		if (relay) { // Fetch resource from other server
 			try {
@@ -45,7 +49,7 @@ public class Query {
 				clientMessage.command = Constant.QUERY.toUpperCase();
 				clientMessage.resourceTemplate = new ResourceTemplate(this.resource);
 				clientMessage.relay = false;
-				for (Server server : serverList) {
+				for (Server server : isSecure ? Storage.secureServerList : Storage.serverList) {
 					Logger.debug(String.format("QUERY: Fetch resource from %s:%d", server.hostname, server.port));
 					ArrayList<Resource> relayRes = new QueryRelay(server.hostname, server.port, clientMessage)
 							.fetchResourceList();
@@ -62,7 +66,7 @@ public class Query {
 
 		return result;
 	}
-	
+
 	public static Boolean isMatch(Resource res, Resource template) {
 		Boolean result = false;
 
@@ -79,7 +83,5 @@ public class Query {
 
 		return result;
 	}
-	
-
 
 }
