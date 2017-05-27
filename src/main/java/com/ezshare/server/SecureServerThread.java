@@ -54,9 +54,9 @@ public class SecureServerThread extends Thread {
 					DataOutputStream streamOut = new DataOutputStream(secureSocket.getOutputStream());
 					Message message = Utilities.convertJsonToObject(jsonString, Message.class);
 					if ((message.command.equals(Constant.FETCH.toUpperCase())
-							|| message.command.equals(Constant.QUERY.toUpperCase()))
+							|| message.command.equals(Constant.QUERY.toUpperCase())
+							|| message.command.equals(Constant.SUBSCRIBE.toUpperCase()))
 							&& !jsonString.contains("resourceTemplate")) {
-
 						streamOut.writeUTF(Utilities.getReturnMessage(Constant.MISSING_RESOURCE_TEMPLATE));
 						break;
 
@@ -70,10 +70,11 @@ public class SecureServerThread extends Thread {
 					} else if (message.command.equals(Constant.SUBSCRIBE.toUpperCase())) {
 						// store the information for this subscriber
 						secureSocket.setKeepAlive(true);
-						Storage.secureSubscriber.add(new SecureSubscriber(message.id, 0, message.resourceTemplate, this.secureSocket));
+						Storage.secureSubscriber
+								.add(new SecureSubscriber(message.id, 0, message.resourceTemplate, this.secureSocket));
 						Subscription subscription = new Subscription(streamOut, message, true);
 						subscription.subscribe();
-						//break;
+						// break;
 					} else {
 						CommandHandler handler = new CommandHandler(message, streamOut, Storage.secret, true);
 						handler.processMessage();

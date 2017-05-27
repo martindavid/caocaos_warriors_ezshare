@@ -4,6 +4,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
@@ -24,9 +25,18 @@ import EZShare.Constant;
 public class Exchange {
 	private ArrayList<Server> serverList;
 	private static final int DEFAULT_TIMEOUT = 5000;
+	private SSLContext sslContext;
 
 	public Exchange(ArrayList<Server> serverList) {
 		this.serverList = serverList;
+		try (InputStream keyStoreInput = Thread.currentThread().getContextClassLoader()
+				.getResourceAsStream(Constant.CLIENT_KEYSTORE_KEY);
+				InputStream trustStoreInput = Thread.currentThread().getContextClassLoader()
+						.getResourceAsStream(Constant.CLIENT_TRUSTSTORE_KEY);) {
+			sslContext = Utilities.setSSLFactories(keyStoreInput, Constant.KEYSTORE_PASSWORD, trustStoreInput);
+		} catch (Exception e) {
+			Logger.error(e);
+		}
 	}
 
 	public String processCommand(boolean isSecure) throws JsonProcessingException {
@@ -140,20 +150,15 @@ public class Exchange {
 	 */
 	private boolean isSecureServer(Server server) {
 		boolean isValid = false;
-		SSLContext sslContext = null;
-		try (InputStream keyStoreInput = Thread.currentThread().getContextClassLoader()
-				.getResourceAsStream(Constant.CLIENT_KEYSTORE_KEY);
-				InputStream trustStoreInput = Thread.currentThread().getContextClassLoader()
-						.getResourceAsStream(Constant.CLIENT_TRUSTSTORE_KEY);) {
-			sslContext = Utilities.setSSLFactories(keyStoreInput, Constant.KEYSTORE_PASSWORD, trustStoreInput);
-		} catch (Exception e) {
-			Logger.error(e);
-		}
-		SSLSocketFactory sslsocketfactory = (SSLSocketFactory) sslContext.getSocketFactory();
-		try (SSLSocket socket = (SSLSocket) sslsocketfactory.createSocket(server.hostname, server.port)) {
-			isValid = true; // if there's no exception then server is secure
+		Logger.debug(String.format("[SECURE EXCHANGE] validate server %s:%d", server.hostname, server.port));
+		
+		SSLSocketFactory sslsocketfactory = (SSLSocketFactory) this.sslContext.getSocketFactory();
+		try (SSLSocket socket = (SSLSocket) sslsocketfactory.createSocket()) {
+			socket.connect(new InetSocketAddress(server.hostname, server.port), DEFAULT_TIMEOUT);
+			isValid = socket.isConnected(); // if there's no exception then server is secure
+			socket.close();
 		} catch (SocketTimeoutException e) {
-			Logger.error("[SECURE EXCHANGE] - socket timeout");
+			Logger.error("[SECURE EXCHANGE] - socket timeout for server " + server.hostname);
 			Logger.error(e);
 		} catch (UnknownHostException e) {
 			Logger.error("Don't know about host " + server.hostname);
@@ -162,6 +167,8 @@ public class Exchange {
 			Logger.error("Couldn't get I/O for the connection to " + server.hostname);
 			Logger.error(e);
 		}
+		
+		Logger.debug(String.format("[SECURE EXCHANGE] server %s:%d is valid: %b", server.hostname, server.port, isValid));
 		
 		return isValid;
 	}

@@ -83,7 +83,11 @@ public class CommandHandler {
 			responseMessage = new Exchange(this.message.serverList).processCommand(this.isSecure);
 			streamOut.writeUTF(responseMessage);
 			Logger.debug("EXCHANGE: response message: " + responseMessage);
-			Logger.debug("EXCHANGE: Server List Size: " + Storage.serverList.size());
+			if (this.isSecure) {
+				Logger.debug("EXCHANGE: Secure Server List Size: " + Storage.secureServerList.size());
+			} else {
+				Logger.debug("EXCHANGE: Server List Size: " + Storage.serverList.size());
+			}
 			break;
 		default:
 			responseMessage = Utilities.getReturnMessage(Constant.INVALID_COMMAND);
