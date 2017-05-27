@@ -5,6 +5,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.SocketTimeoutException;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocket;
@@ -84,7 +85,18 @@ public class SSLClient {
 				}
 			} else if (message.command.equals(Constant.SUBSCRIBE.toUpperCase())) {
 				while (System.in.available() == 0) {
-					if ((response = DataInputStream.readUTF(streamIn)) != null) {
+					try {
+						// Hacky way to prevent blocking operation from readUTF, 
+						// in order for app detect enter click from user
+						socket.setSoTimeout(2000); 
+						response = streamIn.readUTF();
+					} catch(SocketTimeoutException e) {
+						response = "";
+					} catch(Exception e) {
+						Logger.error(e);
+					}
+					
+					if (!response.isEmpty()) {
 						Logger.info(response);
 						if (response.contains("error")) {
 							break;

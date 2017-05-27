@@ -3,8 +3,10 @@ package com.ezshare.server;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.UnknownHostException;
 
+import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
@@ -27,15 +29,21 @@ public class SubscriptionSecureServerThread implements Runnable {
 	private SSLSocket socket;
 	private DataInputStream streamIn;
 	private DataOutputStream streamOut;
-	
+	private SSLContext sslContext;
+
 	public SubscriptionSecureServerThread(Server server, SecureSubscriber subscriber) {
-		System.setProperty(Constant.JAVANET_KEYSTORE_PROP, Constant.SERVER_KEYSTORE_KEY);
-		System.setProperty(Constant.JAVANET_KEYSTOREPASS_PROP, Constant.KEYSTORE_PASSWORD);
-		System.setProperty(Constant.JAVANET_TRUSTSTORE_PROP, Constant.SERVER_TRUSTSTORE_KEY);
+		try (InputStream keyStoreInput = Thread.currentThread().getContextClassLoader()
+				.getResourceAsStream(Constant.SERVER_KEYSTORE_KEY);
+				InputStream trustStoreInput = Thread.currentThread().getContextClassLoader()
+						.getResourceAsStream(Constant.SERVER_TRUSTSTORE_KEY);) {
+			this.sslContext = Utilities.setSSLFactories(keyStoreInput, Constant.KEYSTORE_PASSWORD, trustStoreInput);
+		} catch (Exception e) {
+			Logger.error(e);
+		}
 		this.server = server;
 		this.resourceTemplate = subscriber.subscribeTemplate;
 		try {
-			SSLSocketFactory sslsocketfactory = (SSLSocketFactory) SSLSocketFactory.getDefault();
+			SSLSocketFactory sslsocketfactory = (SSLSocketFactory) this.sslContext.getSocketFactory();
 			socket = (SSLSocket) sslsocketfactory.createSocket(server.hostname, server.port);
 			streamIn = new DataInputStream(socket.getInputStream());
 			streamOut = new DataOutputStream(socket.getOutputStream());
@@ -45,7 +53,7 @@ public class SubscriptionSecureServerThread implements Runnable {
 			Logger.error(e);
 		}
 	}
-	
+
 	@Override
 	public void run() {
 		try {
@@ -64,11 +72,11 @@ public class SubscriptionSecureServerThread implements Runnable {
 				if (Storage.secureSubscriber.size() == 0) {
 					UnsubscribeMessage unsubscribeMessage = new UnsubscribeMessage(message.id);
 					streamOut.writeUTF(unsubscribeMessage.toJson());
-					Storage.secureServerThread.remove(this);
+					Storage.subscriptionSecureServerThread.remove(this);
 					break;
 				}
 				if ((response = DataInputStream.readUTF(streamIn)) != null) {
-					
+
 					Logger.info(response);
 					if (!response.contains(Constant.SUCCESS)) {
 						Resource res = Utilities.convertJsonToObject(response, Resource.class);
@@ -111,9 +119,9 @@ public class SubscriptionSecureServerThread implements Runnable {
 				Logger.error(e);
 			}
 		}
-		
+
 	}
-	
+
 	/***
 	 * Update this thread if there is any new subscriber Check if the existing
 	 * subscriber has same template so no need to send new request, otherwise
@@ -123,13 +131,16 @@ public class SubscriptionSecureServerThread implements Runnable {
 	 */
 	public void updateRequest(SecureSubscriber subscriber) {
 		try {
-			Logger.debug(String.format("Update new subscriber for subscription server thread %s:%d", server.hostname, server.port));
+			Logger.debug(String.format("Update new subscriber for subscription server thread %s:%d", server.hostname,
+					server.port));
 			// Find from existing resource list
-			// If template exists then no need to send new request to other server just stream out the resources to client
+			// If template exists then no need to send new request to other
+			// server just stream out the resources to client
 			SubscriptionResources existingTemplate = Storage.secureSubscriptionResources.stream()
 					.filter(x -> x.resourceTemplate.equals(subscriber.subscribeTemplate)).findAny().orElse(null);
 			if (existingTemplate == null) {
-				Logger.debug(String.format("Send new subscribe template to server %s:%d", server.hostname, server.port));
+				Logger.debug(
+						String.format("Send new subscribe template to server %s:%d", server.hostname, server.port));
 				Storage.subscriptionResources.add(new SubscriptionResources(subscriber.subscribeTemplate));
 				EZShare.Message message = new EZShare.Message();
 				message.command = Constant.SUBSCRIBE.toUpperCase();

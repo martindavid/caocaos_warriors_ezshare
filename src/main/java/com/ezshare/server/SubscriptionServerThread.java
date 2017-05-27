@@ -58,7 +58,7 @@ public class SubscriptionServerThread implements Runnable {
 				if (Storage.subscriber.size() == 0) {
 					UnsubscribeMessage unmessage = new UnsubscribeMessage(message.id);
 					streamOut.writeUTF(unmessage.toJson());
-					Storage.serverThread.remove(this);
+					Storage.subscriptionServerThread.remove(this);
 					break;
 				}
 				if (streamIn.available() > 0) {

@@ -15,16 +15,16 @@ public class SubscriptionRelay {
 	public void relaySubscription() {
 		Logger.debug("[SUBSCRIPTION_RELAY] START Subscription Relay");
 		try {
-			if (Storage.serverThread.size() == 0) {
+			if (Storage.subscriptionServerThread.size() == 0) {
 				for (Server server : Storage.serverList) {
 					Logger.debug("[SUBSCRIPTION_RELAY] Start new thread for " + server.hostname + ":" + server.port);
 					SubscriptionServerThread serverThread = new SubscriptionServerThread(server, subscriber);
 					Thread thread = new Thread(serverThread);
 					thread.start();
-					Storage.serverThread.add(serverThread);
+					Storage.subscriptionServerThread.add(serverThread);
 				}
 			} else {
-				for (SubscriptionServerThread server : Storage.serverThread) {
+				for (SubscriptionServerThread server : Storage.subscriptionServerThread) {
 					server.updateRequest(subscriber);
 				}
 			}

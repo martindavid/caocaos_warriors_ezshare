@@ -1,7 +1,6 @@
 package com.ezshare.server;
 
 import java.io.DataOutputStream;
-import java.util.ArrayList;
 
 import org.pmw.tinylog.Logger;
 
@@ -30,25 +29,12 @@ public class Subscription {
 
 	public void subscribe() {
 		try {
-			// For QUERY, only fetch resource from local server, fetch from
-			// remote server will be done from
-			// SubscriptionServerThread class
-			Query subscribe = new Query(message.resourceTemplate, false, isSecure);
-			ArrayList<Resource> resourceList = subscribe.getResourceList();
-
 			if (isSecure) {
 				SecureSubscriber subscriber = Storage.secureSubscriber.stream().filter(x -> x.id.equals(message.id))
 						.findAny().orElse(null);
 				if (subscriber != null) {
 					String successResponse = new SubscriptionResponse(Constant.SUCCESS, subscriber.id).toJson();
 					streamOut.writeUTF(successResponse);
-
-					if (resourceList.size() > 0) {
-						for (Resource res : resourceList) {
-							streamOut.writeUTF(res.toJson());
-							subscriber.resultSize += 1;
-						}
-					}
 					
 					if (message.relay) {
 						SecureSubscriptionRelay relay = new SecureSubscriptionRelay(subscriber);
@@ -61,13 +47,6 @@ public class Subscription {
 				if (subscriber != null) {
 					String successResponse = new SubscriptionResponse(Constant.SUCCESS, subscriber.id).toJson();
 					streamOut.writeUTF(successResponse);
-
-					if (resourceList.size() > 0) {
-						for (Resource res : resourceList) {
-							streamOut.writeUTF(res.toJson());
-							subscriber.resultSize += 1;
-						}
-					}
 
 					if (message.relay) {
 						SubscriptionRelay relay = new SubscriptionRelay(subscriber);

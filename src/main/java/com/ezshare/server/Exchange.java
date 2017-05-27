@@ -1,11 +1,15 @@
 package com.ezshare.server;
 
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 
+import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
@@ -19,6 +23,7 @@ import EZShare.Constant;
 
 public class Exchange {
 	private ArrayList<Server> serverList;
+	private static final int DEFAULT_TIMEOUT = 5000;
 
 	public Exchange(ArrayList<Server> serverList) {
 		this.serverList = serverList;
@@ -34,9 +39,8 @@ public class Exchange {
 				existingServer = (Server) Storage.secureServerList.stream()
 						.filter(x -> x.hostname.equals(server.hostname) && x.port == server.port).findAny()
 						.orElse(null);
-				if (existingServer == null) {
+				if (existingServer == null && isSecureServer(server)) {
 					Storage.secureServerList.add(server);
-					//Storage.subscriptionSecureServer.add(new SubscriptionSecureServer(server.hostname, server.port));
 				}
 			} else {
 				existingServer = (Server) Storage.serverList.stream()
@@ -44,7 +48,6 @@ public class Exchange {
 						.orElse(null);
 				if (existingServer == null) {
 					Storage.serverList.add(server);
-					//Storage.subscriptionServer.add(new SubscriptionServer(server.hostname, server.port));
 				}
 			}
 		}
@@ -69,28 +72,34 @@ public class Exchange {
 
 		} catch (UnknownHostException e) {
 			Logger.error("Don't know about host " + server.hostname);
-			Logger.debug(String.format("EXCHANGE: removing %s from server list", server.hostname));
-			Storage.serverList.remove(index);
 			Logger.error(e);
+			removeServerFromList(server, false);
 		} catch (IOException e) {
 			Logger.error("Couldn't get I/O for the connection to " + server.hostname);
-			Logger.debug(String.format("EXCHANGE: removing %s from server list", server.hostname));
-			Storage.serverList.remove(index);
 			Logger.error(e);
+			removeServerFromList(server, false);
 		}
 	}
 
 	public void runSecureServerInteraction() {
 		int index = (int) (Math.random() * this.serverList.size());
 		Server server = this.serverList.get(index);
-		System.setProperty("javax.net.ssl.trustStore", "clientKeyStore/clientKeystore.jks");
-		System.setProperty("javax.net.ssl.keyStorePassword", "comp90015");
+		SSLContext sslContext = null;
+		try (InputStream keyStoreInput = Thread.currentThread().getContextClassLoader()
+				.getResourceAsStream(Constant.CLIENT_KEYSTORE_KEY);
+				InputStream trustStoreInput = Thread.currentThread().getContextClassLoader()
+						.getResourceAsStream(Constant.CLIENT_TRUSTSTORE_KEY);) {
+			sslContext = Utilities.setSSLFactories(keyStoreInput, Constant.KEYSTORE_PASSWORD, trustStoreInput);
+		} catch (Exception e) {
+			Logger.error(e);
+		}
 		// Create SSL socket and connect it to the remote server
-		SSLSocketFactory sslsocketfactory = (SSLSocketFactory) SSLSocketFactory.getDefault();
-
-		try (SSLSocket echoSocket = (SSLSocket) sslsocketfactory.createSocket(server.hostname, server.port);
-				DataOutputStream streamOut = new DataOutputStream(echoSocket.getOutputStream());) {
+		SSLSocketFactory sslsocketfactory = (SSLSocketFactory) sslContext.getSocketFactory();
+		try (SSLSocket socket = (SSLSocket) sslsocketfactory.createSocket(server.hostname, server.port);
+				DataOutputStream streamOut = new DataOutputStream(socket.getOutputStream());
+				DataInputStream streamIn = new DataInputStream(socket.getInputStream());) {
 			String message = "";
+			socket.setSoTimeout(DEFAULT_TIMEOUT);
 			try {
 				message = new ExchangeMessage(Constant.EXCHANGE.toUpperCase(), this.serverList).toJson();
 				Logger.debug(String.format("EXCHANGE: message: %s", message));
@@ -100,15 +109,72 @@ public class Exchange {
 			Logger.debug(String.format("EXCHANGE: send message to %s:%d", server.hostname, server.port));
 			streamOut.writeUTF(message);
 
+			String response = "";
+			while (true) {
+				if ((response = DataInputStream.readUTF(streamIn)) != null) {
+				}
+				Logger.debug(response);
+				if (response.contains("error")) {
+					break;
+				}
+			}
+		} catch (SocketTimeoutException e) {
+			Logger.error("[SECURE EXCHANGE] - socket timeout");
+			Logger.error(e);
+			removeServerFromList(server, true);
 		} catch (UnknownHostException e) {
 			Logger.error("Don't know about host " + server.hostname);
-			Logger.debug(String.format("EXCHANGE: removing %s from server list", server.hostname));
-			Storage.serverList.remove(index);
+			Logger.error(e);
+			removeServerFromList(server, true);
+		} catch (IOException e) {
+			Logger.error("Couldn't get I/O for the connection to " + server.hostname);
+			Logger.error(e);
+			removeServerFromList(server, true);
+		}
+	}
+
+	/**
+	 * Helper method to check whether exchange server is secure or not
+	 * 
+	 * @return true if server is secure, otherwise server is not secure
+	 */
+	private boolean isSecureServer(Server server) {
+		boolean isValid = false;
+		SSLContext sslContext = null;
+		try (InputStream keyStoreInput = Thread.currentThread().getContextClassLoader()
+				.getResourceAsStream(Constant.CLIENT_KEYSTORE_KEY);
+				InputStream trustStoreInput = Thread.currentThread().getContextClassLoader()
+						.getResourceAsStream(Constant.CLIENT_TRUSTSTORE_KEY);) {
+			sslContext = Utilities.setSSLFactories(keyStoreInput, Constant.KEYSTORE_PASSWORD, trustStoreInput);
+		} catch (Exception e) {
+			Logger.error(e);
+		}
+		SSLSocketFactory sslsocketfactory = (SSLSocketFactory) sslContext.getSocketFactory();
+		try (SSLSocket socket = (SSLSocket) sslsocketfactory.createSocket(server.hostname, server.port)) {
+			isValid = true; // if there's no exception then server is secure
+		} catch (SocketTimeoutException e) {
+			Logger.error("[SECURE EXCHANGE] - socket timeout");
+			Logger.error(e);
+		} catch (UnknownHostException e) {
+			Logger.error("Don't know about host " + server.hostname);
 			Logger.error(e);
 		} catch (IOException e) {
 			Logger.error("Couldn't get I/O for the connection to " + server.hostname);
-			Logger.debug(String.format("EXCHANGE: removing %s from server list", server.hostname));
-			Storage.serverList.remove(index);
+			Logger.error(e);
+		}
+		
+		return isValid;
+	}
+
+	private void removeServerFromList(Server server, boolean isSecure) {
+		Logger.debug(String.format("[EXCHANGE]: removing %s from server list", server.hostname));
+		try {
+			if (isSecure) {
+				Storage.secureServerList.remove(server);
+			} else {
+				Storage.serverList.remove(server);
+			}
+		} catch (Exception e) {
 			Logger.error(e);
 		}
 	}
