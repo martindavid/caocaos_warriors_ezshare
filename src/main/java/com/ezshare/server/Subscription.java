@@ -85,7 +85,7 @@ public class Subscription {
 	 */
 	public void unsubscribe() {
 		try {
-			if (isSecure) {
+			if (this.isSecure) {
 				SecureSubscriber subscriber = Storage.secureSubscriber.stream().filter(x -> x.id.equals(message.id))
 						.findAny().orElse(null);
 				Resource resTemplate = subscriber.subscribeTemplate;
@@ -138,8 +138,9 @@ public class Subscription {
 	 *            new resource that come from publish/share command
 	 */
 	public void notifySubscriber(Resource resource) {
-		if (isSecure) {
+		if (this.isSecure) {
 			for (SecureSubscriber subscriber : Storage.secureSubscriber) {
+				Logger.debug(String.format("Notify subscriber %s", subscriber.id));
 				if (Utilities.isResourceMatch(resource, subscriber.subscribeTemplate)) {
 					Resource newres = new Resource(resource);
 					if (!resource.owner.isEmpty()) {
@@ -157,6 +158,7 @@ public class Subscription {
 			}
 		} else {
 			for (Subscriber subscriber : Storage.subscriber) {
+				Logger.debug(String.format("Notify subscriber %s", subscriber.id));
 				if (Utilities.isResourceMatch(resource, subscriber.subscribeTemplate)) {
 					Resource newres = new Resource(resource);
 					if (!resource.owner.isEmpty()) {

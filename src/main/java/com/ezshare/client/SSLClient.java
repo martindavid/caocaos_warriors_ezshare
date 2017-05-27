@@ -53,8 +53,73 @@ public class SSLClient {
 			Logger.debug("Setting Debug On");
 			Logger.debug("[SENT]:" + message.toJson());
 
-			transferMessage(streamOut);
-			receiveMessage(streamIn, streamOut);
+			streamOut.writeUTF(message.toJson());
+
+			String response = "";
+			String string = "";
+
+			boolean exitLoop = false;
+
+			if (message.command.equals(Constant.FETCH.toUpperCase())) {
+
+				while (true) {
+					if ((string = DataInputStream.readUTF(streamIn)) != null) {
+						response = string;
+					}
+
+					Logger.debug(response);
+					Responses serverResponse = Utilities.convertJsonToObject(response, Responses.class);
+
+					// Only fetch the file the response is not an error
+					if (!serverResponse.response.equals(Constant.ERROR)) {
+						// Receiving the file
+						fileTransfer = new FileTransfer(streamIn);
+						fileTransfer.download();
+					}
+					exitLoop = true;
+
+					if (exitLoop) {
+						break;
+					}
+				}
+			} else if (message.command.equals(Constant.SUBSCRIBE.toUpperCase())) {
+				while (System.in.available() == 0) {
+					if ((response = DataInputStream.readUTF(streamIn)) != null) {
+						Logger.info(response);
+						if (response.contains("error")) {
+							break;
+						}
+					}
+				}
+
+				UnsubscribeMessage unmessage = new UnsubscribeMessage(message.id);
+				streamOut.writeUTF(unmessage.toJson());
+				while (true) {
+					if ((response = DataInputStream.readUTF(streamIn)) != null) {
+						Logger.info(response);
+					}
+					if ((!message.command.equals(Constant.QUERY.toUpperCase())
+							&& !message.command.equals(Constant.SUBSCRIBE.toUpperCase()))
+							|| response.contains(Constant.RESULT_SIZE) || response.contains("this")) {
+						break;
+					}
+				}
+			} else {
+				while (true) {
+					if ((string = DataInputStream.readUTF(streamIn)) != null) {
+						response = string;
+					}
+					Logger.debug(response);
+
+					if (!message.command.equals(Constant.QUERY.toUpperCase())
+							|| response.contains(Constant.RESULT_SIZE)) {
+						break;
+					}
+					if (response.contains("error")) {
+						break;
+					}
+				}
+			}
 		} catch (Exception e) {
 			Logger.error(e);
 		}
@@ -62,79 +127,10 @@ public class SSLClient {
 	}
 
 	public void transferMessage(DataOutputStream streamOut) throws IOException {
-		streamOut.writeUTF(message.toJson());
+
 	}
 
 	public void receiveMessage(DataInputStream streamIn, DataOutputStream streamOut) throws IOException {
 
-		String response = "";
-		String string = "";
-
-		boolean exitLoop = false;
-
-		if (message.command.equals(Constant.FETCH.toUpperCase())) {
-
-			while (true) {
-				if ((string = DataInputStream.readUTF(streamIn)) != null) {
-					response = string;
-				}
-
-				Logger.debug(response);
-				Responses serverResponse = Utilities.convertJsonToObject(response, Responses.class);
-
-				// Only fetch the file the response is not an error
-				if (!serverResponse.response.equals(Constant.ERROR)) {
-					// Receiving the file
-					fileTransfer = new FileTransfer(streamIn);
-					fileTransfer.download();
-				}
-				exitLoop = true;
-
-				if (exitLoop) {
-					break;
-				}
-			}
-		} else if (message.command.equals(Constant.SUBSCRIBE.toUpperCase())) {
-			// always listen to server until client explicitly press
-			// ENTER
-			while (true) {
-				if (System.in.available() > 0) {
-					break;
-				}
-				if ((response = DataInputStream.readUTF(streamIn)) != null) {
-					Logger.info(response);
-					if (response.contains("error")) {
-						break;
-					}
-				}
-			}
-
-			UnsubscribeMessage unmessage = new UnsubscribeMessage(message.id);
-			streamOut.writeUTF(unmessage.toJson());
-			while (true) {
-				if ((response = DataInputStream.readUTF(streamIn)) != null) {
-					Logger.info(response);
-				}
-				if ((!message.command.equals(Constant.QUERY.toUpperCase())
-						&& !message.command.equals(Constant.SUBSCRIBE.toUpperCase()))
-						|| response.contains(Constant.RESULT_SIZE) || response.contains("this")) {
-					break;
-				}
-			}
-		} else {
-			while (true) {
-				if ((string = DataInputStream.readUTF(streamIn)) != null) {
-					response = string;
-				}
-				Logger.debug(response);
-
-				if (!message.command.equals(Constant.QUERY.toUpperCase()) || response.contains(Constant.RESULT_SIZE)) {
-					break;
-				}
-				if (response.contains("error")) {
-					break;
-				}
-			}
-		}
 	}
 }
