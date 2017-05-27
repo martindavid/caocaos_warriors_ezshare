@@ -86,19 +86,19 @@ public class SSLClient {
 			} else if (message.command.equals(Constant.SUBSCRIBE.toUpperCase())) {
 				while (System.in.available() == 0) {
 					try {
-						// Hacky way to prevent blocking operation from readUTF, 
+						// Hacky way to prevent blocking operation from readUTF,
 						// in order for app detect enter click from user
-						socket.setSoTimeout(2000); 
+						socket.setSoTimeout(2000);
 						response = streamIn.readUTF();
-					} catch(SocketTimeoutException e) {
+					} catch (SocketTimeoutException e) {
 						response = "";
-					} catch(Exception e) {
+					} catch (Exception e) {
 						Logger.error(e);
 					}
-					
+
 					if (!response.isEmpty()) {
 						Logger.info(response);
-						if (response.contains("error")) {
+						if (response.contains(Constant.ERROR)) {
 							break;
 						}
 					}
@@ -127,7 +127,7 @@ public class SSLClient {
 							|| response.contains(Constant.RESULT_SIZE)) {
 						break;
 					}
-					if (response.contains("error")) {
+					if (response.contains(Constant.ERROR)) {
 						break;
 					}
 				}
@@ -135,14 +135,6 @@ public class SSLClient {
 		} catch (Exception e) {
 			Logger.error(e);
 		}
-
-	}
-
-	public void transferMessage(DataOutputStream streamOut) throws IOException {
-
-	}
-
-	public void receiveMessage(DataInputStream streamIn, DataOutputStream streamOut) throws IOException {
 
 	}
 }
